@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { SwipeCard } from "./SwipeCard";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Moon, Sun } from "lucide-react";
@@ -41,46 +41,45 @@ export function SwipeContainer({
     console.log('Theme toggled to:', newDarkMode ? 'dark' : 'light');
   };
 
-  const nextCard = () => {
-    if (currentIndex < snippets.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      console.log('Next card:', currentIndex + 1);
-    } else {
-      // Loop back to first card
-      setCurrentIndex(0);
-      console.log('Looped back to first card');
-    }
-  };
+  const nextCard = useCallback(() => {
+    setCurrentIndex((current) => {
+      const next = current < snippets.length - 1 ? current + 1 : 0;
+      console.log('Next card:', next);
+      return next;
+    });
+  }, [snippets.length]);
 
-  const previousCard = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      console.log('Previous card:', currentIndex - 1);
-    } else {
-      // Loop to last card
-      setCurrentIndex(snippets.length - 1);
-      console.log('Looped to last card');
-    }
-  };
+  const previousCard = useCallback(() => {
+    setCurrentIndex((current) => {
+      const prev = current > 0 ? current - 1 : snippets.length - 1;
+      console.log('Previous card:', prev);
+      return prev;
+    });
+  }, [snippets.length]);
 
   // Touch/swipe handlers
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
     setStartY(e.touches[0].clientY);
-  };
+    console.log('Touch start at:', e.touches[0].clientY);
+  }, []);
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     const endY = e.changedTouches[0].clientY;
     const deltaY = startY - endY;
     const threshold = 50;
 
+    console.log('Touch end - startY:', startY, 'endY:', endY, 'deltaY:', deltaY);
+
     if (Math.abs(deltaY) > threshold) {
       if (deltaY > 0) {
+        console.log('Swiping up - next card');
         nextCard();
       } else {
+        console.log('Swiping down - previous card');
         previousCard();
       }
     }
-  };
+  }, [startY, nextCard, previousCard]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -98,7 +97,7 @@ export function SwipeContainer({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex]);
+  }, [nextCard, previousCard, onBack]);
 
   if (!snippets.length) {
     return (
