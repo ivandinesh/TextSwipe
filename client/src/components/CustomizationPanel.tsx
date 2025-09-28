@@ -18,12 +18,20 @@ const BACKGROUND_OPTIONS = [
   { name: "Purple", value: "purple", class: "bg-purple-900" },
   { name: "Green", value: "green", class: "bg-green-900" },
   { name: "Orange", value: "orange", class: "bg-orange-900" },
+  { name: "Pink", value: "pink", class: "bg-pink-900" },
+  { name: "Teal", value: "teal", class: "bg-teal-900" },
+  { name: "Red", value: "red", class: "bg-red-900" },
+  { name: "Indigo", value: "indigo", class: "bg-indigo-900" },
+  { name: "Slate", value: "slate", class: "bg-slate-900" },
+  { name: "Emerald", value: "emerald", class: "bg-emerald-900" },
 ];
 
 const FONT_OPTIONS = [
   { name: "Inter", value: "font-sans" },
   { name: "Serif", value: "font-serif" },
   { name: "Mono", value: "font-mono" },
+  { name: "Cursive", value: "font-cursive" },
+  { name: "Display", value: "font-display" },
 ];
 
 export function CustomizationPanel({ 
@@ -84,7 +92,7 @@ export function CustomizationPanel({
             <h3 className="font-medium">Background</h3>
           </div>
           
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-4 gap-2">
             {BACKGROUND_OPTIONS.map((bg) => (
               <button
                 key={bg.value}

@@ -127,6 +127,36 @@ export function SwipeLearn() {
     console.log('Returned to topic selection');
   };
 
+  const handleTopicChange = async (newTopic: string) => {
+    console.log('Handling topic change to:', newTopic);
+    setCurrentTopic(newTopic);
+    setCurrentView('loading');
+    
+    try {
+      const response = await fetch('/api/generate-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic: newTopic, count: 5 }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.snippets) {
+          setLearningSnippets(data.snippets);
+          setCurrentView('learning');
+          console.log('Successfully generated content for new topic:', newTopic);
+        } else {
+          throw new Error(data.error || 'Failed to generate content');
+        }
+      } else {
+        throw new Error('Network response was not ok');
+      }
+    } catch (error) {
+      console.error('Error changing topic:', error);
+      setCurrentView('input');
+    }
+  };
+
   const handleLike = (content: string) => {
     const updatedLiked = likedSnippets.includes(content) 
       ? likedSnippets.filter(snippet => snippet !== content)
@@ -189,6 +219,7 @@ export function SwipeLearn() {
           mode={currentMode}
           onBack={handleBack}
           onLike={handleLike}
+          onTopicChange={handleTopicChange}
         />
       )}
     </div>

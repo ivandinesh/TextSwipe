@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { SwipeCard } from "./SwipeCard";
 import { CustomizationPanel } from "./CustomizationPanel";
+import { RelatedTopicsPanel } from "./RelatedTopicsPanel";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Moon, Sun, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,6 +12,7 @@ interface SwipeContainerProps {
   mode: 'ai' | 'demo';
   onBack: () => void;
   onLike?: (content: string) => void;
+  onTopicChange?: (newTopic: string) => void;
   className?: string;
 }
 
@@ -20,12 +22,15 @@ export function SwipeContainer({
   mode,
   onBack, 
   onLike,
+  onTopicChange,
   className 
 }: SwipeContainerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [startY, setStartY] = useState(0);
+  const [startX, setStartX] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showCustomization, setShowCustomization] = useState(false);
+  const [showRelatedTopics, setShowRelatedTopics] = useState(false);
   const [allSnippets, setAllSnippets] = useState<string[]>(snippets);
   const [isLoading, setIsLoading] = useState(false);
   const [backgroundStyle, setBackgroundStyle] = useState("dark");
@@ -107,20 +112,35 @@ export function SwipeContainer({
     });
   }, [allSnippets.length]);
 
-  // Touch/swipe handlers
+  // Touch/swipe handlers with horizontal detection
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     setStartY(e.touches[0].clientY);
-    console.log('Touch start at:', e.touches[0].clientY);
+    setStartX(e.touches[0].clientX);
+    console.log('Touch start at Y:', e.touches[0].clientY, 'X:', e.touches[0].clientX);
   }, []);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     const endY = e.changedTouches[0].clientY;
+    const endX = e.changedTouches[0].clientX;
     const deltaY = startY - endY;
+    const deltaX = startX - endX;
     const threshold = 50;
 
-    console.log('Touch end - startY:', startY, 'endY:', endY, 'deltaY:', deltaY);
+    console.log('Touch end - startY:', startY, 'endY:', endY, 'deltaY:', deltaY, 'deltaX:', deltaX);
 
-    if (Math.abs(deltaY) > threshold) {
+    // Check if horizontal swipe is more dominant than vertical
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > threshold) {
+      if (deltaX > 0) {
+        // Swiped left - show customization
+        setShowCustomization(true);
+        console.log('Left swipe detected - showing customization');
+      } else {
+        // Swiped right - show related topics
+        setShowRelatedTopics(true);
+        console.log('Right swipe detected - showing related topics');
+      }
+    } else if (Math.abs(deltaY) > threshold) {
+      // Vertical swipe for navigation
       if (deltaY > 0) {
         console.log('Swiping up - next card');
         nextCard();
@@ -129,7 +149,7 @@ export function SwipeContainer({
         previousCard();
       }
     }
-  }, [startY, nextCard, previousCard]);
+  }, [startY, startX, nextCard, previousCard]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -157,6 +177,12 @@ export function SwipeContainer({
       case 'purple': return 'bg-gradient-to-br from-purple-900 to-purple-800';
       case 'green': return 'bg-gradient-to-br from-green-900 to-green-800';
       case 'orange': return 'bg-gradient-to-br from-orange-900 to-orange-800';
+      case 'pink': return 'bg-gradient-to-br from-pink-900 to-pink-800';
+      case 'teal': return 'bg-gradient-to-br from-teal-900 to-teal-800';
+      case 'red': return 'bg-gradient-to-br from-red-900 to-red-800';
+      case 'indigo': return 'bg-gradient-to-br from-indigo-900 to-indigo-800';
+      case 'slate': return 'bg-gradient-to-br from-slate-900 to-slate-800';
+      case 'emerald': return 'bg-gradient-to-br from-emerald-900 to-emerald-800';
       default: return 'bg-gray-900';
     }
   };
@@ -250,6 +276,7 @@ export function SwipeContainer({
       {/* Swipe Instruction Hint */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center text-sm text-white/60 md:hidden">
         <p>Swipe up/down to navigate</p>
+        <p className="text-xs mt-1 opacity-80">Swipe left for settings • Swipe right for topics</p>
       </div>
 
       {/* Customization Panel */}
@@ -258,6 +285,17 @@ export function SwipeContainer({
         onClose={() => setShowCustomization(false)}
         onBackgroundChange={setBackgroundStyle}
         onFontChange={setFontClass}
+      />
+
+      {/* Related Topics Panel */}
+      <RelatedTopicsPanel
+        isOpen={showRelatedTopics}
+        onClose={() => setShowRelatedTopics(false)}
+        currentTopic={topic}
+        onTopicSelect={(newTopic) => {
+          onTopicChange?.(newTopic);
+          console.log('New topic selected from related topics:', newTopic);
+        }}
       />
     </div>
   );

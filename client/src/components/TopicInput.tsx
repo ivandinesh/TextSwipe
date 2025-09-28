@@ -20,6 +20,10 @@ const RANDOM_TOPICS = [
   "Math concepts",
   "Cooking techniques",
   "Science experiments",
+  "Machine Learning",
+  "Cryptocurrency",
+  "Climate Change",
+  "Psychology facts"
 ];
 
 export function TopicInput({ onSubmit, isLoading = false, className }: TopicInputProps) {
@@ -36,8 +40,9 @@ export function TopicInput({ onSubmit, isLoading = false, className }: TopicInpu
   const handleRandomTopic = () => {
     const randomTopic = RANDOM_TOPICS[Math.floor(Math.random() * RANDOM_TOPICS.length)];
     setTopic(randomTopic);
-    onSubmit(randomTopic, selectedMode);
-    console.log('Random topic selected:', randomTopic);
+    // Force AI mode for random topics to ensure content generation
+    onSubmit(randomTopic, 'ai');
+    console.log('Random topic selected:', randomTopic, 'Mode: ai');
   };
 
   return (
@@ -121,7 +126,9 @@ export function TopicInput({ onSubmit, isLoading = false, className }: TopicInpu
               className="cursor-pointer hover-elevate"
               onClick={() => {
                 setTopic(suggestedTopic);
-                onSubmit(suggestedTopic, selectedMode);
+                // Force AI mode for popular topics to ensure content generation
+                onSubmit(suggestedTopic, 'ai');
+                console.log('Popular topic selected:', suggestedTopic, 'Mode: ai');
               }}
               data-testid={`badge-topic-${index}`}
             >
