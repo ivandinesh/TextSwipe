@@ -73,20 +73,47 @@ export function SwipeLearn() {
         
         setLearningSnippets(snippets);
       } else {
-        // AI mode - placeholder for now
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        setLearningSnippets([
-          "AI-generated content would appear here when OpenAI API key is configured.",
-          "This feature requires backend integration with OpenAI's API.",
-          "For now, try Demo Mode to see the full learning experience!",
-        ]);
+        // AI mode - call backend API
+        const response = await fetch('/api/generate-content', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            topic, 
+            count: 5 
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success && data.snippets) {
+          setLearningSnippets(data.snippets);
+        } else {
+          throw new Error(data.error || 'Failed to generate content');
+        }
       }
       
       setCurrentView('learning');
     } catch (error) {
       console.error('Error loading content:', error);
-      // Fallback to demo content
-      setLearningSnippets(DEMO_CONTENT["python basics"]);
+      
+      // Show error message but still provide fallback content
+      const errorSnippet = mode === 'ai' 
+        ? "⚠️ Could not generate AI content. Please check your connection and try again."
+        : "⚠️ Could not load demo content. Please try again.";
+      
+      // Fallback to demo content with error message
+      const fallbackSnippets = [
+        errorSnippet,
+        ...DEMO_CONTENT["python basics"].slice(1)
+      ];
+      
+      setLearningSnippets(fallbackSnippets);
       setCurrentView('learning');
     }
   };
