@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, ChevronUp, ChevronDown } from "lucide-react";
+import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SwipeCardProps {
@@ -83,29 +83,8 @@ export function SwipeCard({
           ))}
         </div>
 
-        {/* Navigation Buttons (Desktop) */}
-        <div className="hidden md:flex flex-col gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onPrevious}
-            disabled={index === 0}
-            className="h-10 w-10 rounded-full bg-card/80 backdrop-blur-sm"
-            data-testid="button-previous"
-          >
-            <ChevronUp className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onNext}
-            disabled={index === total - 1}
-            className="h-10 w-10 rounded-full bg-card/80 backdrop-blur-sm"
-            data-testid="button-next"
-          >
-            <ChevronDown className="h-5 w-5" />
-          </Button>
-        </div>
+        {/* Empty space for symmetry */}
+        <div className="w-12"></div>
       </div>
     </div>
   );

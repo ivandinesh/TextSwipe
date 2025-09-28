@@ -38,12 +38,14 @@ const DEMO_CONTENT: Record<string, string[]> = {
 export function SwipeLearn() {
   const [currentView, setCurrentView] = useState<'input' | 'loading' | 'learning'>('input');
   const [currentTopic, setCurrentTopic] = useState('');
+  const [currentMode, setCurrentMode] = useState<'ai' | 'demo'>('demo');
   const [learningSnippets, setLearningSnippets] = useState<string[]>([]);
   const [likedSnippets, setLikedSnippets] = useState<string[]>([]);
 
   const handleTopicSubmit = async (topic: string, mode: 'ai' | 'demo') => {
     console.log('Topic submitted:', topic, 'Mode:', mode);
     setCurrentTopic(topic);
+    setCurrentMode(mode);
     setCurrentView('loading');
 
     try {
@@ -184,6 +186,7 @@ export function SwipeLearn() {
         <SwipeContainer
           snippets={learningSnippets}
           topic={currentTopic}
+          mode={currentMode}
           onBack={handleBack}
           onLike={handleLike}
         />

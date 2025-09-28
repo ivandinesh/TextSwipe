@@ -15,6 +15,7 @@ export default function SwipeContainerExample() {
       <SwipeContainer
         snippets={mockSnippets}
         topic="JavaScript Basics"
+        mode="demo"
         onBack={() => console.log('Back button pressed')}
         onLike={(content) => console.log('Liked content:', content.substring(0, 50) + '...')}
       />
