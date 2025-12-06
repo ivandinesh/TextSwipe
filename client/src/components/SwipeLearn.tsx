@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TopicInput } from "./TopicInput";
 import { SwipeContainer } from "./SwipeContainer";
 import { LoadingScreen } from "./LoadingScreen";
@@ -170,16 +170,17 @@ export function SwipeLearn() {
   };
 
   // Load liked snippets on mount
-  useState(() => {
+  useEffect(() => {
     const saved = localStorage.getItem('swipelearn-liked');
     if (saved) {
       try {
         setLikedSnippets(JSON.parse(saved));
+        console.log('Loaded liked snippets from localStorage:', JSON.parse(saved).length);
       } catch (error) {
         console.error('Error loading liked snippets:', error);
       }
     }
-  });
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
