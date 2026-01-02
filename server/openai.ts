@@ -1,71 +1,124 @@
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Using OpenRouter API with OpenAI SDK
-// the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY,
-  baseURL: "https://openrouter.ai/api/v1"
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+if (!GEMINI_API_KEY) {
+  throw new Error("❌ GEMINI_API_KEY is not defined. Check PM2 environment config.");
+}
+
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+
+/**
+ * Gemini model configuration
+ * - flash = fast + cheap
+ * - temperature low → consistent output
+ */
+const model = genAI.getGenerativeModel({
+  model: "gemini-2.5-flash",
+  generationConfig: {
+    temperature: 0.4,
+    maxOutputTokens: 800,
+    responseMimeType: "application/json",
+  },
 });
 
-export async function generateLearningSnippets(topic: string, count: number = 5): Promise<string[]> {
+/**
+ * Hard timeout wrapper to avoid stuck requests
+ */
+function withTimeout<T>(promise: Promise<T>, ms = 15_000): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error("Gemini request timed out")),
+      ms
+    );
+
+    promise
+      .then((res) => {
+        clearTimeout(timer);
+        resolve(res);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+}
+
+/**
+ * Generates bite-sized learning snippets
+ */
+export async function generateLearningSnippets(
+  topic: string,
+  count = 5
+): Promise<string[]> {
   try {
-    const prompt = `Create ${count} educational snippets about "${topic}". Each snippet should be:
-- A single, concise learning point (1-2 sentences)
-- Easy to understand and memorable
-- Perfect for mobile learning (like TikTok-style quick lessons)
-- Practical and actionable when possible
-
-Return the snippets as a JSON array of strings.
-
-Example format:
-["First learning snippet about the topic", "Second learning snippet with practical info", ...]`;
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Using a reliable model available on OpenRouter
-      messages: [
-        {
-          role: "system",
-          content: "You are an expert educator who creates bite-sized learning content optimized for mobile consumption."
-        },
-        {
-          role: "user", 
-          content: prompt
-        }
-      ],
-      response_format: { type: "json_object" },
-    });
-
-    const content = response.choices[0].message.content;
-    if (!content) {
-      throw new Error("No content generated");
+    if (!topic || topic.trim().length === 0) {
+      throw new Error("Topic is required");
     }
 
-    // Parse the JSON response
-    const parsed = JSON.parse(content);
-    
-    // Handle different possible response formats
-    if (Array.isArray(parsed)) {
-      return parsed.slice(0, count);
-    } else if (parsed.snippets && Array.isArray(parsed.snippets)) {
-      return parsed.snippets.slice(0, count);
-    } else if (parsed.lessons && Array.isArray(parsed.lessons)) {
-      return parsed.lessons.slice(0, count);
-    } else {
-      // Fallback: extract values from object
-      const values = Object.values(parsed).filter(val => typeof val === 'string');
-      return values.slice(0, count) as string[];
+    const prompt = `
+You are an expert educator creating short-form mobile learning content.
+
+TASK:
+Create exactly ${count} learning snippets about: "${topic}"
+
+RULES:
+- Each snippet must be 1–2 sentences
+- Clear, practical, and memorable
+- No emojis
+- No markdown
+- No numbering
+- No explanations outside the array
+
+OUTPUT FORMAT (STRICT JSON ONLY):
+{
+  "snippets": [
+    "First snippet",
+    "Second snippet"
+  ]
+}
+`;
+
+    const result = await withTimeout(
+      model.generateContent(prompt)
+    );
+
+    const text = result.response.text();
+
+    if (!text) {
+      throw new Error("Empty response from Gemini");
     }
+
+    let parsed: unknown;
+
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      throw new Error("Invalid JSON returned by Gemini");
+    }
+
+    if (
+      typeof parsed === "object" &&
+      parsed !== null &&
+      "snippets" in parsed &&
+      Array.isArray((parsed as any).snippets)
+    ) {
+      return (parsed as any).snippets.slice(0, count);
+    }
+
+    throw new Error("Unexpected Gemini response shape");
 
   } catch (error) {
-    console.error('Error generating learning snippets:', error);
-    
-    // Fallback content if AI fails
+    console.error("❌ Gemini generation failed:", error instanceof Error ? error.message : error);
+
+    // Safe fallback (never break user flow)
     return [
-      `Learn about ${topic}: This topic covers fundamental concepts and practical applications.`,
-      `Key insight: ${topic} involves understanding core principles that build upon each other.`,
-      `Practice tip: Apply ${topic} concepts in small, manageable steps for better retention.`,
-      `Remember: ${topic} becomes easier with consistent practice and real-world application.`,
-      `Expert advice: Focus on understanding the 'why' behind ${topic} concepts, not just memorizing facts.`
+      `${topic}: Learn the core idea and why it matters.`,
+      `Key insight: ${topic} works best when understood conceptually, not memorized.`,
+      `Practical tip: Apply ${topic} in small, real examples.`,
+      `Remember: Consistency beats intensity when learning ${topic}.`,
+      `Expert advice: Focus on fundamentals before advanced ${topic} concepts.`,
     ];
   }
 }
+
