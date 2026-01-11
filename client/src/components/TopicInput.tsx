@@ -6,84 +6,75 @@ import { Shuffle, Sparkles, Book } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TopicInputProps {
-  onSubmit: (topic: string, mode: 'ai' | 'demo') => void;
+  onSubmit: (topic: string) => void;
   isLoading?: boolean;
   className?: string;
 }
 
-const RANDOM_TOPICS = [
-  "Python basics",
-  "Italian recipes", 
-  "Space facts",
-  "Photography tips",
-  "History trivia",
-  "Math concepts",
-  "Cooking techniques",
-  "Science experiments",
-  "Machine Learning",
-  "Cryptocurrency",
-  "Climate Change",
-  "Psychology facts"
+// Popular and catchy topics for FocusFeed
+const POPULAR_TOPICS = [
+  "Quantum Computing",
+  "Neuroplasticity",
+  "Dark Matter",
+  "Biohacking",
+  "Blockchain",
+  "AI Ethics",
+  "Space Colonization",
+  "Cryptography",
+  "Genetic Engineering",
+  "Renewable Energy",
+  "Consciousness",
+  "Time Dilation"
+];
+
+// Surprising and lesser-known topics
+const SURPRISE_TOPICS = [
+  "The Science of Lucid Dreaming",
+  "How Fungi Control Our Minds",
+  "The Mystery of Dark Flow",
+  "Quantum Biology in Birds",
+  "The Hidden World of Soil",
+  "The Physics of Black Holes",
+  "The Secret Life of Plants",
+  "The Science of Synesthesia",
+  "The Mystery of Ball Lightning",
+  "The Hidden Universe of Microbes",
+  "The Science of Déjà Vu",
+  "The Mystery of Dark Energy"
 ];
 
 export function TopicInput({ onSubmit, isLoading = false, className }: TopicInputProps) {
   const [topic, setTopic] = useState("");
-  const [selectedMode, setSelectedMode] = useState<'ai' | 'demo'>('demo');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (topic.trim()) {
-      onSubmit(topic.trim(), selectedMode);
+      onSubmit(topic.trim());
     }
   };
 
   const handleRandomTopic = () => {
-    const randomTopic = RANDOM_TOPICS[Math.floor(Math.random() * RANDOM_TOPICS.length)];
+    const randomTopic = POPULAR_TOPICS[Math.floor(Math.random() * POPULAR_TOPICS.length)];
     setTopic(randomTopic);
-    // Force AI mode for random topics to ensure content generation
-    onSubmit(randomTopic, 'ai');
-    console.log('Random topic selected:', randomTopic, 'Mode: ai');
+    onSubmit(randomTopic);
+    console.log('Random topic selected:', randomTopic);
+  };
+
+  const handleSurpriseTopic = () => {
+    const surpriseTopic = SURPRISE_TOPICS[Math.floor(Math.random() * SURPRISE_TOPICS.length)];
+    setTopic(surpriseTopic);
+    onSubmit(surpriseTopic);
+    console.log('Surprise topic selected:', surpriseTopic);
   };
 
   return (
     <div className={cn("w-full max-w-md mx-auto space-y-6", className)}>
-      {/* Mode Selection */}
-      <div className="space-y-3">
-        <p className="text-sm font-medium text-muted-foreground">Choose your learning mode:</p>
-        <div className="flex gap-3">
-          <Button
-            variant={selectedMode === 'demo' ? "default" : "outline"}
-            onClick={() => setSelectedMode('demo')}
-            className="flex-1 gap-2"
-            data-testid="button-mode-demo"
-          >
-            <Book className="h-4 w-4" />
-            Demo Mode
-          </Button>
-          <Button
-            variant={selectedMode === 'ai' ? "default" : "outline"}
-            onClick={() => setSelectedMode('ai')}
-            className="flex-1 gap-2"
-            data-testid="button-mode-ai"
-          >
-            <Sparkles className="h-4 w-4" />
-            AI Mode
-          </Button>
-        </div>
-        
-        {selectedMode === 'ai' && (
-          <Badge variant="secondary" className="w-full justify-center py-2">
-            Requires OpenAI API key
-          </Badge>
-        )}
-      </div>
-
-      {/* Topic Input Form */}
+      {/* FocusFeed Input Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Input
             type="text"
-            placeholder="What do you want to learn? (e.g., Python basics)"
+            placeholder="What do you want to focus on? (e.g., Quantum Computing)"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             disabled={isLoading}
@@ -97,42 +88,42 @@ export function TopicInput({ onSubmit, isLoading = false, className }: TopicInpu
             type="submit"
             disabled={!topic.trim() || isLoading}
             className="flex-1"
-            data-testid="button-start-learning"
+            data-testid="button-start-focusing"
           >
-            {isLoading ? "Loading..." : "Start Learning"}
+            {isLoading ? "Loading..." : "Start Focusing"}
           </Button>
-          
+
           <Button
             type="button"
             variant="outline"
-            onClick={handleRandomTopic}
+            onClick={handleSurpriseTopic}
             disabled={isLoading}
-            size="icon"
-            data-testid="button-random-topic"
+            className="flex-1 gap-2"
+            data-testid="button-surprise-me"
           >
-            <Shuffle className="h-4 w-4" />
+            <Sparkles className="h-4 w-4" />
+            Surprise Me
           </Button>
         </div>
       </form>
 
-      {/* Quick Topic Suggestions */}
+      {/* Popular Topics */}
       <div className="space-y-3">
-        <p className="text-sm font-medium text-muted-foreground">Or try these popular topics:</p>
+        <p className="text-sm font-medium text-muted-foreground">Popular Focus Topics:</p>
         <div className="flex flex-wrap gap-2">
-          {RANDOM_TOPICS.slice(0, 4).map((suggestedTopic, index) => (
+          {POPULAR_TOPICS.slice(0, 6).map((popularTopic, index) => (
             <Badge
               key={index}
               variant="outline"
-              className="cursor-pointer hover-elevate"
+              className="cursor-pointer hover:bg-primary/10"
               onClick={() => {
-                setTopic(suggestedTopic);
-                // Force AI mode for popular topics to ensure content generation
-                onSubmit(suggestedTopic, 'ai');
-                console.log('Popular topic selected:', suggestedTopic, 'Mode: ai');
+                setTopic(popularTopic);
+                onSubmit(popularTopic);
+                console.log('Popular topic selected:', popularTopic);
               }}
-              data-testid={`badge-topic-${index}`}
+              data-testid={`badge-popular-${index}`}
             >
-              {suggestedTopic}
+              {popularTopic}
             </Badge>
           ))}
         </div>

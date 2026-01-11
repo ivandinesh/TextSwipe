@@ -34,33 +34,33 @@ const FONT_OPTIONS = [
   { name: "Display", value: "font-display" },
 ];
 
-export function CustomizationPanel({ 
-  isOpen, 
-  onClose, 
+export function CustomizationPanel({
+  isOpen,
+  onClose,
   onBackgroundChange,
-  onFontChange 
+  onFontChange
 }: CustomizationPanelProps) {
   const [selectedBackground, setSelectedBackground] = useState("dark");
   const [selectedFont, setSelectedFont] = useState("font-sans");
 
   useEffect(() => {
     // Load saved preferences
-    const savedBg = localStorage.getItem('swipelearn-background') || 'dark';
-    const savedFont = localStorage.getItem('swipelearn-font') || 'font-sans';
+    const savedBg = localStorage.getItem('focusfeed-background') || 'dark';
+    const savedFont = localStorage.getItem('focusfeed-font') || 'font-sans';
     setSelectedBackground(savedBg);
     setSelectedFont(savedFont);
   }, []);
 
   const handleBackgroundSelect = (bgOption: typeof BACKGROUND_OPTIONS[0]) => {
     setSelectedBackground(bgOption.value);
-    localStorage.setItem('swipelearn-background', bgOption.value);
+    localStorage.setItem('focusfeed-background', bgOption.value);
     onBackgroundChange(bgOption.value);
     console.log('Background changed to:', bgOption.value);
   };
 
   const handleFontSelect = (fontOption: typeof FONT_OPTIONS[0]) => {
     setSelectedFont(fontOption.value);
-    localStorage.setItem('swipelearn-font', fontOption.value);
+    localStorage.setItem('focusfeed-font', fontOption.value);
     onFontChange(fontOption.value);
     console.log('Font changed to:', fontOption.value);
   };
@@ -68,8 +68,8 @@ export function CustomizationPanel({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-card rounded-lg p-6 w-full max-w-md border">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-card rounded-lg p-6 w-full max-w-md border" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
@@ -80,8 +80,9 @@ export function CustomizationPanel({
             size="icon"
             onClick={onClose}
             data-testid="button-close-customization"
+            className="md:p-2 p-3 md:h-8 md:w-8 h-10 w-10"
           >
-            <X className="h-4 w-4" />
+            <X className="md:h-4 md:w-4 h-5 w-5" />
           </Button>
         </div>
 
@@ -91,7 +92,7 @@ export function CustomizationPanel({
             <Palette className="h-4 w-4" />
             <h3 className="font-medium">Background</h3>
           </div>
-          
+
           <div className="grid grid-cols-4 gap-2">
             {BACKGROUND_OPTIONS.map((bg) => (
               <button
@@ -107,8 +108,8 @@ export function CustomizationPanel({
                 data-testid={`button-background-${bg.value}`}
               >
                 <div className="absolute bottom-1 left-1 right-1">
-                  <Badge 
-                    variant="secondary" 
+                  <Badge
+                    variant="secondary"
                     className="text-xs w-full justify-center"
                   >
                     {bg.name}
@@ -125,7 +126,7 @@ export function CustomizationPanel({
             <Type className="h-4 w-4" />
             <h3 className="font-medium">Font</h3>
           </div>
-          
+
           <div className="space-y-2">
             {FONT_OPTIONS.map((font) => (
               <button

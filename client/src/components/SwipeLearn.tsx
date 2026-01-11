@@ -3,87 +3,33 @@ import { TopicInput } from "./TopicInput";
 import { SwipeContainer } from "./SwipeContainer";
 import { LoadingScreen } from "./LoadingScreen";
 
-//todo: remove mock functionality
-const DEMO_CONTENT: Record<string, string[]> = {
-  "python basics": [
-    "Python is an interpreted, high-level programming language known for its readable syntax and versatility.",
-    "Variables in Python don't need type declarations. You can simply assign values: name = 'Alice', age = 25.",
-    "Python uses indentation to define code blocks instead of curly braces. This makes code more readable and consistent.",
-    "Lists in Python are ordered, changeable collections: fruits = ['apple', 'banana', 'cherry'].",
-    "Python's 'for' loops can iterate over any sequence: for fruit in fruits: print(fruit)."
-  ],
-  "italian recipes": [
-    "Authentic Italian pasta should be cooked 'al dente' - firm to the bite, usually 1-2 minutes less than package directions.",
-    "The key to perfect risotto is gradually adding warm broth while stirring constantly to release the rice's starch.",
-    "Pizza dough needs to rest for at least 24 hours in the refrigerator for the best flavor and texture.",
-    "Real Carbonara uses only eggs, Pecorino Romano, guanciale, and black pepper - no cream or peas!",
-    "Italian tomato sauce is simple: San Marzano tomatoes, garlic, basil, and good olive oil. Less is more."
-  ],
-  "space facts": [
-    "A day on Venus is longer than its year. Venus rotates so slowly that one day (243 Earth days) exceeds its orbital period (225 Earth days).",
-    "The largest volcano in our solar system is Olympus Mons on Mars, standing about 21 kilometers (13 miles) high.",
-    "One teaspoon of neutron star material would weigh about 6 billion tons on Earth due to its incredible density.",
-    "The International Space Station travels at approximately 28,000 km/h (17,500 mph) and orbits Earth every 90 minutes.",
-    "Saturn's moon Titan has lakes and rivers of liquid methane and ethane, making it one of the most Earth-like worlds we know."
-  ],
-  "photography tips": [
-    "The rule of thirds: Divide your frame into 9 sections and place important elements along these lines or at their intersections.",
-    "Golden hour occurs one hour after sunrise and one hour before sunset, providing soft, warm light perfect for portraits.",
-    "A lower f-stop number (like f/1.8) creates a shallow depth of field, blurring the background to make your subject pop.",
-    "ISO controls your camera's sensitivity to light. Higher ISO allows shooting in darker conditions but may add grain.",
-    "Leading lines guide the viewer's eye through your photo. Use roads, rivers, or architectural elements to create visual flow."
-  ]
-};
+interface DemoContent {
+  [key: string]: string[];
+}
+
+
 
 export function SwipeLearn() {
-  const [currentView, setCurrentView] = useState<'input' | 'loading' | 'learning'>('input');
-  const [currentTopic, setCurrentTopic] = useState('');
-  const [currentMode, setCurrentMode] = useState<'ai' | 'demo'>('demo');
+  const [currentView, setCurrentView] = useState<
+    "input" | "loading" | "learning"
+  >("input");
+  const [currentTopic, setCurrentTopic] = useState("");
   const [learningSnippets, setLearningSnippets] = useState<string[]>([]);
   const [likedSnippets, setLikedSnippets] = useState<string[]>([]);
 
-  const handleTopicSubmit = async (topic: string, mode: 'ai' | 'demo') => {
-    console.log('Topic submitted:', topic, 'Mode:', mode);
+  const handleTopicSubmit = async (topic: string) => {
+    console.log("Topic submitted:", topic);
     setCurrentTopic(topic);
-    setCurrentMode(mode);
-    setCurrentView('loading');
+    setCurrentView("loading");
 
     try {
-      if (mode === 'demo') {
-        // Simulate loading time
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        // Find matching demo content or use default
-        const normalizedTopic = topic.toLowerCase();
-        let snippets = DEMO_CONTENT[normalizedTopic];
-        
-        if (!snippets) {
-          // If no exact match, use a generic set based on topic keywords
-          if (normalizedTopic.includes('python') || normalizedTopic.includes('programming')) {
-            snippets = DEMO_CONTENT["python basics"];
-          } else if (normalizedTopic.includes('cook') || normalizedTopic.includes('recipe')) {
-            snippets = DEMO_CONTENT["italian recipes"];
-          } else if (normalizedTopic.includes('space') || normalizedTopic.includes('astronomy')) {
-            snippets = DEMO_CONTENT["space facts"];
-          } else if (normalizedTopic.includes('photo')) {
-            snippets = DEMO_CONTENT["photography tips"];
-          } else {
-            // Fallback to Python basics
-            snippets = DEMO_CONTENT["python basics"];
-          }
-        }
-        
-        setLearningSnippets(snippets);
-      } else {
         // AI mode - call backend API
-        const response = await fetch('/api/generate-content', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            topic, 
-            count: 5 
+        const response = await fetch("/api/generate-content", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            topic,
+            count: 5,
           }),
         });
 
@@ -92,50 +38,47 @@ export function SwipeLearn() {
         }
 
         const data = await response.json();
-        
+
         if (data.success && data.snippets) {
           setLearningSnippets(data.snippets);
         } else {
-          throw new Error(data.error || 'Failed to generate content');
+          throw new Error(data.error || "Failed to generate content");
         }
-      }
-      
-      setCurrentView('learning');
+
+      setCurrentView("learning");
     } catch (error) {
-      console.error('Error loading content:', error);
-      
+      console.error("Error loading content:", error);
+
       // Show error message but still provide fallback content
-      const errorSnippet = mode === 'ai' 
-        ? "⚠️ Could not generate AI content. Please check your connection and try again."
-        : "⚠️ Could not load demo content. Please try again.";
-      
+      const errorSnippet = "⚠️ Could not generate content. Please check your connection and try again.";
+
       // Fallback to demo content with error message
       const fallbackSnippets = [
         errorSnippet,
-        ...DEMO_CONTENT["python basics"].slice(1)
+        ...DEMO_CONTENT["python basics"].slice(1),
       ];
-      
+
       setLearningSnippets(fallbackSnippets);
-      setCurrentView('learning');
+      setCurrentView("learning");
     }
   };
 
   const handleBack = () => {
-    setCurrentView('input');
-    setCurrentTopic('');
+    setCurrentView("input");
+    setCurrentTopic("");
     setLearningSnippets([]);
-    console.log('Returned to topic selection');
+    console.log("Returned to topic selection");
   };
 
   const handleTopicChange = async (newTopic: string) => {
-    console.log('Handling topic change to:', newTopic);
+    console.log("Handling topic change to:", newTopic);
     setCurrentTopic(newTopic);
-    setCurrentView('loading');
-    
+    setCurrentView("loading");
+
     try {
-      const response = await fetch('/api/generate-content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/generate-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic: newTopic, count: 5 }),
       });
 
@@ -143,81 +86,86 @@ export function SwipeLearn() {
         const data = await response.json();
         if (data.success && data.snippets) {
           setLearningSnippets(data.snippets);
-          setCurrentView('learning');
-          console.log('Successfully generated content for new topic:', newTopic);
+          setCurrentView("learning");
+          console.log("Successfully generated content for new topic:", newTopic);
         } else {
-          throw new Error(data.error || 'Failed to generate content');
+          throw new Error(data.error || "Failed to generate content");
         }
       } else {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
     } catch (error) {
-      console.error('Error changing topic:', error);
-      setCurrentView('input');
+      console.error("Error changing topic:", error);
+      setCurrentView("input");
     }
   };
 
   const handleLike = (content: string) => {
-    const updatedLiked = likedSnippets.includes(content) 
-      ? likedSnippets.filter(snippet => snippet !== content)
+    const updatedLiked = likedSnippets.includes(content)
+      ? likedSnippets.filter((snippet) => snippet !== content)
       : [...likedSnippets, content];
-    
+
     setLikedSnippets(updatedLiked);
-    
+
     // Store in localStorage
-    localStorage.setItem('swipelearn-liked', JSON.stringify(updatedLiked));
+    localStorage.setItem('focusfeed-liked', JSON.stringify(updatedLiked));
     console.log('Updated liked snippets:', updatedLiked.length);
   };
 
   // Load liked snippets on mount
   useEffect(() => {
-    const saved = localStorage.getItem('swipelearn-liked');
+    const saved = localStorage.getItem('focusfeed-liked');
     if (saved) {
       try {
         setLikedSnippets(JSON.parse(saved));
-        console.log('Loaded liked snippets from localStorage:', JSON.parse(saved).length);
+        console.log(
+          "Loaded liked snippets from localStorage:",
+          JSON.parse(saved).length,
+        );
       } catch (error) {
-        console.error('Error loading liked snippets:', error);
+        console.error("Error loading liked snippets:", error);
       }
     }
   }, []);
 
   return (
     <div className="min-h-screen bg-background">
-      {currentView === 'input' && (
+      {currentView === "input" && (
         <div className="min-h-screen flex flex-col items-center justify-center p-8">
           <div className="text-center mb-8 max-w-md">
             <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              SwipeLearn
+              FocusFeed
             </h1>
             <p className="text-muted-foreground text-lg">
-              Learn like you scroll. Swipe through bite-sized lessons designed for the mobile generation.
+              Focus like never before. Dive into curated knowledge feeds designed
+              to help you concentrate and learn efficiently.
             </p>
           </div>
-          
+
           <TopicInput onSubmit={handleTopicSubmit} />
-          
+
           {likedSnippets.length > 0 && (
             <div className="mt-8 text-center">
               <p className="text-sm text-muted-foreground">
-                {likedSnippets.length} snippet{likedSnippets.length !== 1 ? 's' : ''} liked
+                {likedSnippets.length} snippet
+                {likedSnippets.length !== 1 ? "s" : ""} liked
               </p>
             </div>
           )}
         </div>
       )}
-      
-      {currentView === 'loading' && (
-        <LoadingScreen 
-          message={`Creating amazing ${currentTopic} lessons just for you...`} 
+
+      {currentView === "loading" && (
+        <LoadingScreen
+          message={`Creating amazing ${currentTopic} lessons just for you...`}
         />
       )}
-      
-      {currentView === 'learning' && (
+
+      {currentView === "learning" && (
         <SwipeContainer
           snippets={learningSnippets}
           topic={currentTopic}
-          mode={currentMode}
+          mode="ai"
           onBack={handleBack}
           onLike={handleLike}
           onTopicChange={handleTopicChange}
