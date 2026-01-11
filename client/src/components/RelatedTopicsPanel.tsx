@@ -224,5 +224,6 @@ export function RelatedTopicsPanel({
         </div>
       </div>
     </div>
+  </div>
   );
 }
