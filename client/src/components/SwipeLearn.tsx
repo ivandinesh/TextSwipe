@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { TopicInput } from "./TopicInput";
 import { SwipeContainer } from "./SwipeContainer";
 import { LoadingScreen } from "./LoadingScreen";
@@ -10,10 +11,20 @@ interface DemoContent {
 
 
 export function SwipeLearn() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [currentView, setCurrentView] = useState<
     "input" | "loading" | "learning"
-  >("input");
-  const [currentTopic, setCurrentTopic] = useState("");
+  >(() => {
+    // Check URL params for initial state
+    const params = new URLSearchParams(location.search);
+    return params.get('view') === 'learning' ? 'learning' : 'input';
+  });
+  const [currentTopic, setCurrentTopic] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('topic') || "";
+  });
   const [learningSnippets, setLearningSnippets] = useState<string[]>([]);
   const [likedSnippets, setLikedSnippets] = useState<string[]>([]);
 
@@ -21,6 +32,8 @@ export function SwipeLearn() {
     console.log("Topic submitted:", topic);
     setCurrentTopic(topic);
     setCurrentView("loading");
+    // Update URL with topic and view state
+    navigate(`?view=learning&topic=${encodeURIComponent(topic)}`);
 
     try {
         // AI mode - call backend API
@@ -67,6 +80,8 @@ export function SwipeLearn() {
     setCurrentView("input");
     setCurrentTopic("");
     setLearningSnippets([]);
+    // Update URL to reflect current state
+    navigate('?', { replace: true });
     console.log("Returned to topic selection");
   };
 
@@ -168,7 +183,11 @@ export function SwipeLearn() {
           mode="ai"
           onBack={handleBack}
           onLike={handleLike}
-          onTopicChange={handleTopicChange}
+          onTopicChange={(newTopic) => {
+            setCurrentTopic(newTopic);
+            // Update URL with new topic
+            navigate(`?view=learning&topic=${encodeURIComponent(newTopic)}`);
+          }}
         />
       )}
     </div>

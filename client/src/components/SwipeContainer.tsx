@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { SwipeCard } from "./SwipeCard";
-import { CustomizationPanel } from "./CustomizationPanel";
-import { RelatedTopicsPanel } from "./RelatedTopicsPanel";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Moon, Sun, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,45 +25,24 @@ export function SwipeContainer({
 }: SwipeContainerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [showCustomization, setShowCustomization] = useState(false);
-  const [showRelatedTopics, setShowRelatedTopics] = useState(false);
-  const [allSnippets, setAllSnippets] = useState<string[]>(snippets);
   const [isLoading, setIsLoading] = useState(false);
-  const [backgroundStyle, setBackgroundStyle] = useState<
-    | "dark"
-    | "light"
-    | "blue"
-    | "purple"
-    | "green"
-    | "orange"
-    | "pink"
-    | "teal"
-    | "red"
-    | "indigo"
-    | "slate"
-    | "emerald"
-  >("dark");
-  const [fontClass, setFontClass] = useState<string>("font-sans");
+  const [allSnippets, setAllSnippets] = useState<string[]>(snippets);
+  const [backgroundStyle, setBackgroundStyle] = useState("bg-[#FFFFFF]"); // Default: white
+  const [fontClass, setFontClass] = useState("font-sans"); // Default: Inter
+  const [textColor, setTextColor] = useState("text-[#000000]"); // Default: black
 
   // Use refs for touch coordinates to avoid async state issues
   const touchStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
-  // Initialize preferences from localStorage
+  // Initialize theme from localStorage or use defaults
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    const systemPrefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)",
-    ).matches;
-    const shouldUseDark =
-      savedTheme === "dark" || (!savedTheme && systemPrefersDark);
+    const savedBg = localStorage.getItem('focusfeed-background') || 'bg-[#FFFFFF]';
+    const savedFont = localStorage.getItem('focusfeed-font') || 'font-sans';
+    const savedTextColor = localStorage.getItem('focusfeed-text-color') || 'text-[#000000]';
 
-    const savedBg = localStorage.getItem("focusfeed-background") || "dark";
-    const savedFont = localStorage.getItem("focusfeed-font") || "font-sans";
-
-    setIsDarkMode(shouldUseDark);
-    setBackgroundStyle(savedBg as typeof backgroundStyle);
+    setBackgroundStyle(savedBg);
     setFontClass(savedFont);
-    document.documentElement.classList.toggle("dark", shouldUseDark);
+    setTextColor(savedTextColor);
   }, []);
 
   // Update snippets when new ones are provided
@@ -73,12 +50,40 @@ export function SwipeContainer({
     setAllSnippets(snippets);
   }, [snippets]);
 
-  const toggleTheme = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-    localStorage.setItem("theme", newDarkMode ? "dark" : "light");
-    document.documentElement.classList.toggle("dark", newDarkMode);
-    console.log("Theme toggled to:", newDarkMode ? "dark" : "light");
+  // Cycle through background colors
+  const cycleBackground = () => {
+    const colors = ['bg-[#FFFFFF]', 'bg-[#E6E6FA]', 'bg-[#98FF98]', 'bg-[#FFDAB9]', 'bg-[#87CEEB]', 'bg-[#FFFACD]', 'bg-[#FFC0CB]'];
+    const currentIndex = colors.indexOf(backgroundStyle);
+    const nextIndex = (currentIndex + 1) % colors.length;
+    const nextColor = colors[nextIndex];
+    setBackgroundStyle(nextColor);
+    localStorage.setItem('focusfeed-background', nextColor);
+  };
+
+  // Cycle through fonts
+  const cycleFont = () => {
+    const fonts = ['font-sans', 'font-serif', 'font-mono', 'font-comic', 'font-arial', 'font-times', 'font-courier'];
+    const currentIndex = fonts.indexOf(fontClass);
+    const nextIndex = (currentIndex + 1) % fonts.length;
+    const nextFont = fonts[nextIndex];
+    setFontClass(nextFont);
+    localStorage.setItem('focusfeed-font', nextFont);
+  };
+
+  // Cycle through text colors
+  const cycleTextColor = () => {
+    const textColors = ['text-[#000000]', 'text-[#4B0082]', 'text-[#2E8B57]', 'text-[#CD853F]', 'text-[#1E90FF]', 'text-[#B8860B]', 'text-[#C71585]'];
+    const currentIndex = textColors.indexOf(textColor);
+    const nextIndex = (currentIndex + 1) % textColors.length;
+    const nextTextColor = textColors[nextIndex];
+    setTextColor(nextTextColor);
+    localStorage.setItem('focusfeed-text-color', nextTextColor);
+  };
+
+  // Determine appropriate text color based on background
+  const getTextColor = () => {
+    const darkBackgrounds = ["dark", "blue", "purple", "green", "red", "indigo", "slate", "emerald"];
+    return darkBackgrounds.includes(backgroundStyle) ? "text-white" : "text-black";
   };
 
   // Generate more content for infinite scroll
@@ -129,60 +134,38 @@ export function SwipeContainer({
     });
   }, [allSnippets.length]);
 
-  // Touch/swipe handlers with horizontal detection using refs
+  // Touch/swipe handlers for vertical navigation only
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
-      // Skip swipe handling when panels are open
-      if (showCustomization || showRelatedTopics) return;
-
       touchStartRef.current = {
         x: e.touches[0].clientX,
-        y: e.touches[0].clientY,
+        y: e.touches[0].clientY
       };
     },
-    [showCustomization, showRelatedTopics],
+    []
   );
 
   const handleTouchEnd = useCallback(
     (e: React.TouchEvent<HTMLDivElement>) => {
-      // Skip swipe handling when panels are open
-      if (showCustomization || showRelatedTopics) return;
-
       const endX = e.changedTouches[0].clientX;
       const endY = e.changedTouches[0].clientY;
       const deltaX = touchStartRef.current.x - endX;
       const deltaY = touchStartRef.current.y - endY;
 
       const verticalThreshold = 50;
-      const horizontalThreshold = 80; // Higher threshold for horizontal to prevent accidental triggers
 
-      // Prioritize vertical swipes for card navigation
-      // Only trigger horizontal if it's clearly dominant (2x more horizontal than vertical)
-      if (
-        Math.abs(deltaX) > horizontalThreshold &&
-        Math.abs(deltaX) > Math.abs(deltaY) * 2
-      ) {
-        if (deltaX > 0) {
-          // Swiped left - show customization
-          setShowCustomization(true);
-          console.log("Left swipe detected - showing customization");
-        } else {
-          // Swiped right - show related topics
-          setShowRelatedTopics(true);
-          console.log("Right swipe detected - showing related topics");
-        }
-      } else if (Math.abs(deltaY) > verticalThreshold) {
-        // Vertical swipe for navigation
+      // Only handle vertical swipes for navigation
+      if (Math.abs(deltaY) > verticalThreshold && Math.abs(deltaY) > Math.abs(deltaX)) {
         if (deltaY > 0) {
-          console.log("Swiping up - next card");
+          console.log('Swiping up - next card');
           nextCard();
         } else {
-          console.log("Swiping down - previous card");
+          console.log('Swiping down - previous card');
           previousCard();
         }
       }
     },
-    [showCustomization, showRelatedTopics, nextCard, previousCard],
+    [nextCard, previousCard]
   );
 
   // Keyboard navigation
@@ -205,32 +188,8 @@ export function SwipeContainer({
 
   // Background styles
   const getBackgroundClasses = () => {
-    switch (backgroundStyle) {
-      case "light":
-        return "bg-gray-100";
-      case "blue":
-        return "bg-gradient-to-br from-blue-900 to-blue-800";
-      case "purple":
-        return "bg-gradient-to-br from-purple-900 to-purple-800";
-      case "green":
-        return "bg-gradient-to-br from-green-900 to-green-800";
-      case "orange":
-        return "bg-gradient-to-br from-orange-900 to-orange-800";
-      case "pink":
-        return "bg-gradient-to-br from-pink-900 to-pink-800";
-      case "teal":
-        return "bg-gradient-to-br from-teal-900 to-teal-800";
-      case "red":
-        return "bg-gradient-to-br from-red-900 to-red-800";
-      case "indigo":
-        return "bg-gradient-to-br from-indigo-900 to-indigo-800";
-      case "slate":
-        return "bg-gradient-to-br from-slate-900 to-slate-800";
-      case "emerald":
-        return "bg-gradient-to-br from-emerald-900 to-emerald-800";
-      default:
-        return "bg-gray-900";
-    }
+    // Directly return the backgroundStyle since it's already a Tailwind class
+    return backgroundStyle;
   };
 
   if (!allSnippets.length) {
@@ -255,52 +214,69 @@ export function SwipeContainer({
     >
       {/* Top Bar */}
       <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-4 bg-background/80 backdrop-blur-sm">
-        <Button
-          variant="ghost"
-          onClick={onBack}
-          className="gap-2"
-          data-testid="button-back"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onBack}
+            className="gap-2"
+            data-testid="button-back"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={cycleBackground}
+            className="hover:bg-primary/10"
+            aria-label="Cycle background color"
+          >
+            <Palette className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={cycleFont}
+            className="hover:bg-primary/10"
+            aria-label="Cycle font"
+          >
+            <Type className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={cycleTextColor}
+            className="hover:bg-primary/10"
+            aria-label="Cycle text color"
+          >
+            <Paintbrush className="h-5 w-5" />
+          </Button>
+        </div>
 
         <div className="text-center">
           <h1
-            className="font-semibold text-lg text-white"
+            className={`font-semibold text-lg ${textColor}`}
             data-testid="text-topic-title"
           >
             {topic}
           </h1>
-          <p className="text-sm text-white/70">
+          <p className={`text-sm ${textColor}/70`}>
             {currentIndex + 1} of ∞
             {isLoading && " • Loading..."}
           </p>
         </div>
 
         <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowCustomization(true)}
-            className="text-white hover:bg-white/20"
-            data-testid="button-customize"
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="text-white hover:bg-white/20"
-            data-testid="button-theme-toggle"
-          >
-            {isDarkMode ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </Button>
+          <ThemeControls
+            onBackgroundChange={setBackgroundStyle}
+            onFontChange={setFontClass}
+            onTextColorChange={(color) => {
+              // Apply text color change
+              document.documentElement.classList.remove('text-white', 'text-black', 'text-gray-300', 'text-yellow-300');
+              document.documentElement.classList.add(color);
+            }}
+          />
         </div>
       </div>
 
@@ -329,33 +305,14 @@ export function SwipeContainer({
       </div>
 
       {/* Swipe Instruction Hint */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center text-sm text-white/60 md:hidden">
+      <div className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center text-sm ${textColor}/60 md:hidden`}>
         <p>Swipe up/down to navigate</p>
         <p className="text-xs mt-1 opacity-80">
-          Swipe left for settings • Swipe right for topics
+          Swipe up/down to navigate cards
         </p>
       </div>
 
-      {/* Customization Panel */}
-      <CustomizationPanel
-        isOpen={showCustomization}
-        onClose={() => setShowCustomization(false)}
-        onBackgroundChange={(color: string) =>
-          setBackgroundStyle(color as typeof backgroundStyle)
-        }
-        onFontChange={setFontClass}
-      />
 
-      {/* Related Topics Panel */}
-      <RelatedTopicsPanel
-        isOpen={showRelatedTopics}
-        onClose={() => setShowRelatedTopics(false)}
-        currentTopic={topic}
-        onTopicSelect={(newTopic) => {
-          onTopicChange?.(newTopic);
-          console.log("New topic selected from related topics:", newTopic);
-        }}
-      />
     </div>
   );
 }

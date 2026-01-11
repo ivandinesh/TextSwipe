@@ -1,168 +1,139 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+/**
+ * OpenRouter API integration for Meta Llama
+ * Uses meta-llama/llama-3.3-70b-instruct:free model
+ */
+
 import dotenv from "dotenv";
 
-// Load environment variables explicitly
+// Load environment variables
 dotenv.config();
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-// Validate API key format
-if (!GEMINI_API_KEY) {
-  console.warn("⚠️ GEMINI_API_KEY is not set. Using fallback content.");
-} else if (!GEMINI_API_KEY.startsWith('AIza') || GEMINI_API_KEY.length !== 39) {
-  console.warn("⚠️ GEMINI_API_KEY format appears invalid. Expected format: AIza... (39 chars)");
-}
-
-// Only initialize Gemini if API key is available
-let genAI: GoogleGenerativeAI | null = null;
-let model: any = null;
-
-if (GEMINI_API_KEY) {
-  genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-
-  /**
-   * Gemini model configuration
-   * - flash = fast + cheap
-   * - temperature low → consistent output
-   */
-  model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
-    generationConfig: {
-      temperature: 0.4,
-      maxOutputTokens: 800,
-      responseMimeType: "application/json",
-    },
-  });
-}
+// Simple in-memory cache
+const snippetCache = new Map<string, string[]>();
 
 /**
- * Gemini model configuration
- * - flash = fast + cheap
- * - temperature low → consistent output
- */
-if (genAI) {
-  model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
-    generationConfig: {
-      temperature: 0.4,
-      maxOutputTokens: 800,
-      responseMimeType: "application/json",
-    },
-  });
-}
-
-/**
- * Hard timeout wrapper to avoid stuck requests
- */
-function withTimeout<T>(promise: Promise<T>, ms = 15_000): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(
-      () => reject(new Error("Gemini request timed out")),
-      ms,
-    );
-
-    promise
-      .then((res) => {
-        clearTimeout(timer);
-        resolve(res);
-      })
-      .catch((err) => {
-        clearTimeout(timer);
-        reject(err);
-      });
-  });
-}
-
-/**
- * Generates bite-sized learning snippets
+ * Generates learning snippets using OpenRouter API with Meta Llama
  */
 export async function generateLearningSnippets(
   topic: string,
   count: number = 5,
 ): Promise<string[]> {
   try {
+    // Check cache first
+    const cacheKey = `${topic}:${count}`;
+    if (snippetCache.has(cacheKey)) {
+      console.log(`⚡ Cache hit for topic: ${topic}`);
+      return snippetCache.get(cacheKey)!;
+    }
+
+    if (!process.env.OPENROUTER_API_KEY) {
+      console.warn("⚠️ OPENROUTER_API_KEY is not set. Using fallback content.");
+      return getFallbackContent(topic, count);
+    }
+
     if (!topic || topic.trim().length === 0) {
       throw new Error("Topic is required");
     }
 
-    // If no API key or model is available, return fallback content
-    if (!GEMINI_API_KEY || !model) {
-      console.log(
-        "🔑 No GEMINI_API_KEY available or model not initialized, using fallback content",
-      );
-      return getFallbackContent(topic, count);
-    }
-
+    // Improved prompt for better results
     const prompt = `
-You are an expert educator creating short-form mobile learning content.
+You are an expert educator creating engaging, bite-sized learning content.
 
-TASK:
-Create exactly ${count} learning snippets about: "${topic}"
+GUIDELINES:
+- Create exactly ${count} concise learning snippets about: "${topic}"
+- Each snippet: 1-2 sentences max
+- Focus on practical, actionable insights
+- Use simple, clear language
+- Avoid jargon and complex terms
+- Make it engaging and memorable
 
-RULES:
-- Each snippet must be 1–2 sentences
-- Clear, practical, and memorable
-- No emojis
-- No markdown
-- No numbering
-- No explanations outside the array
-
-OUTPUT FORMAT (STRICT JSON ONLY):
+EXAMPLE FORMAT:
 {
   "snippets": [
-    "First snippet",
-    "Second snippet"
+    "First insight about ${topic}",
+    "Second practical tip about ${topic}"
   ]
 }
-`;
 
-    const result = await withTimeout(model.generateContent(prompt));
+RESPONSE FORMAT: STRICT JSON ONLY
+`.trim();
 
-    const text = (result as any).response.text();
+    // OpenRouter API call
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "meta-llama/llama-3.3-70b-instruct:free",
+        messages: [
+          {
+            role: "system",
+            content: "You are a helpful assistant that creates concise learning snippets.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 1000,
+      }),
+    });
 
-    if (!text) {
-      throw new Error("Empty response from Gemini");
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("OpenRouter API error:", errorData);
+
+      // Check for rate limit error
+      if (response.status === 429) {
+        console.warn("⚠️ OpenRouter rate limit exceeded");
+        return getFallbackContent(topic, count);
+      }
+
+      throw new Error(`OpenRouter API error: ${response.status}`);
     }
 
-    let parsed: unknown;
+    const result = await response.json();
 
+    if (!result.choices || !result.choices[0]?.message?.content) {
+      throw new Error("Invalid response format from OpenRouter");
+    }
+
+    // Parse the JSON response
+    let snippets;
     try {
-      parsed = JSON.parse(text);
-    } catch {
-      throw new Error("Invalid JSON returned by Gemini");
+      const content = result.choices[0].message.content;
+      const parsed = JSON.parse(content);
+      snippets = parsed.snippets;
+    } catch (e) {
+      console.error("Failed to parse OpenRouter response:", e);
+      throw new Error("Invalid JSON format from OpenRouter");
     }
 
-    if (
-      typeof parsed === "object" &&
-      parsed !== null &&
-      "snippets" in parsed &&
-      Array.isArray((parsed as any).snippets)
-    ) {
-      return (parsed as any).snippets.slice(0, count);
-    }
+    // Cache the result
+    snippetCache.set(cacheKey, snippets);
 
-    throw new Error("Unexpected Gemini response shape");
-  } catch (error: unknown) {
-    console.error(
-      "❌ Gemini generation failed:",
-      error instanceof Error ? error.message : error,
-    );
-
-    // Safe fallback (never break user flow)
+    return snippets;
+  } catch (error) {
+    console.error("❌ OpenRouter generation failed:", error instanceof Error ? error.message : error);
     return getFallbackContent(topic, count);
   }
 }
 
+/**
+ * Fallback content when API fails
+ */
 function getFallbackContent(topic: string, count: number): string[] {
   const fallbackSnippets = [
-    `${topic}: Learn the core idea and why it matters.`,
-    `Key insight: ${topic} works best when understood conceptually, not memorized.`,
-    `Practical tip: Apply ${topic} in small, real examples.`,
-    `Remember: Consistency beats intensity when learning ${topic}.`,
-    `Expert advice: Focus on fundamentals before advanced ${topic} concepts.`,
-    `Did you know? ${topic} has many practical applications in real-world scenarios.`,
-    `Pro tip: Break down ${topic} into smaller, manageable parts for easier learning.`,
-    `Common mistake: Many beginners struggle with the basics of ${topic} - master them first.`,
+    `Discover the fundamentals of ${topic} and why it matters in today's world.`,
+    `Key insight: ${topic} becomes more powerful when you understand its core principles.`,
+    `Practical tip: Start applying ${topic} concepts in small, real-world scenarios.`,
+    `Remember: Mastering ${topic} requires consistent practice and curiosity.`,
+    `Expert advice: Focus on the fundamentals of ${topic} before diving into advanced concepts.`,
+    `Did you know? ${topic} has fascinating applications across various industries.`,
+    `Pro tip: Break down ${topic} into smaller, manageable learning modules.`,
   ];
 
   return fallbackSnippets.slice(0, count);
