@@ -1,5 +1,5 @@
-import { SwipeLearn } from "@/components/SwipeLearn";
+import { FocusFeed } from "@/components/FocusFeed";
 
 export default function Home() {
-  return <SwipeLearn />;
+  return <FocusFeed />;
 }

@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Settings, X, Palette, Type } from "lucide-react";
+import { Settings, X, Palette, Type, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CustomizationPanelProps {
@@ -42,6 +42,8 @@ export function CustomizationPanel({
 }: CustomizationPanelProps) {
   const [selectedBackground, setSelectedBackground] = useState("dark");
   const [selectedFont, setSelectedFont] = useState("font-sans");
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Load saved preferences
@@ -50,6 +52,33 @@ export function CustomizationPanel({
     setSelectedBackground(savedBg);
     setSelectedFont(savedFont);
   }, []);
+
+  // Swipe-to-close functionality for mobile
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      setTouchStart(e.touches[0].clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!touchStart) return;
+      const touchEnd = e.touches[0].clientY;
+      const diff = touchStart - touchEnd;
+
+      if (diff > 50) { // Swipe down more than 50px to close
+        onClose();
+      }
+    };
+
+    const panel = panelRef.current;
+    if (panel) {
+      panel.addEventListener('touchstart', handleTouchStart);
+      panel.addEventListener('touchmove', handleTouchMove);
+      return () => {
+        panel.removeEventListener('touchstart', handleTouchStart);
+        panel.removeEventListener('touchmove', handleTouchMove);
+      };
+    }
+  }, [touchStart, onClose]);
 
   const handleBackgroundSelect = (bgOption: typeof BACKGROUND_OPTIONS[0]) => {
     setSelectedBackground(bgOption.value);
@@ -69,7 +98,13 @@ export function CustomizationPanel({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-card rounded-lg p-6 w-full max-w-md border" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={panelRef}
+        className={`bg-card rounded-lg p-6 w-full max-w-md border transition-transform duration-200 ${
+          touchStart ? 'translate-y-2' : ''
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
@@ -84,6 +119,14 @@ export function CustomizationPanel({
           >
             <X className="md:h-4 md:w-4 h-5 w-5" />
           </Button>
+        </div>
+
+        {/* Swipe hint for mobile users */}
+        <div className="flex justify-center mb-4 md:hidden">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <ArrowDown className="h-4 w-4" />
+            <span>Swipe down to close</span>
+          </div>
         </div>
 
         {/* Background Colors */}
@@ -146,6 +189,18 @@ export function CustomizationPanel({
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Mobile-friendly bottom close button */}
+        <div className="mt-6 pt-4 border-t border-border md:hidden">
+          <Button
+            variant="outline"
+            className="w-full py-3"
+            onClick={onClose}
+            data-testid="button-close-bottom"
+          >
+            Close Settings
+          </Button>
         </div>
       </div>
     </div>
