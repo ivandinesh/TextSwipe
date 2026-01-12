@@ -3,7 +3,7 @@
  * Uses meta-llama/llama-3.3-70b-instruct:free model
  */
 
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 
 // Load environment variables
 dotenv.config();
@@ -95,9 +95,10 @@ RESPONSE FORMAT: STRICT JSON ONLY
       throw new Error(`OpenRouter API error: ${response.status}`);
     }
 
-    const result = await response.json();
+    const result: any = await response.json();
 
-    if (!result.choices || !result.choices[0]?.message?.content) {
+    // Check if response has the expected structure
+    if (!result?.choices?.[0]?.message?.content) {
       throw new Error("Invalid response format from OpenRouter");
     }
 
@@ -117,10 +118,11 @@ RESPONSE FORMAT: STRICT JSON ONLY
 
     return snippets;
   } catch (error) {
-    console.error("❌ OpenRouter generation failed:", error instanceof Error ? error.message : error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.warn("ℹ️ OpenRouter API call failed, using fallback content:", errorMessage);
     return getFallbackContent(topic, count);
   }
-}
+ }
 
 /**
  * Fallback content when API fails

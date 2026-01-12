@@ -12,17 +12,21 @@ interface SwipeCardProps {
   onPrevious: () => void;
   onLike?: (content: string) => void;
   className?: string;
+  textColor?: string;
+  fontClass?: string;
 }
 
-export function SwipeCard({ 
-  content, 
-  index, 
-  total, 
-  isActive, 
-  onNext, 
-  onPrevious, 
+export function SwipeCard({
+  content,
+  index,
+  total,
+  isActive,
+  onNext,
+  onPrevious,
   onLike,
-  className 
+  className,
+  textColor,
+  fontClass
 }: SwipeCardProps) {
   const [isLiked, setIsLiked] = useState(false);
 
@@ -33,7 +37,7 @@ export function SwipeCard({
   };
 
   return (
-    <div 
+    <div
       className={cn(
         "relative h-screen w-full flex flex-col justify-center items-center p-8 transition-all duration-300",
         isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
@@ -43,8 +47,9 @@ export function SwipeCard({
     >
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center max-w-2xl mx-auto">
-        <p 
-          className="text-xl md:text-2xl lg:text-3xl font-medium leading-relaxed text-center text-foreground"
+        <p
+          className={`text-xl md:text-2xl lg:text-3xl font-medium leading-relaxed text-center ${fontClass || ''}`}
+          style={textColor ? { color: textColor } : {}}
           data-testid={`text-content-${index}`}
         >
           {content}
@@ -64,8 +69,8 @@ export function SwipeCard({
           )}
           data-testid={`button-like-${index}`}
         >
-          <Heart 
-            className={cn("h-6 w-6", isLiked && "fill-current")} 
+          <Heart
+            className={cn("h-6 w-6", isLiked && "fill-current")}
           />
         </Button>
 

@@ -1,8 +1,17 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { SwipeCard } from "./SwipeCard";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Moon, Sun, Settings } from "lucide-react";
+import { ArrowLeft, Palette, Type, Paintbrush } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// Simple debounce function
+const debounce = (func: () => void, delay: number) => {
+  let timeoutId: NodeJS.Timeout;
+  return () => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(func, delay);
+  };
+};
 
 interface SwipeContainerProps {
   snippets: string[];
@@ -29,7 +38,7 @@ export function SwipeContainer({
   const [allSnippets, setAllSnippets] = useState<string[]>(snippets);
   const [backgroundStyle, setBackgroundStyle] = useState("bg-[#FFFFFF]"); // Default: white
   const [fontClass, setFontClass] = useState("font-sans"); // Default: Inter
-  const [textColor, setTextColor] = useState("text-[#000000]"); // Default: black
+  const [textColor, setTextColor] = useState("#000000"); // Default: black
 
   // Use refs for touch coordinates to avoid async state issues
   const touchStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -38,7 +47,7 @@ export function SwipeContainer({
   useEffect(() => {
     const savedBg = localStorage.getItem('focusfeed-background') || 'bg-[#FFFFFF]';
     const savedFont = localStorage.getItem('focusfeed-font') || 'font-sans';
-    const savedTextColor = localStorage.getItem('focusfeed-text-color') || 'text-[#000000]';
+    const savedTextColor = localStorage.getItem('focusfeed-text-color') || '#000000';
 
     setBackgroundStyle(savedBg);
     setFontClass(savedFont);
@@ -50,19 +59,29 @@ export function SwipeContainer({
     setAllSnippets(snippets);
   }, [snippets]);
 
-  // Cycle through background colors
-  const cycleBackground = () => {
-    const colors = ['bg-[#FFFFFF]', 'bg-[#E6E6FA]', 'bg-[#98FF98]', 'bg-[#FFDAB9]', 'bg-[#87CEEB]', 'bg-[#FFFACD]', 'bg-[#FFC0CB]'];
-    const currentIndex = colors.indexOf(backgroundStyle);
-    const nextIndex = (currentIndex + 1) % colors.length;
-    const nextColor = colors[nextIndex];
-    setBackgroundStyle(nextColor);
-    localStorage.setItem('focusfeed-background', nextColor);
-  };
+  // Reset content when topic changes
+  useEffect(() => {
+    setAllSnippets(snippets);
+    setCurrentIndex(0);
+    console.log('Topic changed, resetting content:', topic);
+  }, [topic, snippets]);
+
+  // Cycle through background colors with debouncing
+  const cycleBackground = useCallback(
+    debounce(() => {
+      const colors = ['bg-[#FFFFFF]', 'bg-[#E6E6FA]', 'bg-[#98FF98]', 'bg-[#FFDAB9]', 'bg-[#87CEEB]', 'bg-[#FFFACD]', 'bg-[#FFC0CB]'];
+      const currentIndex = colors.indexOf(backgroundStyle);
+      const nextIndex = (currentIndex + 1) % colors.length;
+      const nextColor = colors[nextIndex];
+      setBackgroundStyle(nextColor);
+      localStorage.setItem('focusfeed-background', nextColor);
+    }, 300),
+    [backgroundStyle]
+  );
 
   // Cycle through fonts
   const cycleFont = () => {
-    const fonts = ['font-sans', 'font-serif', 'font-mono', 'font-comic', 'font-arial', 'font-times', 'font-courier'];
+    const fonts = ['font-sans', 'font-serif', 'font-mono', 'font-roboto', 'font-open-sans', 'font-lora', 'font-source-code-pro'];
     const currentIndex = fonts.indexOf(fontClass);
     const nextIndex = (currentIndex + 1) % fonts.length;
     const nextFont = fonts[nextIndex];
@@ -72,12 +91,13 @@ export function SwipeContainer({
 
   // Cycle through text colors
   const cycleTextColor = () => {
-    const textColors = ['text-[#000000]', 'text-[#4B0082]', 'text-[#2E8B57]', 'text-[#CD853F]', 'text-[#1E90FF]', 'text-[#B8860B]', 'text-[#C71585]'];
+    const textColors = ['#000000', '#4B0082', '#2E8B57', '#CD853F', '#1E90FF', '#B8860B', '#C71585'];
     const currentIndex = textColors.indexOf(textColor);
     const nextIndex = (currentIndex + 1) % textColors.length;
     const nextTextColor = textColors[nextIndex];
     setTextColor(nextTextColor);
     localStorage.setItem('focusfeed-text-color', nextTextColor);
+    console.log('Text color changed to:', nextTextColor);
   };
 
   // Determine appropriate text color based on background
@@ -101,16 +121,41 @@ export function SwipeContainer({
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.snippets) {
-          setAllSnippets(prev => [...prev, ...data.snippets]);
-          console.log('Generated more content, total:', allSnippets.length + data.snippets.length);
+          setAllSnippets(prev => {
+            const newSnippets = [...prev, ...data.snippets];
+            console.log('Generated more content, total:', newSnippets.length);
+            return newSnippets;
+          });
+        } else {
+          // Fallback: Generate some placeholder content if API fails
+          const fallbackSnippets = Array(5).fill(0).map((_, i) =>
+            `Content about ${topic} could not be generated. This is a placeholder card ${i + 1}.`
+          );
+          setAllSnippets(prev => {
+            const newSnippets = [...prev, ...fallbackSnippets];
+            console.log('ℹ️ Server returned success but no valid snippets, using fallback content for topic:', topic);
+            return newSnippets;
+          });
         }
+      } else {
+        // Handle non-ok responses
+        console.error('API request failed with status:', response.status);
+        const fallbackSnippets = Array(5).fill(0).map((_, i) =>
+          `API request failed for ${topic}. Showing placeholder content ${i + 1}.`
+        );
+        setAllSnippets(prev => [...prev, ...fallbackSnippets]);
       }
     } catch (error) {
       console.error('Error generating more content:', error);
+      // Show error to user and provide fallback content
+      const errorSnippets = Array(5).fill(0).map((_, i) =>
+        `Network error occurred. Unable to generate content for ${topic}. Card ${i + 1}.`
+      );
+      setAllSnippets(prev => [...prev, ...errorSnippets]);
     } finally {
       setIsLoading(false);
     }
-  }, [topic, isLoading, allSnippets.length]);
+  }, [topic, isLoading]);
 
   const nextCard = useCallback(() => {
     setCurrentIndex((current) => {
@@ -203,28 +248,35 @@ export function SwipeContainer({
   return (
     <div
       className={cn(
-        "relative h-screen overflow-hidden transition-all duration-500 ease-in-out",
-        getBackgroundClasses(),
+        "relative h-screen overflow-hidden transition-all duration-300 ease-in-out",
+        backgroundStyle,
         fontClass,
         className,
       )}
+      style={{
+        fontFamily: fontClass.replace('font-', ''),
+        transition: 'background-color 0.3s ease, color 0.3s ease'
+      }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       data-testid="swipe-container"
     >
       {/* Top Bar */}
       <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-4 bg-background/80 backdrop-blur-sm">
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onBack}
-            className="gap-2"
-            data-testid="button-back"
+        <div className="text-center">
+          <h1
+            className={`font-semibold text-lg ${textColor}`}
+            data-testid="text-topic-title"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
+            {topic}
+          </h1>
+          <p className={`text-sm ${textColor}/70`}>
+            {currentIndex + 1} of ∞
+            {isLoading && " • Loading..."}
+          </p>
+        </div>
+
+        <div className="flex gap-2">
           <Button
             variant="ghost"
             size="icon"
@@ -252,56 +304,49 @@ export function SwipeContainer({
           >
             <Paintbrush className="h-5 w-5" />
           </Button>
-        </div>
-
-        <div className="text-center">
-          <h1
-            className={`font-semibold text-lg ${textColor}`}
-            data-testid="text-topic-title"
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onBack}
+            className="gap-2"
+            data-testid="button-back"
           >
-            {topic}
-          </h1>
-          <p className={`text-sm ${textColor}/70`}>
-            {currentIndex + 1} of ∞
-            {isLoading && " • Loading..."}
-          </p>
-        </div>
-
-        <div className="flex gap-2">
-          <ThemeControls
-            onBackgroundChange={setBackgroundStyle}
-            onFontChange={setFontClass}
-            onTextColorChange={(color) => {
-              // Apply text color change
-              document.documentElement.classList.remove('text-white', 'text-black', 'text-gray-300', 'text-yellow-300');
-              document.documentElement.classList.add(color);
-            }}
-          />
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
         </div>
       </div>
 
       {/* Cards Container */}
       <div className="relative h-full pt-16">
-        {allSnippets.map((snippet, index) => (
-          <SwipeCard
-            key={index}
-            content={snippet}
-            index={index}
-            total={allSnippets.length}
-            isActive={index === currentIndex}
-            onNext={nextCard}
-            onPrevious={previousCard}
-            onLike={onLike}
-            className={cn(
-              "absolute inset-0 transition-all duration-300 ease-out",
-              index === currentIndex
-                ? "opacity-100 translate-y-0 scale-100"
-                : index < currentIndex
-                  ? "opacity-0 -translate-y-full scale-95"
-                  : "opacity-0 translate-y-full scale-95",
-            )}
-          />
-        ))}
+        {allSnippets.length > 0 ? (
+          allSnippets.map((snippet, index) => (
+            <SwipeCard
+              key={index}
+              content={snippet}
+              index={index}
+              total={allSnippets.length}
+              isActive={index === currentIndex}
+              onNext={nextCard}
+              onPrevious={previousCard}
+              onLike={onLike}
+              textColor={textColor}
+              fontClass={fontClass}
+              className={cn(
+                "absolute inset-0 transition-all duration-300 ease-out",
+                index === currentIndex
+                  ? "opacity-100 translate-y-0 scale-100"
+                  : index < currentIndex
+                    ? "opacity-0 -translate-y-full scale-95"
+                    : "opacity-0 translate-y-full scale-95",
+              )}
+            />
+          ))
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-xl text-gray-500">No content available for this topic</p>
+          </div>
+        )}
       </div>
 
       {/* Swipe Instruction Hint */}
