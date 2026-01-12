@@ -4,6 +4,8 @@ import { storage } from "./storage";
 import { generateLearningSnippets } from "./openai";
 import { z } from "zod";
 import rateLimit from "express-rate-limit";
+import chatsRouter from "./routes/chats";
+import topicRoutes from "./routes/topicRoutes";
 
 const generateContentSchema = z.object({
   topic: z.string().min(1).max(200),
@@ -23,7 +25,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Apply rate limiting to all API routes
   app.use("/api/", limiter);
 
+  // Chat routes for user-specific chat threads
+  app.use("/api", chatsRouter);
+
   // Generate AI learning content
+  // Note: This endpoint is now also handled in chatsRouter for chat association
   app.post("/api/generate-content", async (req: Request, res: Response) => {
     try {
       const { topic, count } = generateContentSchema.parse(req.body) as {
@@ -62,6 +68,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   });
+
+  // Topic routes for user preferences
+  app.use("/api", topicRoutes);
 
   const httpServer = createServer(app);
 

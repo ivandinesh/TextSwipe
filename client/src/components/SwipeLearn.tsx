@@ -1,5 +1,24 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+
+// Demo content for fallback when API fails
+const DEMO_CONTENT = {
+  "python basics": [
+    "Python is a high-level, interpreted programming language.",
+    "It was created by Guido van Rossum and first released in 1991.",
+    "Python supports multiple programming paradigms including procedural, object-oriented, and functional programming.",
+    "It has a large standard library and extensive third-party support through the Python Package Index (PyPI).",
+    "Python's syntax emphasizes readability and uses indentation for code blocks.",
+    "It's widely used in web development, data science, machine learning, and automation."
+  ],
+  "javascript basics": [
+    "JavaScript is a versatile programming language used for web development.",
+    "It runs in web browsers and can also be used on servers with Node.js.",
+    "JavaScript supports both procedural and object-oriented programming styles.",
+    "Modern JavaScript includes features like arrow functions, classes, and modules.",
+    "It's essential for creating interactive web pages and web applications.",
+    "JavaScript has a large ecosystem with frameworks like React, Vue, and Angular."
+  ]
+};
 import { TopicInput } from "./TopicInput";
 import { SwipeContainer } from "./SwipeContainer";
 import { LoadingScreen } from "./LoadingScreen";
@@ -11,20 +30,10 @@ interface DemoContent {
 
 
 export function SwipeLearn() {
-  const navigate = useNavigate();
-  const location = useLocation();
-
   const [currentView, setCurrentView] = useState<
     "input" | "loading" | "learning"
-  >(() => {
-    // Check URL params for initial state
-    const params = new URLSearchParams(location.search);
-    return params.get('view') === 'learning' ? 'learning' : 'input';
-  });
-  const [currentTopic, setCurrentTopic] = useState(() => {
-    const params = new URLSearchParams(location.search);
-    return params.get('topic') || "";
-  });
+  >("input");
+  const [currentTopic, setCurrentTopic] = useState("");
   const [learningSnippets, setLearningSnippets] = useState<string[]>([]);
   const [likedSnippets, setLikedSnippets] = useState<string[]>([]);
 
@@ -33,7 +42,7 @@ export function SwipeLearn() {
     setCurrentTopic(topic);
     setCurrentView("loading");
     // Update URL with topic and view state
-    navigate(`?view=learning&topic=${encodeURIComponent(topic)}`);
+    // navigate(`?view=learning&topic=${encodeURIComponent(topic)}`);
 
     try {
         // AI mode - call backend API
@@ -81,7 +90,7 @@ export function SwipeLearn() {
     setCurrentTopic("");
     setLearningSnippets([]);
     // Update URL to reflect current state
-    navigate('?', { replace: true });
+    // navigate('?', { replace: true });
     console.log("Returned to topic selection");
   };
 
@@ -186,7 +195,7 @@ export function SwipeLearn() {
           onTopicChange={(newTopic) => {
             setCurrentTopic(newTopic);
             // Update URL with new topic
-            navigate(`?view=learning&topic=${encodeURIComponent(newTopic)}`);
+            // navigate(`?view=learning&topic=${encodeURIComponent(newTopic)}`);
           }}
         />
       )}

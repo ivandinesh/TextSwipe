@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTopicService } from "@/services/topicService";
 import { TopicInput } from "./TopicInput";
 import { SwipeContainer } from "./SwipeContainer";
 import { LoadingScreen } from "./LoadingScreen";
@@ -7,9 +8,30 @@ interface DemoContent {
   [key: string]: string[];
 }
 
+// Demo content for fallback when API fails
+const DEMO_CONTENT: DemoContent = {
+  "python basics": [
+    "Python is a high-level, interpreted programming language.",
+    "It was created by Guido van Rossum and first released in 1991.",
+    "Python supports multiple programming paradigms including procedural, object-oriented, and functional programming.",
+    "It has a large standard library and extensive third-party support through the Python Package Index (PyPI).",
+    "Python's syntax emphasizes readability and uses indentation for code blocks.",
+    "It's widely used in web development, data science, machine learning, and automation."
+  ],
+  "javascript basics": [
+    "JavaScript is a versatile programming language used for web development.",
+    "It runs in web browsers and can also be used on servers with Node.js.",
+    "JavaScript supports both procedural and object-oriented programming styles.",
+    "Modern JavaScript includes features like arrow functions, classes, and modules.",
+    "It's essential for creating interactive web pages and web applications.",
+    "JavaScript has a large ecosystem with frameworks like React, Vue, and Angular."
+  ]
+};
+
 
 
 export function FocusFeed() {
+  const topicService = useTopicService();
   const [currentView, setCurrentView] = useState<
     "input" | "loading" | "learning"
   >("input");
@@ -109,6 +131,11 @@ export function FocusFeed() {
 
     // Store in localStorage
     localStorage.setItem('focusfeed-liked', JSON.stringify(updatedLiked));
+
+    // Track like in topic service
+    const isLiked = !likedSnippets.includes(content);
+    topicService.trackTopicLike(currentTopic, isLiked);
+
     console.log('Updated liked snippets:', updatedLiked.length);
   };
 

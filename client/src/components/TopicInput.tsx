@@ -1,31 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Shuffle, Sparkles, Book } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTopicService } from "@/services/topicService";
 
 interface TopicInputProps {
   onSubmit: (topic: string) => void;
   isLoading?: boolean;
   className?: string;
 }
-
-// Popular and catchy topics for FocusFeed
-const POPULAR_TOPICS = [
-  "Quantum Computing",
-  "Neuroplasticity",
-  "Dark Matter",
-  "Biohacking",
-  "Blockchain",
-  "AI Ethics",
-  "Space Colonization",
-  "Cryptography",
-  "Genetic Engineering",
-  "Renewable Energy",
-  "Consciousness",
-  "Time Dilation"
-];
 
 // Surprising and lesser-known topics
 const SURPRISE_TOPICS = [
@@ -45,6 +30,13 @@ const SURPRISE_TOPICS = [
 
 export function TopicInput({ onSubmit, isLoading = false, className }: TopicInputProps) {
   const [topic, setTopic] = useState("");
+  const topicService = useTopicService();
+  const [popularTopics, setPopularTopics] = useState<string[]>([]);
+
+  // Load popular topics
+  useEffect(() => {
+    setPopularTopics(topicService.getPopularTopics(6));
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,9 +46,11 @@ export function TopicInput({ onSubmit, isLoading = false, className }: TopicInpu
   };
 
   const handleRandomTopic = () => {
-    const randomTopic = POPULAR_TOPICS[Math.floor(Math.random() * POPULAR_TOPICS.length)];
+    const allTopics = topicService.getPopularTopics(12);
+    const randomTopic = allTopics[Math.floor(Math.random() * allTopics.length)];
     setTopic(randomTopic);
     onSubmit(randomTopic);
+    topicService.trackTopicSelection(randomTopic);
     console.log('Random topic selected:', randomTopic);
   };
 
@@ -111,7 +105,7 @@ export function TopicInput({ onSubmit, isLoading = false, className }: TopicInpu
       <div className="space-y-3">
         <p className="text-sm font-medium text-muted-foreground">Popular Focus Topics:</p>
         <div className="flex flex-wrap gap-2">
-          {POPULAR_TOPICS.slice(0, 6).map((popularTopic, index) => (
+          {popularTopics.map((popularTopic, index) => (
             <Badge
               key={index}
               variant="outline"
@@ -119,6 +113,7 @@ export function TopicInput({ onSubmit, isLoading = false, className }: TopicInpu
               onClick={() => {
                 setTopic(popularTopic);
                 onSubmit(popularTopic);
+                topicService.trackTopicSelection(popularTopic);
                 console.log('Popular topic selected:', popularTopic);
               }}
               data-testid={`badge-popular-${index}`}

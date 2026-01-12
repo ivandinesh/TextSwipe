@@ -9,6 +9,7 @@ interface RelatedTopicsPanelProps {
   onClose: () => void;
   currentTopic: string;
   onTopicSelect: (topic: string) => void;
+  likedTopics?: string[];
 }
 
 // Generate related topics based on the current topic
@@ -69,7 +70,7 @@ const getRelatedTopics = (topic: string): string[] => {
   ];
 };
 
-const POPULAR_TOPICS = [
+const DEFAULT_POPULAR_TOPICS = [
   "Artificial Intelligence", "Climate Science", "Psychology", "Philosophy",
   "Economics", "Astronomy", "Biology", "Chemistry", "Mathematics",
   "Literature", "Music Theory", "Film Studies", "Architecture", "Design Thinking"
@@ -85,7 +86,23 @@ export function RelatedTopicsPanel({
   const [isLoading, setIsLoading] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const [popularTopics] = useState(POPULAR_TOPICS);
+  // Initialize popular topics with user-specific data if available
+  const [popularTopics, setPopularTopics] = useState<string[]>(() => {
+    // Try to load from localStorage first
+    const savedPopular = localStorage.getItem('focusfeed-popular-topics');
+    if (savedPopular) {
+      try {
+        const parsed = JSON.parse(savedPopular);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      } catch (error) {
+        console.error("Error loading popular topics:", error);
+      }
+    }
+
+    return DEFAULT_POPULAR_TOPICS;
+  });
 
   useEffect(() => {
     if (currentTopic) {
