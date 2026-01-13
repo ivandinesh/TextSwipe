@@ -38,6 +38,101 @@ export function FocusFeed() {
   const [currentTopic, setCurrentTopic] = useState("");
   const [learningSnippets, setLearningSnippets] = useState<string[]>([]);
   const [likedSnippets, setLikedSnippets] = useState<string[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const index = params.get('index');
+    return index ? parseInt(index) || 0 : 0;
+  });
+
+  // Check URL parameters on initial load
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    const topic = params.get('topic');
+    const index = params.get('index');
+
+    if (view === 'learning' && topic) {
+      // Restore from URL
+      setCurrentView("loading");
+      setCurrentTopic(topic);
+
+      // Fetch content for this topic
+      const fetchContent = async () => {
+        try {
+          const response = await fetch("/api/generate-content", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              topic,
+              count: 5,
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.snippets) {
+              setLearningSnippets(data.snippets);
+              setCurrentView("learning");
+              // Restore the specific card index if provided
+              if (index) {
+                setCurrentIndex(parseInt(index) || 0);
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error restoring from URL:", error);
+          setCurrentView("input");
+        }
+      };
+
+      fetchContent();
+    }
+  }, []);
+
+  // Check URL parameters on initial load
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    const topic = params.get('topic');
+    const index = params.get('index');
+
+    if (view === 'learning' && topic) {
+      // Restore from URL
+      setCurrentView("loading");
+      setCurrentTopic(topic);
+
+      // Fetch content for this topic
+      const fetchContent = async () => {
+        try {
+          const response = await fetch("/api/generate-content", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              topic,
+              count: 5,
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.snippets) {
+              setLearningSnippets(data.snippets);
+              setCurrentView("learning");
+              // Restore the specific card index if provided
+              if (index) {
+                setCurrentIndex(parseInt(index) || 0);
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error restoring from URL:", error);
+          setCurrentView("input");
+        }
+      };
+
+      fetchContent();
+    }
+  }, []);
 
   const handleTopicSubmit = async (topic: string) => {
     console.log("Topic submitted:", topic);
@@ -63,23 +158,32 @@ export function FocusFeed() {
 
         if (data.success && data.snippets) {
           setLearningSnippets(data.snippets);
+          setCurrentView("learning");
+          // Update URL to preserve state on refresh (start at first card)
+          window.history.pushState(
+            { view: 'learning', topic, index: 0 },
+            '',
+            `?view=learning&topic=${encodeURIComponent(topic)}&index=0`
+          );
         } else {
           throw new Error(data.error || "Failed to generate content");
         }
-
       setCurrentView("learning");
+      // Update URL to preserve state on refresh
+      window.history.pushState(
+        { view: 'learning', topic, index: 0 },
+        '',
+        `?view=learning&topic=${encodeURIComponent(topic)}&index=0`
+      );
     } catch (error) {
       console.error("Error loading content:", error);
-
       // Show error message but still provide fallback content
       const errorSnippet = "⚠️ Could not generate content. Please check your connection and try again.";
-
       // Fallback to demo content with error message
       const fallbackSnippets = [
         errorSnippet,
         ...DEMO_CONTENT["python basics"].slice(1),
       ];
-
       setLearningSnippets(fallbackSnippets);
       setCurrentView("learning");
     }
@@ -89,6 +193,13 @@ export function FocusFeed() {
     setCurrentView("input");
     setCurrentTopic("");
     setLearningSnippets([]);
+    setCurrentIndex(0);
+    // Update URL to reflect current state
+    window.history.pushState(
+      { view: 'input', index: 0 },
+      '',
+      '?view=input&index=0'
+    );
     console.log("Returned to topic selection");
   };
 
@@ -155,6 +266,28 @@ export function FocusFeed() {
     }
   }, []);
 
+  // Add window popstate event listener for browser navigation
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state) {
+        if (event.state.view === 'learning' && event.state.topic) {
+          setCurrentView("learning");
+          setCurrentTopic(event.state.topic);
+          if (event.state.index !== undefined) {
+            setCurrentIndex(event.state.index);
+          }
+          // You might want to refetch content here if needed
+        } else {
+          setCurrentView("input");
+          setCurrentIndex(0);
+        }
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       {currentView === "input" && (
@@ -196,6 +329,7 @@ export function FocusFeed() {
           onBack={handleBack}
           onLike={handleLike}
           onTopicChange={handleTopicChange}
+          currentTopic={currentTopic}
         />
       )}
     </div>

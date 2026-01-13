@@ -21,6 +21,7 @@ interface SwipeContainerProps {
   onLike?: (content: string) => void;
   onTopicChange?: (newTopic: string) => void;
   className?: string;
+  currentTopic?: string;
 }
 
 export function SwipeContainer({
@@ -31,6 +32,7 @@ export function SwipeContainer({
   onLike,
   onTopicChange,
   className,
+  currentTopic,
 }: SwipeContainerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -112,38 +114,69 @@ export function SwipeContainer({
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/generate-content", {
+      // Add timestamp and session ID to ensure unique requests per user
+      const timestamp = Date.now();
+      const sessionId = Math.random().toString(36).substring(2, 8);
+      const response = await fetch(`/api/generate-content`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, count: 5 }),
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache, no-store, must-revalidate"
+        },
+        body: JSON.stringify({
+          topic,
+          count: 5,
+          // Add variation seed and session ID to ensure different results
+          variation: Math.random().toString(36).substring(2, 8),
+          sessionId: sessionId
+        }),
       });
 
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.snippets) {
-          setAllSnippets(prev => {
-            const newSnippets = [...prev, ...data.snippets];
-            console.log('Generated more content, total:', newSnippets.length);
-            return newSnippets;
-          });
+          // Track all previously generated content to prevent duplicates
+          const existingContent = new Set(allSnippets.map(s => s.toLowerCase().trim()));
+          const uniqueSnippets = data.snippets.filter((snippet: string) =>
+            !existingContent.has(snippet.toLowerCase().trim())
+          );
+
+          // If we got duplicates, log and try to use what we can
+          if (uniqueSnippets.length < data.snippets.length) {
+            console.warn(`Received ${data.snippets.length} snippets, but ${data.snippets.length - uniqueSnippets.length} were duplicates`);
+          }
+
+          // If we have no unique snippets, generate fallback content
+          if (uniqueSnippets.length === 0) {
+            console.warn('All snippets were duplicates, generating fallback content');
+            const fallbackSnippets = Array(5).fill(0).map((_, i) =>
+              `Additional insights about ${topic} - Point ${i + 1}`
+            );
+            setAllSnippets(prev => {
+              console.log('Using fallback content due to duplicates');
+              return [...prev, ...fallbackSnippets];
+            });
+          } else {
+            setAllSnippets(prev => {
+              const newSnippets = [...prev, ...uniqueSnippets];
+              console.log('Added', uniqueSnippets.length, 'unique snippets. Total:', newSnippets.length);
+              return newSnippets;
+            });
+          }
         } else {
           // Fallback: Generate some placeholder content if API fails
-          const fallbackSnippets = Array(5).fill(0).map((_, i) =>
-            `Content about ${topic} could not be generated. This is a placeholder card ${i + 1}.`
+          const errorSnippets = Array(5).fill(0).map((_, i) =>
+            `API request failed for ${topic}. Showing placeholder content ${i + 1}.`
           );
-          setAllSnippets(prev => {
-            const newSnippets = [...prev, ...fallbackSnippets];
-            console.log('ℹ️ Server returned success but no valid snippets, using fallback content for topic:', topic);
-            return newSnippets;
-          });
+          setAllSnippets(prev => [...prev, ...errorSnippets]);
         }
       } else {
         // Handle non-ok responses
         console.error('API request failed with status:', response.status);
-        const fallbackSnippets = Array(5).fill(0).map((_, i) =>
+        const errorSnippets = Array(5).fill(0).map((_, i) =>
           `API request failed for ${topic}. Showing placeholder content ${i + 1}.`
         );
-        setAllSnippets(prev => [...prev, ...fallbackSnippets]);
+        setAllSnippets(prev => [...prev, ...errorSnippets]);
       }
     } catch (error) {
       console.error('Error generating more content:', error);
@@ -167,17 +200,29 @@ export function SwipeContainer({
       }
 
       console.log("Next card:", next);
+      // Update URL to preserve card index
+      window.history.pushState(
+        { view: 'learning', topic: topic, index: next },
+        '',
+        `?view=learning&topic=${encodeURIComponent(topic)}&index=${next}`
+      );
       return next;
     });
-  }, [allSnippets.length, generateMoreContent]);
+  }, [allSnippets.length, generateMoreContent, topic]);
 
-  const previousCard = useCallback(() => {
+const previousCard = useCallback(() => {
     setCurrentIndex((current) => {
       const prev = current > 0 ? current - 1 : allSnippets.length - 1;
       console.log("Previous card:", prev);
+      // Update URL to preserve card index
+      window.history.pushState(
+        { view: 'learning', topic: topic, index: prev },
+        '',
+        `?view=learning&topic=${encodeURIComponent(topic)}&index=${prev}`
+      );
       return prev;
     });
-  }, [allSnippets.length]);
+  }, [allSnippets.length, currentTopic]);
 
   // Touch/swipe handlers for vertical navigation only
   const handleTouchStart = useCallback(
