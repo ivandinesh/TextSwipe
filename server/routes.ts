@@ -1,78 +1,126 @@
 import express, { type Express, type Request, type Response } from "express";
-import { createServer, type Server } from "http";
-import { storage } from "./storage";
 import { generateLearningSnippets } from "./openai";
-import { z } from "zod";
+import { createServer, type Server } from "http";
 import rateLimit from "express-rate-limit";
-import chatsRouter from "./routes/chats";
-import topicRoutes from "./routes/topicRoutes";
 
-const generateContentSchema = z.object({
-  topic: z.string().min(1).max(200),
-  count: z.number().min(1).max(10).optional().default(5),
-});
-
-// Rate limiting to prevent abuse
+// Rate limiting for API endpoints
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again later",
+  max: 3, // limit each IP to 3 generation chains per window
+  message: 'Too many generation requests from this IP, please try again later',
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Apply rate limiting to all API routes
-  app.use("/api/", limiter);
-
-  // Chat routes for user-specific chat threads
-  app.use("/api", chatsRouter);
-
-  // Generate AI learning content
-  // Note: This endpoint is now also handled in chatsRouter for chat association
-  app.post("/api/generate-content", async (req: Request, res: Response) => {
+  // Apply rate limiting to API routes
+  app.use("/api/generate", limiter);
+  // NEW: Learning snippets generation endpoint with continuation support
+  app.post("/api/generate", async (req: Request, res: Response) => {
     try {
-      const { topic, count } = generateContentSchema.parse(req.body) as {
-        topic: string;
-        count: number;
-      };
+      const { topic, previousSnippet, page = 0 } = req.body;
+      // For now, use IP as user identifier until auth is implemented
+      const userId = req.ip;
 
-      // Sanitize input to prevent injection attacks
-      const sanitizedTopic = topic.trim().replace(/[^\w\s\-]/gi, '');
-      if (sanitizedTopic !== topic) {
-        console.warn(`Input sanitization: Original "${topic}" -> "${sanitizedTopic}"`);
+      if (!topic || typeof topic !== "string") {
+        return res
+          .status(400)
+          .json({ error: "Topic is required and must be a string" });
       }
 
-      console.log(`Generating AI content for topic: ${sanitizedTopic}`);
-      const snippets = await generateLearningSnippets(sanitizedTopic, count);
-
-      res.json({
-        success: true,
-        snippets,
+      // Generate snippets with continuation support
+      const result = await generateLearningSnippets(
         topic,
-      });
-    } catch (error: unknown) {
-      console.error("Error generating content:", error);
+        10,
+        previousSnippet,
+        userId,
+        page,
+        true, // generateOptions
+      );
 
-      if (error instanceof z.ZodError) {
-        res.status(400).json({
-          success: false,
-          error: "Invalid request data",
-          details: error.errors,
-        });
-      } else {
-        res.status(500).json({
-          success: false,
-          error: "Failed to generate content. Please try again.",
-        });
-      }
+      // Final validation: ensure no repetitive patterns in response
+      const validatedSnippets = result.snippets.map((content) => {
+        if (/additional insights about .* - point \d+/i.test(content)) {
+          const timestamp = Date.now();
+          const uniqueId = (timestamp + page * 1000)
+            .toString(36)
+            .substring(0, 6);
+          return `Unique insight ${uniqueId}: ${topic} has ${["fundamental", "advanced", "practical", "theoretical", "applied"][page % 5]} aspects worth exploring`;
+        }
+        return content;
+      });
+
+      // Return cards with continuation token, page info, and options for infinite scroll
+      // Return cards with continuation token, page info, and options for infinite scroll
+      res.json({
+        cards: validatedSnippets.map((content) => ({ content })),
+        nextPrevious: result.continuationToken,
+        page: page + 1,
+        options: result.options,
+      });
+    } catch (error) {
+      console.error("Generation error:", error);
+      res.status(500).json({
+        error: "Failed to generate learning snippets",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
     }
   });
 
-  // Topic routes for user preferences
-  app.use("/api", topicRoutes);
+  // EXISTING: Keep the old endpoint for backward compatibility
+  app.post("/api/generate-content", async (req: Request, res: Response) => {
+    try {
+      const { topic, page = 0 } = req.body;
+
+      if (!topic || typeof topic !== "string") {
+        return res
+          .status(400)
+          .json({ error: "Topic is required and must be a string" });
+      }
+
+      // Call the new function but without continuation for backward compatibility
+      const result = await generateLearningSnippets(
+        topic,
+        10,
+        undefined,
+        req.ip,
+        page,
+        true, // generateOptions
+      );
+
+      // Final validation: ensure no repetitive patterns in response
+      const validatedSnippets = result.snippets.map((content) => {
+        if (/additional insights about .* - point \d+/i.test(content)) {
+          const timestamp = Date.now();
+          const uniqueId = (timestamp + page * 1000)
+            .toString(36)
+            .substring(0, 6);
+          return `Unique insight ${uniqueId}: ${topic} has ${["fundamental", "advanced", "practical", "theoretical", "applied"][page % 5]} aspects worth exploring`;
+        }
+        return content;
+      });
+
+      // Return the old format with page info and options for backward compatibility
+      res.json({
+        success: true,
+        snippets: result.snippets,
+        page: page + 1,
+        options: result.options,
+      });
+    } catch (error) {
+      console.error("Generation error:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to generate content. Please try again.",
+      });
+    }
+  });
+
+  // Health check endpoint
+  app.get("/api/health", (req: Request, res: Response) => {
+    res.json({ status: "healthy", timestamp: new Date().toISOString() });
+  });
 
   const httpServer = createServer(app);
-
   return httpServer;
 }

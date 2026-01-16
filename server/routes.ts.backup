@@ -1,0 +1,48 @@
+import express, { type Express, type Request, type Response } from "express";
+import { generateLearningSnippets } from "./openai";
+import { createServer, type Server } from "http";
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Learning snippets generation endpoint with continuation support
+  app.post("/api/generate", async (req: Request, res: Response) => {
+    try {
+      const { topic, previousSnippet } = req.body;
+      // For now, use IP as user identifier until auth is implemented
+      const userId = req.ip;
+
+      if (!topic || typeof topic !== "string") {
+        return res
+          .status(400)
+          .json({ error: "Topic is required and must be a string" });
+      }
+
+      // Generate snippets with continuation support
+      const result = await generateLearningSnippets(
+        topic,
+        5,
+        previousSnippet,
+        userId,
+      );
+
+      // Return cards with continuation token for infinite scroll
+      res.json({
+        cards: result.snippets.map((content) => ({ content })),
+        nextPrevious: result.continuationToken,
+      });
+    } catch (error) {
+      console.error("Generation error:", error);
+      res.status(500).json({
+        error: "Failed to generate learning snippets",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  });
+
+  // Health check endpoint
+  app.get("/api/health", (req: Request, res: Response) => {
+    res.json({ status: "healthy", timestamp: new Date().toISOString() });
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { SwipeCard } from "./SwipeCard";
+import { OptionsCard } from "./OptionsCard";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Palette, Type, Paintbrush } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -22,6 +23,7 @@ interface SwipeContainerProps {
   onTopicChange?: (newTopic: string) => void;
   className?: string;
   currentTopic?: string;
+  chatId?: string;
 }
 
 export function SwipeContainer({
@@ -33,14 +35,18 @@ export function SwipeContainer({
   onTopicChange,
   className,
   currentTopic,
+  chatId,
 }: SwipeContainerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [totalCards, setTotalCards] = useState(10);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [allSnippets, setAllSnippets] = useState<string[]>(snippets);
   const [backgroundStyle, setBackgroundStyle] = useState("bg-[#FFFFFF]"); // Default: white
   const [fontClass, setFontClass] = useState("font-sans"); // Default: Inter
   const [textColor, setTextColor] = useState("#000000"); // Default: black
+  const [showOptions, setShowOptions] = useState(false);
+  const [currentOptions, setCurrentOptions] = useState<{title: string; description: string}[]>([]);
 
   // Use refs for touch coordinates to avoid async state issues
   const touchStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -114,88 +120,56 @@ export function SwipeContainer({
 
     setIsLoading(true);
     try {
-      // Add timestamp and session ID to ensure unique requests per user
-      const timestamp = Date.now();
-      const sessionId = Math.random().toString(36).substring(2, 8);
-      const response = await fetch(`/api/generate-content`, {
+      const response = await fetch(`/api/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "no-cache, no-store, must-revalidate"
         },
         body: JSON.stringify({
           topic,
-          count: 5,
-          // Add variation seed and session ID to ensure different results
-          variation: Math.random().toString(36).substring(2, 8),
-          sessionId: sessionId
+          chatId,
+          generateOptions: true,
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        if (data.success && data.snippets) {
-          // Track all previously generated content to prevent duplicates
-          const existingContent = new Set(allSnippets.map(s => s.toLowerCase().trim()));
-          const uniqueSnippets = data.snippets.filter((snippet: string) =>
-            !existingContent.has(snippet.toLowerCase().trim())
-          );
-
-          // If we got duplicates, log and try to use what we can
-          if (uniqueSnippets.length < data.snippets.length) {
-            console.warn(`Received ${data.snippets.length} snippets, but ${data.snippets.length - uniqueSnippets.length} were duplicates`);
-          }
-
-          // If we have no unique snippets, generate fallback content
-          if (uniqueSnippets.length === 0) {
-            console.warn('All snippets were duplicates, generating fallback content');
-            const fallbackSnippets = Array(5).fill(0).map((_, i) =>
-              `Additional insights about ${topic} - Point ${i + 1}`
-            );
-            setAllSnippets(prev => {
-              console.log('Using fallback content due to duplicates');
-              return [...prev, ...fallbackSnippets];
-            });
+        if (data.cards) {
+          // If we have exactly 10 cards, show options after the 10th
+          if (allSnippets.length === 10) {
+            setCurrentOptions(data.options || []);
+            setShowOptions(true);
           } else {
-            setAllSnippets(prev => {
-              const newSnippets = [...prev, ...uniqueSnippets];
-              console.log('Added', uniqueSnippets.length, 'unique snippets. Total:', newSnippets.length);
-              return newSnippets;
-            });
+            setAllSnippets(prev => [...prev, ...data.cards.map((c: {content: string}) => c.content)]);
           }
-        } else {
-          // Fallback: Generate some placeholder content if API fails
-          const errorSnippets = Array(5).fill(0).map((_, i) =>
-            `API request failed for ${topic}. Showing placeholder content ${i + 1}.`
-          );
-          setAllSnippets(prev => [...prev, ...errorSnippets]);
         }
-      } else {
-        // Handle non-ok responses
-        console.error('API request failed with status:', response.status);
-        const errorSnippets = Array(5).fill(0).map((_, i) =>
-          `API request failed for ${topic}. Showing placeholder content ${i + 1}.`
-        );
-        setAllSnippets(prev => [...prev, ...errorSnippets]);
       }
     } catch (error) {
-      console.error('Error generating more content:', error);
-      // Show error to user and provide fallback content
-      const errorSnippets = Array(5).fill(0).map((_, i) =>
-        `Network error occurred. Unable to generate content for ${topic}. Card ${i + 1}.`
-      );
-      setAllSnippets(prev => [...prev, ...errorSnippets]);
+      console.error('Error generating content:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [topic, isLoading]);
+  }, [topic, chatId, isLoading]);
 
   const nextCard = useCallback(() => {
     setCurrentIndex((current) => {
+      // If we're showing options, close them and stay on current card
+      if (showOptions) {
+        setShowOptions(false);
+        return current;
+      }
+
       const next = (current + 1) % allSnippets.length;
 
+      // Show options after 10th card (when we've shown all 10 cards)
+      if (current === 9 && allSnippets.length === 10) {
+        setShowOptions(true);
+        setTotalCards(10); // We've shown all 10 cards
+        return current; // Stay on last card to show options
+      }
+
       // If we're near the end, generate more content
-      if (current >= allSnippets.length - 3) {
+      if (current >= allSnippets.length - 3 && !showOptions) {
         generateMoreContent();
       }
 
@@ -208,10 +182,16 @@ export function SwipeContainer({
       );
       return next;
     });
-  }, [allSnippets.length, generateMoreContent, topic]);
+  }, [allSnippets.length, generateMoreContent, topic, showOptions]);
 
-const previousCard = useCallback(() => {
+  const previousCard = useCallback(() => {
     setCurrentIndex((current) => {
+      // If we're showing options, hide them and go back to last card
+      if (showOptions) {
+        setShowOptions(false);
+        return allSnippets.length - 1;
+      }
+
       const prev = current > 0 ? current - 1 : allSnippets.length - 1;
       console.log("Previous card:", prev);
       // Update URL to preserve card index
@@ -222,7 +202,7 @@ const previousCard = useCallback(() => {
       );
       return prev;
     });
-  }, [allSnippets.length, currentTopic]);
+  }, [allSnippets.length, showOptions, currentTopic]);
 
   // Touch/swipe handlers for vertical navigation only
   const handleTouchStart = useCallback(
@@ -268,19 +248,65 @@ const previousCard = useCallback(() => {
         e.preventDefault();
         previousCard();
       } else if (e.key === "Escape") {
-        onBack();
+        if (showOptions) {
+          setShowOptions(false);
+        } else {
+          onBack();
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [nextCard, previousCard, onBack]);
+  }, [nextCard, previousCard, onBack, showOptions]);
 
   // Background styles
   const getBackgroundClasses = () => {
     // Directly return the backgroundStyle since it's already a Tailwind class
     return backgroundStyle;
   };
+
+  const handleOptionSelect = useCallback((optionTitle: string) => {
+    setShowOptions(false);
+    // Generate content for the selected sub-topic
+    generateMoreContentWithSubtopic(optionTitle);
+  }, [generateMoreContent]);
+
+  const generateMoreContentWithSubtopic = useCallback(async (subtopic: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/generate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          topic: `Focus on ${subtopic} aspect of ${topic}`,
+          chatId,
+          generateOptions: true,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.cards) {
+          setAllSnippets(prev => [...prev, ...data.cards.map((c: {content: string}) => c.content)]);
+          setShowOptions(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error generating subtopic content:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [topic, chatId]);
+
+  // Update total cards when snippets change
+  useEffect(() => {
+    if (allSnippets.length > 0) {
+      setTotalCards(showOptions ? 10 : allSnippets.length);
+    }
+  }, [allSnippets.length, showOptions]);
 
   if (!allSnippets.length) {
     return (
@@ -316,7 +342,7 @@ const previousCard = useCallback(() => {
             {topic}
           </h1>
           <p className={`text-sm ${textColor}/70`}>
-            {currentIndex + 1} of ∞
+            {currentIndex + 1} of {totalCards}
             {isLoading && " • Loading..."}
           </p>
         </div>
@@ -364,7 +390,19 @@ const previousCard = useCallback(() => {
 
       {/* Cards Container */}
       <div className="relative h-full pt-16">
-        {allSnippets.length > 0 ? (
+        {showOptions ? (
+          <OptionsCard
+            options={currentOptions}
+            topic={topic}
+            onSelectOption={handleOptionSelect}
+            onGenerateMore={() => {
+              setShowOptions(false);
+              generateMoreContent();
+            }}
+            textColor={textColor}
+            fontClass={fontClass}
+          />
+        ) : (
           allSnippets.map((snippet, index) => (
             <SwipeCard
               key={index}
@@ -387,10 +425,6 @@ const previousCard = useCallback(() => {
               )}
             />
           ))
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-xl text-gray-500">No content available for this topic</p>
-          </div>
         )}
       </div>
 
@@ -401,8 +435,6 @@ const previousCard = useCallback(() => {
           Swipe up/down to navigate cards
         </p>
       </div>
-
-
     </div>
   );
 }
