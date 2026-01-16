@@ -6,7 +6,8 @@ import url from "url";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import cors from "cors";
-+import { initializeDB } from "./db";  // Add this import
+import { initializeDB } from "./db";  // Add this import
+
 // Load environment variables from .env file
 const dotenvResult = dotenv.config();
 if (dotenvResult.error) {
