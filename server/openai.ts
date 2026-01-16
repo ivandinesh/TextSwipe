@@ -84,8 +84,10 @@ GUIDELINES:
 
     if (generateOptions) {
       prompt += `
-- Also suggest 3-4 related sub-topics for further exploration
-`;
+ - Also suggest 3-4 related sub-topics for further exploration
+ - Each sub-topic should be directly related to the main topic
+ - Ensure sub-topics cover different aspects or applications of the main topic
+ `;
     }
 
     prompt += `
@@ -211,22 +213,10 @@ RESPONSE FORMAT: STRICT JSON ONLY
     if (generateOptions && (!fallbackResult.options || fallbackResult.options.length === 0)) {
       console.warn("Generating fallback options for failed API call");
       fallbackResult.options = [
-        {
-          title: `Introduction to ${topic}`,
-          description: `Get started with the fundamentals of ${topic}`
-        },
-        {
-          title: `Advanced ${topic}`,
-          description: `Explore more complex aspects of ${topic}`
-        },
-        {
-          title: `Applications of ${topic}`,
-          description: `Learn about real-world uses of ${topic}`
-        },
-        {
-          title: `${topic} Research`,
-          description: `Discover the latest research in ${topic}`
-        }
+        { title: `Introduction to ${topic}` },
+        { title: `Advanced ${topic}` },
+        { title: `Applications of ${topic}` },
+        { title: `${topic} Research` }
       ];
     }
     return fallbackResult;

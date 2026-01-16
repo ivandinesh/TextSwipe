@@ -77,12 +77,6 @@ export function OptionsCard({
                   >
                     {option.title}
                   </h3>
-                  <p
-                    className={`text-sm ${fontClass || ''}`}
-                    style={textColor ? { color: textColor, opacity: 0.8 } : { opacity: 0.8 }}
-                  >
-                    {option.description}
-                  </p>
                 </div>
               </Button>
             </motion.div>
