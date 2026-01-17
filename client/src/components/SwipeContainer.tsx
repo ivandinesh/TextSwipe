@@ -46,16 +46,20 @@ export function SwipeContainer({
   const [fontClass, setFontClass] = useState("font-sans"); // Default: Inter
   const [textColor, setTextColor] = useState("#000000"); // Default: black
   const [showOptions, setShowOptions] = useState(false);
-  const [currentOptions, setCurrentOptions] = useState<{title: string; description: string}[]>([]);
+  const [currentOptions, setCurrentOptions] = useState<
+    { title: string; description: string }[]
+  >([]);
 
   // Use refs for touch coordinates to avoid async state issues
   const touchStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   // Initialize theme from localStorage or use defaults
   useEffect(() => {
-    const savedBg = localStorage.getItem('focusfeed-background') || 'bg-[#FFFFFF]';
-    const savedFont = localStorage.getItem('focusfeed-font') || 'font-sans';
-    const savedTextColor = localStorage.getItem('focusfeed-text-color') || '#000000';
+    const savedBg =
+      localStorage.getItem("focusfeed-background") || "bg-[#FFFFFF]";
+    const savedFont = localStorage.getItem("focusfeed-font") || "font-sans";
+    const savedTextColor =
+      localStorage.getItem("focusfeed-text-color") || "#000000";
 
     setBackgroundStyle(savedBg);
     setFontClass(savedFont);
@@ -71,85 +75,162 @@ export function SwipeContainer({
   useEffect(() => {
     setAllSnippets(snippets);
     setCurrentIndex(0);
-    console.log('Topic changed, resetting content:', topic);
+    console.log("Topic changed, resetting content:", topic);
   }, [topic, snippets]);
 
   // Cycle through background colors with debouncing
   const cycleBackground = useCallback(
     debounce(() => {
-      const colors = ['bg-[#FFFFFF]', 'bg-[#E6E6FA]', 'bg-[#98FF98]', 'bg-[#FFDAB9]', 'bg-[#87CEEB]', 'bg-[#FFFACD]', 'bg-[#FFC0CB]'];
+      const colors = [
+        "bg-[#FFFFFF]",
+        "bg-[#E6E6FA]",
+        "bg-[#98FF98]",
+        "bg-[#FFDAB9]",
+        "bg-[#87CEEB]",
+        "bg-[#FFFACD]",
+        "bg-[#FFC0CB]",
+      ];
       const currentIndex = colors.indexOf(backgroundStyle);
       const nextIndex = (currentIndex + 1) % colors.length;
       const nextColor = colors[nextIndex];
       setBackgroundStyle(nextColor);
-      localStorage.setItem('focusfeed-background', nextColor);
+      localStorage.setItem("focusfeed-background", nextColor);
     }, 300),
-    [backgroundStyle]
+    [backgroundStyle],
   );
 
   // Cycle through fonts
   const cycleFont = () => {
-    const fonts = ['font-sans', 'font-serif', 'font-mono', 'font-roboto', 'font-open-sans', 'font-lora', 'font-source-code-pro'];
+    const fonts = [
+      "font-sans",
+      "font-serif",
+      "font-mono",
+      "font-roboto",
+      "font-open-sans",
+      "font-lora",
+      "font-source-code-pro",
+    ];
     const currentIndex = fonts.indexOf(fontClass);
     const nextIndex = (currentIndex + 1) % fonts.length;
     const nextFont = fonts[nextIndex];
     setFontClass(nextFont);
-    localStorage.setItem('focusfeed-font', nextFont);
+    localStorage.setItem("focusfeed-font", nextFont);
   };
 
   // Cycle through text colors
   const cycleTextColor = () => {
-    const textColors = ['#000000', '#4B0082', '#2E8B57', '#CD853F', '#1E90FF', '#B8860B', '#C71585'];
+    const textColors = [
+      "#000000",
+      "#4B0082",
+      "#2E8B57",
+      "#CD853F",
+      "#1E90FF",
+      "#B8860B",
+      "#C71585",
+    ];
     const currentIndex = textColors.indexOf(textColor);
     const nextIndex = (currentIndex + 1) % textColors.length;
     const nextTextColor = textColors[nextIndex];
     setTextColor(nextTextColor);
-    localStorage.setItem('focusfeed-text-color', nextTextColor);
-    console.log('Text color changed to:', nextTextColor);
+    localStorage.setItem("focusfeed-text-color", nextTextColor);
+    console.log("Text color changed to:", nextTextColor);
   };
 
   // Determine appropriate text color based on background
   const getTextColor = () => {
-    const darkBackgrounds = ["dark", "blue", "purple", "green", "red", "indigo", "slate", "emerald"];
-    return darkBackgrounds.includes(backgroundStyle) ? "text-white" : "text-black";
+    const darkBackgrounds = [
+      "dark",
+      "blue",
+      "purple",
+      "green",
+      "red",
+      "indigo",
+      "slate",
+      "emerald",
+    ];
+    return darkBackgrounds.includes(backgroundStyle)
+      ? "text-white"
+      : "text-black";
   };
 
   // Generate more content for infinite scroll
-  const generateMoreContent = useCallback(async () => {
-    if (isLoading) return;
+  const generateMoreContent = useCallback(
+    async (findNewTopics: boolean = false) => {
+      if (isLoading) return;
 
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/generate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          topic,
-          chatId,
-          generateOptions: true,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.cards) {
-          // If we have exactly 10 cards, show options after the 10th
-          if (allSnippets.length === 10) {
-            setCurrentOptions(data.options || []);
-            setShowOptions(true);
-          } else {
-            setAllSnippets(prev => [...prev, ...data.cards.map((c: {content: string}) => c.content)]);
-          }
+      setIsLoading(true);
+      try {
+        let newTopic = topic;
+        if (findNewTopics) {
+          // Generate a related topic for finding more relevant topics
+          newTopic = `Related topics about ${topic}`;
         }
+
+        const response = await fetch(`/api/generate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            topic: newTopic,
+            chatId,
+            generateOptions: true,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.cards) {
+            // Reset to first card and replace all content when finding new topics
+            if (findNewTopics) {
+              setAllSnippets(
+                data.cards.map((c: { content: string }) => c.content),
+              );
+              setCurrentIndex(0);
+              setShowOptions(false);
+            }
+            // If we have exactly 10 cards and are generating more on the same topic,
+            // add new cards and move to the first new card
+            else if (allSnippets.length === 10) {
+              setAllSnippets((prev) => [
+                ...prev,
+                ...data.cards.map((c: { content: string }) => c.content),
+              ]);
+              // Move to the first new card
+              setCurrentIndex(allSnippets.length);
+              setShowOptions(false);
+            } else {
+              // Add new cards to the existing ones
+              setAllSnippets((prev) => [
+                ...prev,
+                ...data.cards.map((c: { content: string }) => c.content),
+              ]);
+              // Move to the first new card
+              setCurrentIndex(allSnippets.length);
+              setShowOptions(false);
+            }
+          }
+        } else if (response.status === 429) {
+          console.warn("Rate limit exceeded, using fallback content");
+          // Show a rate limit message to the user
+          setAllSnippets((prev) => [
+            ...prev,
+            "⚠️ Rate limit reached. Please wait a moment before generating more content.",
+          ]);
+        }
+      } catch (error) {
+        console.error("Error generating content:", error);
+        // Show error to user
+        setAllSnippets((prev) => [
+          ...prev,
+          "⚠️ Error generating content. Please try again.",
+        ]);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error generating content:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [topic, chatId, isLoading]);
+    },
+    [topic, chatId, isLoading],
+  );
 
   const nextCard = useCallback(() => {
     setCurrentIndex((current) => {
@@ -168,17 +249,21 @@ export function SwipeContainer({
         return current; // Stay on last card to show options
       }
 
-      // If we're near the end, generate more content
-      if (current >= allSnippets.length - 3 && !showOptions) {
-        generateMoreContent();
+      // If we're near the end, generate more content (but not for the initial 10 cards)
+      if (
+        current >= allSnippets.length - 3 &&
+        !showOptions &&
+        allSnippets.length > 10
+      ) {
+        generateMoreContent(false);
       }
 
       console.log("Next card:", next);
       // Update URL to preserve card index
       window.history.pushState(
-        { view: 'learning', topic: topic, index: next },
-        '',
-        `?view=learning&topic=${encodeURIComponent(topic)}&index=${next}`
+        { view: "learning", topic: topic, index: next },
+        "",
+        `?view=learning&topic=${encodeURIComponent(topic)}&index=${next}`,
       );
       return next;
     });
@@ -196,24 +281,21 @@ export function SwipeContainer({
       console.log("Previous card:", prev);
       // Update URL to preserve card index
       window.history.pushState(
-        { view: 'learning', topic: topic, index: prev },
-        '',
-        `?view=learning&topic=${encodeURIComponent(topic)}&index=${prev}`
+        { view: "learning", topic: topic, index: prev },
+        "",
+        `?view=learning&topic=${encodeURIComponent(topic)}&index=${prev}`,
       );
       return prev;
     });
   }, [allSnippets.length, showOptions, currentTopic]);
 
   // Touch/swipe handlers for vertical navigation only
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      touchStartRef.current = {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY
-      };
-    },
-    []
-  );
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+    };
+  }, []);
 
   const handleTouchEnd = useCallback(
     (e: React.TouchEvent<HTMLDivElement>) => {
@@ -225,17 +307,20 @@ export function SwipeContainer({
       const verticalThreshold = 50;
 
       // Only handle vertical swipes for navigation
-      if (Math.abs(deltaY) > verticalThreshold && Math.abs(deltaY) > Math.abs(deltaX)) {
+      if (
+        Math.abs(deltaY) > verticalThreshold &&
+        Math.abs(deltaY) > Math.abs(deltaX)
+      ) {
         if (deltaY > 0) {
-          console.log('Swiping up - next card');
+          console.log("Swiping up - next card");
           nextCard();
         } else {
-          console.log('Swiping down - previous card');
+          console.log("Swiping down - previous card");
           previousCard();
         }
       }
     },
-    [nextCard, previousCard]
+    [nextCard, previousCard],
   );
 
   // Keyboard navigation
@@ -266,40 +351,49 @@ export function SwipeContainer({
     return backgroundStyle;
   };
 
-  const handleOptionSelect = useCallback((optionTitle: string) => {
-    setShowOptions(false);
-    // Generate content for the selected sub-topic
-    generateMoreContentWithSubtopic(optionTitle);
-  }, [generateMoreContent]);
+  const generateMoreContentWithSubtopic = useCallback(
+    async (subtopic: string) => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/generate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            topic: `Focus on ${subtopic} aspect of ${topic}`,
+            chatId,
+            generateOptions: true,
+          }),
+        });
 
-  const generateMoreContentWithSubtopic = useCallback(async (subtopic: string) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/generate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          topic: `Focus on ${subtopic} aspect of ${topic}`,
-          chatId,
-          generateOptions: true,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.cards) {
-          setAllSnippets(prev => [...prev, ...data.cards.map((c: {content: string}) => c.content)]);
-          setShowOptions(false);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.cards) {
+            setAllSnippets((prev) => [
+              ...prev,
+              ...data.cards.map((c: { content: string }) => c.content),
+            ]);
+            setShowOptions(false);
+          }
         }
+      } catch (error) {
+        console.error("Error generating subtopic content:", error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error generating subtopic content:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [topic, chatId]);
+    },
+    [topic, chatId],
+  );
+
+  const handleOptionSelect = useCallback(
+    (optionTitle: string) => {
+      setShowOptions(false);
+      // Generate content for the selected sub-topic
+      generateMoreContentWithSubtopic(optionTitle);
+    },
+    [generateMoreContentWithSubtopic],
+  );
 
   // Update total cards when snippets change
   useEffect(() => {
@@ -325,8 +419,8 @@ export function SwipeContainer({
         className,
       )}
       style={{
-        fontFamily: fontClass.replace('font-', ''),
-        transition: 'background-color 0.3s ease, color 0.3s ease'
+        fontFamily: fontClass.replace("font-", ""),
+        transition: "background-color 0.3s ease, color 0.3s ease",
       }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -395,9 +489,13 @@ export function SwipeContainer({
             options={currentOptions}
             topic={topic}
             onSelectOption={handleOptionSelect}
-            onGenerateMore={() => {
+            onGenerateMore={async (findNewTopics: boolean = false) => {
               setShowOptions(false);
-              generateMoreContent();
+              await generateMoreContent(findNewTopics);
+              // Ensure we go back to the first card when finding new topics
+              if (findNewTopics) {
+                setCurrentIndex(0);
+              }
             }}
             textColor={textColor}
             fontClass={fontClass}
@@ -429,7 +527,9 @@ export function SwipeContainer({
       </div>
 
       {/* Swipe Instruction Hint */}
-      <div className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center text-sm ${textColor}/60 md:hidden`}>
+      <div
+        className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center text-sm ${textColor}/60 md:hidden`}
+      >
         <p>Swipe up/down to navigate</p>
         <p className="text-xs mt-1 opacity-80">
           Swipe up/down to navigate cards

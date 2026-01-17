@@ -12,7 +12,7 @@ interface OptionsCardProps {
   options: Option[];
   topic: string;
   onSelectOption: (option: string) => void;
-  onGenerateMore: () => void;
+  onGenerateMore: (findNewTopics?: boolean) => void;
   textColor?: string;
   fontClass?: string;
   className?: string;
@@ -40,14 +40,14 @@ export function OptionsCard({
     <div
       className={cn(
         "relative h-screen w-full flex flex-col justify-center items-center p-8 transition-all duration-300",
-        className
+        className,
       )}
       data-testid="options-card"
     >
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto px-4">
         <h2
-          className={`text-2xl md:text-3xl font-bold mb-8 text-center ${fontClass || ''}`}
+          className={`text-2xl md:text-3xl font-bold mb-8 text-center ${fontClass || ""}`}
           style={textColor ? { color: textColor } : {}}
           data-testid="options-title"
         >
@@ -66,13 +66,14 @@ export function OptionsCard({
                 onClick={() => handleOptionSelect(option.title)}
                 className={cn(
                   "w-full h-32 p-4 text-left flex flex-col items-start justify-between border-2 border-primary/20 hover:border-primary/40 transition-all duration-200",
-                  selectedOption === option.title && "border-primary bg-primary/10"
+                  selectedOption === option.title &&
+                    "border-primary bg-primary/10",
                 )}
                 data-testid={`option-${index}`}
               >
                 <div className="flex-1">
                   <h3
-                    className={`font-semibold mb-2 ${fontClass || ''}`}
+                    className={`font-semibold mb-2 ${fontClass || ""}`}
                     style={textColor ? { color: textColor } : {}}
                   >
                     {option.title}
@@ -83,18 +84,56 @@ export function OptionsCard({
           ))}
         </div>
 
-        <Button
-          onClick={onGenerateMore}
-          variant="outline"
-          className={cn(
-            "flex items-center gap-2 px-6 py-2",
-            fontClass || ''
-          )}
-          style={textColor ? { color: textColor, borderColor: textColor } : {}}
-          data-testid="generate-more-button"
-        >
-          🔄 Generate More on {topic}
-        </Button>
+        {options && options.length > 0 ? (
+          <Button
+            onClick={() => onGenerateMore(false)}
+            variant="outline"
+            className={cn(
+              "flex items-center gap-2 px-6 py-2 mt-4",
+              fontClass || "",
+            )}
+            style={
+              textColor ? { color: textColor, borderColor: textColor } : {}
+            }
+            data-testid="generate-more-button"
+          >
+            🔄 Generate More on {topic}
+          </Button>
+        ) : (
+          <div className="text-center py-4 text-muted-foreground">
+            <p className="mb-4">No related topics available for "{topic}"</p>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <Button
+                onClick={() => onGenerateMore(false)}
+                variant="outline"
+                className={cn(
+                  "flex items-center gap-2 px-6 py-2",
+                  fontClass || "",
+                )}
+                style={
+                  textColor ? { color: textColor, borderColor: textColor } : {}
+                }
+                data-testid="generate-more-button"
+              >
+                🔄 Generate More on {topic}
+              </Button>
+              <Button
+                onClick={() => onGenerateMore(true)}
+                variant="outline"
+                className={cn(
+                  "flex items-center gap-2 px-6 py-2",
+                  fontClass || "",
+                )}
+                style={
+                  textColor ? { color: textColor, borderColor: textColor } : {}
+                }
+                data-testid="find-more-topics-button"
+              >
+                🎯 Find More Relevant Topics
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Bottom Controls (empty for symmetry) */}
@@ -106,7 +145,7 @@ export function OptionsCard({
               key={i}
               className={cn(
                 "w-2 h-2 rounded-full transition-all",
-                i === 9 ? "bg-primary w-6" : "bg-muted"
+                i === 9 ? "bg-primary w-6" : "bg-muted",
               )}
             />
           ))}

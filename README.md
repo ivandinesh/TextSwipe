@@ -1,6 +1,6 @@
 # TextSwipe - Text-Based Swipe Learning App
 
-**Updated with new features: Options generation, rate limiting, and enhanced caching**
+**Updated with new features: Options generation, rate limiting, enhanced caching, and robust error handling**
 
 TextSwipe is a full-stack TypeScript monorepo app inspired by TikTok-style scrolling cards, delivering AI-curated educational content for quick, engaging learning sessions. Users swipe through text-based cards on various topics, with real-time generation and personalization.
 
@@ -9,6 +9,7 @@ Live Demo: [focusfeed.me](https://focusfeed.me) (Hosted on Oracle Free Tier with
 ## Features
 - **Swipe Interface**: Intuitive card swiping with Framer Motion animations.
 - **AI Content Generation**: Gemini AI (via Google Generative AI) creates dynamic cards with optional sub-topic suggestions based on user-selected topics.
+- **Robust Error Handling**: Enhanced JSON validation and sanitization for OpenRouter API responses, with graceful fallback mechanisms.
 - **Authentication**: Passport.js for user sessions.
 - **Database**: Postgres with Drizzle ORM for storing users, sessions, and future chat data.
 - **Real-Time**: WebSockets for live updates.
@@ -17,7 +18,7 @@ Live Demo: [focusfeed.me](https://focusfeed.me) (Hosted on Oracle Free Tier with
 
 ## Tech Stack
 - **Frontend**: React, Vite, Tailwind CSS (v3.4.13), Radix UI, TanStack Query, Framer Motion.
-- **Backend**: Express.js, Passport.js, Drizzle ORM (Postgres), OpenRouter API with Meta Llama (meta-llama/llama-3.3-70b-instruct:free model).
+- **Backend**: Express.js, Passport.js, Drizzle ORM (Postgres), OpenRouter API with Meta Llama (meta-llama/llama-3.3-70b-instruct:free model), robust error handling and JSON validation.
 - **Shared**: Zod for validation.
 - **Build/Dev Tools**: esbuild/tsx for backend, Vite for frontend bundling.
 - **Deployment**: Oracle Free Tier (Ubuntu VM), PM2, Nginx, Certbot for SSL.
@@ -51,6 +52,7 @@ Live Demo: [focusfeed.me](https://focusfeed.me) (Hosted on Oracle Free Tier with
 - Build fixes: Tailwind downgrade, PostCSS config, ESM polyfills.
 - Security: .gitignore enhanced for .env/logs/secrets.
 - Hosting: Oracle with iptables/UFW tweaks.
+- Error Handling: Added JSON sanitization and validation for OpenRouter API responses.
 
 ## Forward Plan
 - **Milestone 2: Multiple Chats**: Add chats table (id, user_id, topic), API routes, UI list component, persist cards per chat.
