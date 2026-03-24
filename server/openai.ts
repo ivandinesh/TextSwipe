@@ -1,7 +1,6 @@
 /**
- * OpenRouter API integration for Meta Llama
- * Uses meta-llama/llama-3.3-70b-instruct:free model
- * Supports generating learning cards with optional sub-topic suggestions
+ * OpenRouter API integration with a configurable model/provider.
+ * Supports generating learning cards with optional sub-topic suggestions.
  */
 
 import * as dotenv from "dotenv";
@@ -35,6 +34,12 @@ export interface TopicOption {
 export interface LearningSnippetResult {
   snippets: string[];
   options?: TopicOption[];
+}
+
+const DEFAULT_OPENROUTER_MODEL = "google/gemini-2.5-flash-lite";
+
+function getOpenRouterModel(): string {
+  return process.env.OPENROUTER_MODEL?.trim() || DEFAULT_OPENROUTER_MODEL;
 }
 
 function appendLogLine(filename: string, payload: unknown) {
@@ -123,7 +128,7 @@ function logRequest(
 }
 
 /**
- * Generates learning snippets using OpenRouter API with Meta Llama
+ * Generates learning snippets using OpenRouter API
  */
 export async function generateLearningSnippets(
   topic: string,
@@ -131,8 +136,10 @@ export async function generateLearningSnippets(
   generateOptions: boolean = false,
 ): Promise<LearningSnippetResult> {
   try {
+    const model = getOpenRouterModel();
+
     // Check cache first
-    const cacheKey = `${topic}:${count}:${generateOptions}`;
+    const cacheKey = `${model}:${topic}:${count}:${generateOptions}`;
     if (snippetCache.has(cacheKey)) {
       console.log(`⚡ Cache hit for topic: ${topic}`);
       return snippetCache.get(cacheKey)!;
@@ -203,7 +210,7 @@ RESPONSE FORMAT: STRICT JSON ONLY
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "meta-llama/llama-3.3-70b-instruct:free",
+          model,
           messages: [
             {
               role: "system",

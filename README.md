@@ -34,6 +34,7 @@ Minimum local development variables:
 ```env
 NODE_ENV=development
 OPENROUTER_API_KEY=your_openrouter_key
+OPENROUTER_MODEL=google/gemini-2.5-flash-lite
 PORT=5000
 SESSION_SECRET=replace_me_for_production
 ```
@@ -49,6 +50,7 @@ Notes:
 
 - `APP_ALLOWED_ORIGINS` is only used in production.
 - In production, the app expects `NODE_ENV`, `OPENROUTER_API_KEY`, and `SESSION_SECRET`.
+- `OPENROUTER_MODEL` is optional in code, but recommended in env so you can switch providers/models without editing the server.
 
 ## Install
 
