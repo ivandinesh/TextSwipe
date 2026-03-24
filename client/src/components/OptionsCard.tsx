@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ArrowRight, RefreshCcw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,7 @@ interface OptionsCardProps {
   onSelectOption: (option: string) => void;
   onGenerateMore: (findNewTopics?: boolean) => void;
   textColor?: string;
+  mutedTextColor?: string;
   fontClass?: string;
   className?: string;
 }
@@ -24,6 +26,7 @@ export function OptionsCard({
   onSelectOption,
   onGenerateMore,
   textColor,
+  mutedTextColor,
   fontClass,
   className,
 }: OptionsCardProps) {
@@ -39,118 +42,122 @@ export function OptionsCard({
   return (
     <div
       className={cn(
-        "relative h-screen w-full flex flex-col justify-center items-center p-8 transition-all duration-300",
+        "relative h-screen w-full px-5 pb-8 pt-4 transition-all duration-300 md:px-8",
         className,
       )}
       data-testid="options-card"
     >
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto px-4">
-        <h2
-          className={`text-2xl md:text-3xl font-bold mb-8 text-center ${fontClass || ""}`}
-          style={textColor ? { color: textColor } : {}}
-          data-testid="options-title"
-        >
-          Explore Related Topics
-        </h2>
-
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {options.map((option, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative"
+      <div className="mx-auto flex h-full w-full max-w-5xl flex-col justify-between">
+        <div className="glass-panel rounded-[2rem] px-6 py-8 md:px-8">
+          <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary/80">
+                Continue The Session
+              </p>
+              <h2
+                className={cn(
+                  "mt-3 text-3xl font-semibold md:text-4xl",
+                  fontClass || "",
+                )}
+                style={textColor ? { color: textColor } : {}}
+                data-testid="options-title"
+              >
+                Pick the next direction for {topic}
+              </h2>
+              <p
+                className="mt-3 max-w-xl text-sm leading-7 md:text-base"
+                style={{ color: mutedTextColor || textColor }}
+              >
+                Choose a branch to deepen the thread, or refresh the deck to stay
+                broad and exploratory.
+              </p>
+            </div>
+            <div
+              className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm"
+              style={{ color: mutedTextColor || textColor }}
             >
-              <Button
-                onClick={() => handleOptionSelect(option.title)}
-                className={cn(
-                  "w-full h-32 p-4 text-left flex flex-col items-start justify-between border-2 border-primary/20 hover:border-primary/40 transition-all duration-200",
-                  selectedOption === option.title &&
-                    "border-primary bg-primary/10",
-                )}
-                data-testid={`option-${index}`}
-              >
-                <div className="flex-1">
-                  <h3
-                    className={`font-semibold mb-2 ${fontClass || ""}`}
-                    style={textColor ? { color: textColor } : {}}
-                  >
-                    {option.title}
-                  </h3>
-                </div>
-              </Button>
-            </motion.div>
-          ))}
-        </div>
-
-        {options && options.length > 0 ? (
-          <Button
-            onClick={() => onGenerateMore(false)}
-            variant="outline"
-            className={cn(
-              "flex items-center gap-2 px-6 py-2 mt-4",
-              fontClass || "",
-            )}
-            style={
-              textColor ? { color: textColor, borderColor: textColor } : {}
-            }
-            data-testid="generate-more-button"
-          >
-            🔄 Generate More on {topic}
-          </Button>
-        ) : (
-          <div className="text-center py-4 text-muted-foreground">
-            <p className="mb-4">No related topics available for "{topic}"</p>
-            <div className="flex flex-col sm:flex-row gap-2 justify-center">
-              <Button
-                onClick={() => onGenerateMore(false)}
-                variant="outline"
-                className={cn(
-                  "flex items-center gap-2 px-6 py-2",
-                  fontClass || "",
-                )}
-                style={
-                  textColor ? { color: textColor, borderColor: textColor } : {}
-                }
-                data-testid="generate-more-button"
-              >
-                🔄 Generate More on {topic}
-              </Button>
-              <Button
-                onClick={() => onGenerateMore(true)}
-                variant="outline"
-                className={cn(
-                  "flex items-center gap-2 px-6 py-2",
-                  fontClass || "",
-                )}
-                style={
-                  textColor ? { color: textColor, borderColor: textColor } : {}
-                }
-                data-testid="find-more-topics-button"
-              >
-                🎯 Find More Relevant Topics
-              </Button>
+              {options.length > 0 ? `${options.length} curated follow-ups` : "No follow-ups yet"}
             </div>
           </div>
-        )}
-      </div>
 
-      {/* Bottom Controls (empty for symmetry) */}
-      <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end">
-        <div className="w-12"></div>
-        <div className="flex gap-2">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <div
-              key={i}
+          <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+            {options.map((option, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ y: -4 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative"
+              >
+                <Button
+                  onClick={() => handleOptionSelect(option.title)}
+                  className={cn(
+                    "h-auto w-full rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5 text-left transition-all duration-200 hover:border-primary/35 hover:bg-white/[0.07]",
+                    selectedOption === option.title && "border-primary bg-primary/10",
+                  )}
+                  data-testid={`option-${index}`}
+                >
+                  <div className="flex min-h-[9rem] flex-col justify-between">
+                    <div>
+                      <h3
+                        className={cn("text-lg font-semibold", fontClass || "")}
+                        style={textColor ? { color: textColor } : {}}
+                      >
+                        {option.title}
+                      </h3>
+                      <p
+                        className="mt-3 text-sm leading-6"
+                        style={{ color: mutedTextColor || textColor }}
+                      >
+                        {option.description}
+                      </p>
+                    </div>
+                    <div className="mt-5 flex items-center gap-2 text-sm font-medium text-primary">
+                      Open branch
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
+                  </div>
+                </Button>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-col gap-3 border-t border-white/8 pt-6 md:flex-row">
+            <Button
+              onClick={() => onGenerateMore(false)}
+              variant="outline"
               className={cn(
-                "w-2 h-2 rounded-full transition-all",
-                i === 9 ? "bg-primary w-6" : "bg-muted",
+                "h-12 rounded-2xl border-white/10 bg-white/[0.04] px-5 text-foreground",
+                fontClass || "",
               )}
-            />
-          ))}
+              data-testid="generate-more-button"
+            >
+              <RefreshCcw className="h-4 w-4" />
+              Generate More on {topic}
+            </Button>
+            <Button
+              onClick={() => onGenerateMore(true)}
+              variant="outline"
+              className={cn(
+                "h-12 rounded-2xl border-white/10 bg-white/[0.04] px-5 text-foreground",
+                fontClass || "",
+              )}
+              data-testid="find-more-topics-button"
+            >
+              <Search className="h-4 w-4" />
+              Find More Relevant Topics
+            </Button>
+          </div>
+
+          {options.length === 0 && (
+            <div
+              className="mt-6 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-4 text-sm"
+              style={{ color: mutedTextColor || textColor }}
+            >
+              No related topics were returned this time, so you can refresh the
+              deck or ask for a different set of branches.
+            </div>
+          )}
         </div>
-        <div className="w-12"></div>
       </div>
     </div>
   );

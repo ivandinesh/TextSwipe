@@ -1,157 +1,180 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ------------------------------------------------------------------
-   Fonts
------------------------------------------------------------------- */
-
-.font-cursive {
-  font-family: 'Brush Script MT', cursive;
-}
-
-.font-display {
-  font-family: 'Playfair Display', serif;
-}
-
-/* ------------------------------------------------------------------
-   LIGHT MODE TOKENS
------------------------------------------------------------------- */
-
 :root {
-  --button-outline: rgba(0,0,0,.10);
-  --badge-outline: rgba(0,0,0,.05);
+  --button-outline: rgba(255, 255, 255, 0.12);
+  --badge-outline: rgba(255, 255, 255, 0.08);
+  --opaque-button-border-intensity: 9;
+  --elevate-1: rgba(255, 255, 255, 0.04);
+  --elevate-2: rgba(255, 255, 255, 0.08);
 
+  --background: 248 31% 8%;
+  --foreground: 220 20% 96%;
+  --border: 247 20% 21%;
+
+  --card: 246 30% 12%;
+  --card-foreground: 220 20% 96%;
+  --card-border: 249 18% 22%;
+
+  --sidebar: 246 30% 11%;
+  --sidebar-foreground: 220 20% 96%;
+  --sidebar-border: 247 20% 19%;
+  --sidebar-primary: 188 98% 61%;
+  --sidebar-primary-foreground: 245 30% 10%;
+  --sidebar-accent: 250 22% 18%;
+  --sidebar-accent-foreground: 220 20% 96%;
+  --sidebar-ring: 188 98% 61%;
+
+  --popover: 246 29% 11%;
+  --popover-foreground: 220 20% 96%;
+  --popover-border: 248 18% 22%;
+
+  --primary: 188 98% 61%;
+  --primary-foreground: 245 30% 10%;
+  --secondary: 257 49% 61%;
+  --secondary-foreground: 220 20% 96%;
+  --muted: 248 19% 18%;
+  --muted-foreground: 226 16% 74%;
+  --accent: 249 25% 18%;
+  --accent-foreground: 220 20% 96%;
+  --destructive: 352 88% 63%;
+  --destructive-foreground: 0 0% 98%;
+  --input: 247 21% 18%;
+  --ring: 188 98% 61%;
+
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --radius: 1rem;
+}
+
+.light {
+  --button-outline: rgba(15, 23, 42, 0.12);
+  --badge-outline: rgba(15, 23, 42, 0.08);
   --opaque-button-border-intensity: -8;
+  --elevate-1: rgba(15, 23, 42, 0.04);
+  --elevate-2: rgba(15, 23, 42, 0.08);
 
-  --elevate-1: rgba(0,0,0,.03);
-  --elevate-2: rgba(0,0,0,.08);
-
-  --background: 220 15% 96%;
-  --foreground: 220 15% 15%;
-  --border: 220 13% 91%;
+  --background: 210 40% 98%;
+  --foreground: 236 28% 14%;
+  --border: 220 26% 89%;
 
   --card: 0 0% 100%;
-  --card-foreground: 220 15% 15%;
-  --card-border: 220 13% 95%;
+  --card-foreground: 236 28% 14%;
+  --card-border: 220 25% 91%;
 
-  --sidebar: 220 13% 93%;
-  --sidebar-foreground: 220 15% 15%;
-  --sidebar-border: 220 13% 88%;
+  --sidebar: 220 33% 96%;
+  --sidebar-foreground: 236 28% 14%;
+  --sidebar-border: 220 26% 89%;
+  --sidebar-primary: 188 98% 48%;
+  --sidebar-primary-foreground: 236 28% 14%;
+  --sidebar-accent: 220 33% 92%;
+  --sidebar-accent-foreground: 236 28% 14%;
+  --sidebar-ring: 188 98% 48%;
 
-  --sidebar-primary: 260 90% 55%;
-  --sidebar-primary-foreground: 0 0% 98%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 236 28% 14%;
+  --popover-border: 220 25% 90%;
 
-  --sidebar-accent: 220 13% 90%;
-  --sidebar-accent-foreground: 220 15% 15%;
-  --sidebar-ring: 260 90% 55%;
-
-  --popover: 220 13% 94%;
-  --popover-foreground: 220 15% 15%;
-  --popover-border: 220 13% 89%;
-
-  --primary: 260 90% 55%;
-  --primary-foreground: 0 0% 98%;
-
-  --secondary: 220 10% 88%;
-  --secondary-foreground: 220 15% 15%;
-
-  --muted: 220 10% 90%;
-  --muted-foreground: 220 10% 45%;
-
-  --accent: 220 8% 88%;
-  --accent-foreground: 220 15% 15%;
-
-  --destructive: 0 75% 60%;
+  --primary: 188 98% 48%;
+  --primary-foreground: 236 28% 14%;
+  --secondary: 257 49% 52%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 220 33% 94%;
+  --muted-foreground: 231 12% 42%;
+  --accent: 220 33% 92%;
+  --accent-foreground: 236 28% 14%;
+  --destructive: 352 88% 54%;
   --destructive-foreground: 0 0% 98%;
-
-  --input: 220 13% 85%;
-  --ring: 260 90% 55%;
-
-  --font-sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: "JetBrains Mono", monospace;
-
-  --radius: .5rem;
+  --input: 220 26% 88%;
+  --ring: 188 98% 48%;
 }
-
-/* ------------------------------------------------------------------
-   DARK MODE TOKENS
------------------------------------------------------------------- */
-
-.dark {
-  --button-outline: rgba(255,255,255,.10);
-  --badge-outline: rgba(255,255,255,.05);
-
-  --opaque-button-border-intensity: 9;
-
-  --elevate-1: rgba(255,255,255,.04);
-  --elevate-2: rgba(255,255,255,.09);
-
-  --background: 12 8% 12%;
-  --foreground: 0 0% 95%;
-  --border: 240 6% 20%;
-
-  --card: 240 6% 18%;
-  --card-foreground: 0 0% 95%;
-  --card-border: 240 6% 22%;
-
-  --sidebar: 240 6% 15%;
-  --sidebar-foreground: 0 0% 95%;
-  --sidebar-border: 240 6% 18%;
-
-  --sidebar-primary: 260 90% 65%;
-  --sidebar-primary-foreground: 220 15% 15%;
-
-  --sidebar-accent: 240 6% 20%;
-  --sidebar-accent-foreground: 0 0% 95%;
-  --sidebar-ring: 260 90% 65%;
-
-  --popover: 240 6% 16%;
-  --popover-foreground: 0 0% 95%;
-  --popover-border: 240 6% 20%;
-
-  --primary: 260 90% 65%;
-  --primary-foreground: 220 15% 15%;
-
-  --secondary: 240 6% 22%;
-  --secondary-foreground: 0 0% 95%;
-
-  --muted: 240 6% 20%;
-  --muted-foreground: 0 0% 70%;
-
-  --accent: 240 6% 24%;
-  --accent-foreground: 0 0% 95%;
-
-  --destructive: 0 75% 60%;
-  --destructive-foreground: 0 0% 98%;
-
-  --input: 240 6% 26%;
-  --ring: 260 90% 65%;
-}
-
-/* ------------------------------------------------------------------
-   BASE LAYER
------------------------------------------------------------------- */
 
 @layer base {
   * {
     @apply border-border;
   }
 
+  html {
+    color-scheme: dark;
+  }
+
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply min-h-screen font-sans antialiased bg-background text-foreground;
+    background-image:
+      radial-gradient(circle at top, rgba(58, 227, 255, 0.17), transparent 30%),
+      radial-gradient(circle at 85% 18%, rgba(141, 92, 255, 0.2), transparent 24%),
+      linear-gradient(180deg, rgba(14, 17, 37, 0.98), rgba(7, 10, 26, 1));
+    background-attachment: fixed;
   }
 }
 
-/* ------------------------------------------------------------------
-   UTILITIES
------------------------------------------------------------------- */
+@layer components {
+  .glass-panel {
+    background: linear-gradient(
+      180deg,
+      rgba(22, 27, 56, 0.84),
+      rgba(12, 16, 38, 0.7)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 22px 60px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(24px);
+  }
+
+  .editorial-shell {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .editorial-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 18% 16%, rgba(58, 227, 255, 0.18), transparent 24%),
+      radial-gradient(circle at 82% 22%, rgba(141, 92, 255, 0.18), transparent 20%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 38%);
+  }
+
+  .neon-grid::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 3rem 3rem;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.36), transparent 85%);
+    opacity: 0.35;
+  }
+
+  .chip-surface {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 30px rgba(58, 227, 255, 0.18);
+  }
+}
 
 @layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
 
   input[type="search"]::-webkit-search-cancel-button {
     @apply hidden;

@@ -27,6 +27,25 @@ if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
 }
 
+export interface TopicOption {
+  title: string;
+  description: string;
+}
+
+export interface LearningSnippetResult {
+  snippets: string[];
+  options?: TopicOption[];
+}
+
+function appendLogLine(filename: string, payload: unknown) {
+  const filePath = path.join(logsDir, filename);
+  void fs.promises.appendFile(filePath, JSON.stringify(payload) + "\n").catch(
+    (error) => {
+      console.error("Failed to write log file:", error);
+    },
+  );
+}
+
 /**
  * Sanitize and validate JSON content before parsing
  */
@@ -99,11 +118,8 @@ function logRequest(
     userId: "anonymous", // In future, add actual user ID when auth is implemented
   };
 
-  const logFile = path.join(
-    logsDir,
-    `requests-${new Date().toISOString().split("T")[0]}.log`,
-  );
-  fs.appendFileSync(logFile, JSON.stringify(logEntry) + "\n");
+  const logFile = `requests-${new Date().toISOString().split("T")[0]}.log`;
+  appendLogLine(logFile, logEntry);
 }
 
 /**
@@ -113,10 +129,7 @@ export async function generateLearningSnippets(
   topic: string,
   count: number = 10,
   generateOptions: boolean = false,
-): Promise<{
-  snippets: string[];
-  options?: { title: string; description: string }[];
-}> {
+): Promise<LearningSnippetResult> {
   try {
     // Check cache first
     const cacheKey = `${topic}:${count}:${generateOptions}`;
@@ -253,11 +266,8 @@ RESPONSE FORMAT: STRICT JSON ONLY
         hasContent: !!result?.choices?.[0]?.message?.content,
       },
     };
-    const debugLogFile = path.join(
-      logsDir,
-      `debug-${new Date().toISOString().split("T")[0]}.log`,
-    );
-    fs.appendFileSync(debugLogFile, JSON.stringify(debugLog) + "\n");
+    const debugLogFile = `debug-${new Date().toISOString().split("T")[0]}.log`;
+    appendLogLine(debugLogFile, debugLog);
 
     // Check if response has the expected structure
     if (!result?.choices?.[0]?.message?.content) {
@@ -349,7 +359,7 @@ RESPONSE FORMAT: STRICT JSON ONLY
 
     // Parse the JSON response
     let snippets: string[];
-    let options: { title: string; description: string }[] = [];
+      let options: TopicOption[] = [];
 
     try {
       const content = result.choices[0].message.content;
@@ -361,11 +371,8 @@ RESPONSE FORMAT: STRICT JSON ONLY
         rawResponse: content,
         responseLength: content.length,
       };
-      const debugLogFile = path.join(
-        logsDir,
-        `debug-${new Date().toISOString().split("T")[0]}.log`,
-      );
-      fs.appendFileSync(debugLogFile, JSON.stringify(debugLog) + "\n");
+      const debugLogFile = `debug-${new Date().toISOString().split("T")[0]}.log`;
+      appendLogLine(debugLogFile, debugLog);
 
       const sanitizedJson = sanitizeAndValidateJson(content);
       if (!sanitizedJson) {
@@ -476,7 +483,7 @@ function getFallbackContent(
   topic: string,
   count: number,
   generateOptions: boolean = false,
-): { snippets: string[]; options?: { title: string; description: string }[] } {
+): LearningSnippetResult {
   const fallbackSnippets = [
     `Discover the fundamentals of ${topic} and why it matters in today's world.`,
     `Key insight: ${topic} becomes more powerful when you understand its core principles.`,
@@ -491,7 +498,7 @@ function getFallbackContent(
   ];
 
   // Generate options if requested
-  let options: { title: string; description: string }[] = [];
+  let options: TopicOption[] = [];
   if (generateOptions) {
     // Topic-specific options that are more relevant
     const topicLower = topic.toLowerCase();
@@ -598,7 +605,7 @@ function getFallbackContent(
  */
 function getFallbackOptions(
   topic: string,
-): { title: string; description: string }[] {
+): TopicOption[] {
   return [
     {
       title: `Introduction to ${topic}`,

@@ -4,13 +4,17 @@
  */
 
 import express from 'express';
+import { sql } from 'drizzle-orm';
 import { getDB } from '../db';
 
 const router = express.Router();
 
-// Import database functions
+const DEFAULT_TOPICS = [
+  "Quantum Computing", "Neuroplasticity", "Dark Matter", "Biohacking",
+  "Blockchain", "AI Ethics", "Space Colonization", "Cryptography",
+  "Genetic Engineering", "Renewable Energy", "Consciousness", "Time Dilation"
+];
 
-// Initialize database connection when this module loads
 let db: any = null;
 
 try {
@@ -30,7 +34,6 @@ router.post('/api/topic-interactions', async (req, res) => {
   try {
     const { userId, interactions } = req.body;
 
-    // Skip if no database in development
     if (!db) {
       return res.status(200).json({
         success: true,
@@ -51,22 +54,17 @@ router.post('/api/topic-interactions', async (req, res) => {
 
       try {
         if (db) {
-          await db.query(
-          `INSERT INTO user_topic_interactions
-           (user_id, topic, interaction_count, is_liked, last_interaction)
-           VALUES ($1, $2, $3, $4, NOW())
-           ON CONFLICT (user_id, topic)
-           DO UPDATE SET
-             interaction_count = EXCLUDED.interaction_count,
-             is_liked = EXCLUDED.is_liked,
-             last_interaction = NOW()`,
-          [
-            userId,
-            interaction.topic,
-            interaction.count || 1,
-            interaction.isLiked || false
-          ]
-          );
+          await db.execute(sql`
+            INSERT INTO user_topic_interactions
+              (user_id, topic, interaction_count, is_liked, last_interaction)
+            VALUES
+              (${userId}, ${interaction.topic}, ${interaction.count || 1}, ${interaction.isLiked || false}, NOW())
+            ON CONFLICT (user_id, topic)
+            DO UPDATE SET
+              interaction_count = EXCLUDED.interaction_count,
+              is_liked = EXCLUDED.is_liked,
+              last_interaction = NOW()
+          `);
         }
       } catch (queryError) {
         console.error('Error saving topic interaction:', queryError);
@@ -100,40 +98,34 @@ router.get('/api/popular-topics', async (req, res) => {
       });
     }
 
-    // Get user's popular topics from database
     if (!db) {
-      return res.status(500).json({
-        success: false,
-        error: 'Database not available in development mode'
+      return res.json({
+        topics: DEFAULT_TOPICS,
+        source: 'default'
       });
     }
-    const result = await db.query(
-      `SELECT topic, interaction_count, is_liked, last_interaction
-       FROM user_topic_interactions
-       WHERE user_id = $1
-       ORDER BY
-         is_liked DESC,
-         interaction_count DESC,
-         last_interaction DESC
-       LIMIT 12`,
-      [userId]
-    );
+    const result = await db.execute(sql`
+      SELECT topic, interaction_count, is_liked, last_interaction
+      FROM user_topic_interactions
+      WHERE user_id = ${String(userId)}
+      ORDER BY
+        is_liked DESC,
+        interaction_count DESC,
+        last_interaction DESC
+      LIMIT 12
+    `);
+    const rows = result.rows ?? [];
 
     // If user has no interactions, return some default popular topics
-    if (result.rows.length === 0) {
-      const defaultTopics = [
-        "Quantum Computing", "Neuroplasticity", "Dark Matter", "Biohacking",
-        "Blockchain", "AI Ethics", "Space Colonization", "Cryptography",
-        "Genetic Engineering", "Renewable Energy", "Consciousness", "Time Dilation"
-      ];
+    if (rows.length === 0) {
       return res.json({
-        topics: defaultTopics,
+        topics: DEFAULT_TOPICS,
         source: 'default'
       });
     }
 
     res.json({
-      topics: result.rows.map((row: any) => row.topic),
+      topics: rows.map((row: any) => row.topic),
       source: 'database'
     });
   } catch (error) {
@@ -150,21 +142,24 @@ router.get('/api/popular-topics', async (req, res) => {
 router.get('/api/global-popular-topics', async (req, res) => {
   try {
     if (!db) {
-      return res.status(500).json({
-        success: false,
-        error: 'Database not available in development mode'
+      return res.json({
+        topics: DEFAULT_TOPICS.map((topic, index) => ({
+          topic,
+          popularity: DEFAULT_TOPICS.length - index
+        }))
       });
     }
-    const result = await db.query(
-      `SELECT topic, SUM(interaction_count) as total_count
-       FROM user_topic_interactions
-       GROUP BY topic
-       ORDER BY total_count DESC
-       LIMIT 20`
-    );
+    const result = await db.execute(sql`
+      SELECT topic, SUM(interaction_count) as total_count
+      FROM user_topic_interactions
+      GROUP BY topic
+      ORDER BY total_count DESC
+      LIMIT 20
+    `);
+    const rows = result.rows ?? [];
 
     res.json({
-      topics: result.rows.map((row: any) => ({
+      topics: rows.map((row: any) => ({
         topic: row.topic,
         popularity: row.total_count
       }))

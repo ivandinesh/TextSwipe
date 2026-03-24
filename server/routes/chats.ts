@@ -6,7 +6,7 @@
 import express from 'express';
 import { z } from 'zod';
 import { getDB } from '../db';
-import { chats, chatCards, insertChatSchema, insertChatCardSchema } from '../../shared/schema';
+import { chats, chatCards } from '../../shared/schema';
 import { eq, desc } from 'drizzle-orm';
 import { generateLearningSnippets } from '../openai';
 
@@ -155,7 +155,7 @@ router.post('/api/generate-content', async (req, res) => {
 
     // Generate content using existing logic
     // (This would call your Gemini AI service)
-    const snippets = await generateLearningSnippets(topic, count);
+    const { snippets, options } = await generateLearningSnippets(topic, count, true);
 
     // If chatId provided, store the generated content in chat_cards
     if (chatId && db) {
@@ -188,6 +188,7 @@ router.post('/api/generate-content', async (req, res) => {
     res.json({
       success: true,
       snippets,
+      options: options ?? [],
       topic,
       chatId, // Return chatId if content was associated with a chat
     });
