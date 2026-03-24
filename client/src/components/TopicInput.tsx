@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, Sparkles, Wand2 } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTopicService } from "@/services/topicService";
@@ -54,26 +54,21 @@ export function TopicInput({ onSubmit, isLoading = false, className }: TopicInpu
   };
 
   return (
-    <div className={cn("w-full max-w-2xl mx-auto space-y-7", className)}>
+    <div className={cn("mx-auto w-full max-w-xl space-y-5", className)}>
       <div className="glass-panel rounded-[2rem] p-4 shadow-[0_24px_90px_rgba(0,0,0,0.35)] md:p-6">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <div>
-            <p className="font-display text-xs font-semibold uppercase tracking-[0.32em] text-primary/75">
-              Learning Prompt
-            </p>
-            <h2 className="mt-2 text-xl font-semibold text-foreground md:text-2xl">
-              Drop into a focus stream
-            </h2>
-          </div>
-          <div className="hidden rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-muted-foreground md:block">
-            Swipe-ready in seconds
-          </div>
+        <div className="mb-5">
+          <p className="font-display text-xs font-semibold uppercase tracking-[0.32em] text-primary/75">
+            Start Here
+          </p>
+          <h2 className="mt-2 text-xl font-semibold text-foreground md:text-2xl">
+            Pick a topic and enter the deck.
+          </h2>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             type="text"
-            placeholder="What do you want to focus on? Example: quantum computing, lucid dreaming, dark matter"
+            placeholder="Try renewable energy, lucid dreaming, dark matter..."
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             disabled={isLoading}
@@ -88,7 +83,7 @@ export function TopicInput({ onSubmit, isLoading = false, className }: TopicInpu
               className="h-12 flex-1 rounded-2xl bg-primary text-primary-foreground shadow-[0_12px_34px_rgba(58,227,255,0.28)]"
               data-testid="button-start-focusing"
             >
-              {isLoading ? "Loading..." : "Start Focus Session"}
+              {isLoading ? "Loading..." : "Start session"}
               <ArrowRight className="h-4 w-4" />
             </Button>
 
@@ -101,35 +96,22 @@ export function TopicInput({ onSubmit, isLoading = false, className }: TopicInpu
               data-testid="button-surprise-me"
             >
               <Sparkles className="h-4 w-4" />
-              Surprise Me
+              Surprise me
             </Button>
           </div>
         </form>
-
-        <div className="mt-5 flex items-start gap-3 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
-          <Wand2 className="mt-0.5 h-4 w-4 text-primary" />
-          <p className="text-sm leading-6 text-muted-foreground">
-            FocusFeed turns any topic into a vertical deck of concise, swipeable
-            insights with optional next-step topics when you want to go deeper.
-          </p>
-        </div>
       </div>
 
-      <div className="space-y-3">
-        <div className="flex items-center justify-between gap-4">
-          <p className="font-display text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-            Trending Focus Topics
-          </p>
-          <p className="hidden text-xs text-muted-foreground md:block">
-            Tap a chip to jump straight in
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
+      <div className="space-y-2">
+        <p className="font-display text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+          Popular right now
+        </p>
+        <div className="flex flex-wrap gap-2.5">
           {popularTopics.map((popularTopic, index) => (
             <button
               key={index}
               type="button"
-              className="chip-surface rounded-full px-4 py-2 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/10 hover:text-primary"
+              className="chip-surface rounded-full px-3.5 py-2 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/10 hover:text-primary"
               onClick={() => {
                 setTopic(popularTopic);
                 submitTopic(popularTopic);

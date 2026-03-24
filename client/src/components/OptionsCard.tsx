@@ -18,6 +18,8 @@ interface OptionsCardProps {
   mutedTextColor?: string;
   fontClass?: string;
   className?: string;
+  panelStyle?: React.CSSProperties;
+  tileStyle?: React.CSSProperties;
 }
 
 export function OptionsCard({
@@ -29,6 +31,8 @@ export function OptionsCard({
   mutedTextColor,
   fontClass,
   className,
+  panelStyle,
+  tileStyle,
 }: OptionsCardProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
@@ -47,8 +51,11 @@ export function OptionsCard({
       )}
       data-testid="options-card"
     >
-      <div className="mx-auto flex h-full w-full max-w-5xl flex-col justify-between">
-        <div className="glass-panel rounded-[2rem] px-6 py-8 md:px-8">
+      <div className="mx-auto flex h-full w-full max-w-[min(94vw,78rem)] flex-col justify-between">
+        <div
+          className="rounded-[2rem] border px-6 py-8 backdrop-blur-2xl md:px-8"
+          style={panelStyle}
+        >
           <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
               <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary/80">
@@ -86,32 +93,33 @@ export function OptionsCard({
                 key={index}
                 whileHover={{ y: -4 }}
                 whileTap={{ scale: 0.98 }}
-                className="relative"
+                className="relative min-w-0"
               >
                 <Button
                   onClick={() => handleOptionSelect(option.title)}
                   className={cn(
-                    "h-auto w-full rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5 text-left transition-all duration-200 hover:border-primary/35 hover:bg-white/[0.07]",
+                    "flex h-full min-h-[12rem] w-full min-w-0 flex-col items-start justify-between whitespace-normal break-words rounded-[1.5rem] border p-5 text-left transition-all duration-200 hover:border-primary/35 hover:bg-white/[0.07]",
                     selectedOption === option.title && "border-primary bg-primary/10",
                   )}
+                  style={tileStyle}
                   data-testid={`option-${index}`}
                 >
-                  <div className="flex min-h-[9rem] flex-col justify-between">
-                    <div>
+                  <div className="flex min-h-[9rem] w-full min-w-0 flex-col justify-between">
+                    <div className="min-w-0">
                       <h3
-                        className={cn("text-lg font-semibold", fontClass || "")}
+                        className={cn("text-lg font-semibold leading-tight break-words", fontClass || "")}
                         style={textColor ? { color: textColor } : {}}
                       >
                         {option.title}
                       </h3>
                       <p
-                        className="mt-3 text-sm leading-6"
+                        className="mt-3 whitespace-normal break-words text-sm leading-6"
                         style={{ color: mutedTextColor || textColor }}
                       >
                         {option.description}
                       </p>
                     </div>
-                    <div className="mt-5 flex items-center gap-2 text-sm font-medium text-primary">
+                    <div className="mt-5 flex w-full items-center gap-2 whitespace-normal text-sm font-medium text-primary">
                       Start new 10-card branch
                       <ArrowRight className="h-4 w-4" />
                     </div>

@@ -16,6 +16,7 @@ interface SwipeCardProps {
   mutedTextColor?: string;
   fontClass?: string;
   progressLabel?: string;
+  panelStyle?: React.CSSProperties;
 }
 
 export function SwipeCard({
@@ -32,6 +33,7 @@ export function SwipeCard({
   mutedTextColor,
   fontClass,
   progressLabel,
+  panelStyle,
 }: SwipeCardProps) {
   const handleLike = () => {
     onLike?.(content);
@@ -46,8 +48,11 @@ export function SwipeCard({
       )}
       data-testid={`card-learn-${index}`}
     >
-      <div className="mx-auto flex h-full w-full max-w-4xl flex-col justify-between">
-        <div className="glass-panel min-h-[68vh] rounded-[2rem] px-6 py-8 md:min-h-[72vh] md:px-10 md:py-10">
+      <div className="mx-auto flex h-full w-full max-w-[min(92vw,72rem)] flex-col justify-between">
+        <div
+          className="min-h-[68vh] rounded-[2rem] border px-6 py-8 backdrop-blur-2xl md:min-h-[72vh] md:px-12 md:py-10"
+          style={panelStyle}
+        >
           <div className="mb-8 flex items-center justify-between gap-4">
             <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary/80">
               Insight {index + 1}

@@ -43,6 +43,10 @@ const THEMES: Record<
     surface: string;
     shell: string;
     overlay: string;
+    panel: string;
+    panelBorder: string;
+    panelGlow: string;
+    tile: string;
     text: string;
     muted: string;
   }
@@ -52,6 +56,10 @@ const THEMES: Record<
       "bg-[radial-gradient(circle_at_top,rgba(58,227,255,0.12),transparent_24%),linear-gradient(180deg,rgba(12,15,34,0.95),rgba(6,10,24,1))]",
     shell: "rgba(8, 12, 28, 0.86)",
     overlay: "rgba(255,255,255,0.06)",
+    panel: "linear-gradient(180deg, rgba(18, 24, 54, 0.92), rgba(10, 14, 34, 0.82))",
+    panelBorder: "rgba(116, 161, 255, 0.18)",
+    panelGlow: "0 24px 80px rgba(4, 10, 34, 0.52), inset 0 1px 0 rgba(255,255,255,0.08)",
+    tile: "rgba(255,255,255,0.04)",
     text: "#F6F8FF",
     muted: "#A6B1CF",
   },
@@ -60,6 +68,10 @@ const THEMES: Record<
       "bg-[radial-gradient(circle_at_top_left,rgba(58,227,255,0.15),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(152,92,255,0.22),transparent_26%),linear-gradient(180deg,rgba(18,19,47,0.96),rgba(9,11,33,1))]",
     shell: "rgba(18, 19, 47, 0.86)",
     overlay: "rgba(255,255,255,0.08)",
+    panel: "linear-gradient(180deg, rgba(33, 25, 70, 0.9), rgba(16, 18, 45, 0.84))",
+    panelBorder: "rgba(160, 132, 255, 0.22)",
+    panelGlow: "0 24px 80px rgba(22, 12, 62, 0.46), inset 0 1px 0 rgba(255,255,255,0.1)",
+    tile: "rgba(255,255,255,0.05)",
     text: "#F7F4FF",
     muted: "#B4AED1",
   },
@@ -68,6 +80,10 @@ const THEMES: Record<
       "bg-[radial-gradient(circle_at_top_right,rgba(255,153,92,0.18),transparent_24%),radial-gradient(circle_at_left,rgba(255,96,143,0.14),transparent_20%),linear-gradient(180deg,rgba(31,16,28,0.96),rgba(14,9,18,1))]",
     shell: "rgba(31, 16, 28, 0.86)",
     overlay: "rgba(255,255,255,0.07)",
+    panel: "linear-gradient(180deg, rgba(48, 24, 36, 0.9), rgba(22, 12, 20, 0.84))",
+    panelBorder: "rgba(255, 154, 115, 0.2)",
+    panelGlow: "0 24px 80px rgba(34, 10, 18, 0.5), inset 0 1px 0 rgba(255,255,255,0.08)",
+    tile: "rgba(255,255,255,0.045)",
     text: "#FFF5F5",
     muted: "#D7B3BE",
   },
@@ -425,6 +441,15 @@ export function SwipeContainer({
             textColor={activeTheme.text}
             mutedTextColor={activeTheme.muted}
             fontClass={fontClass}
+            panelStyle={{
+              background: activeTheme.panel,
+              borderColor: activeTheme.panelBorder,
+              boxShadow: activeTheme.panelGlow,
+            }}
+            tileStyle={{
+              background: activeTheme.tile,
+              borderColor: activeTheme.panelBorder,
+            }}
           />
         ) : (
           allSnippets.map((snippet, index) => (
@@ -442,6 +467,11 @@ export function SwipeContainer({
               mutedTextColor={activeTheme.muted}
               fontClass={fontClass}
               progressLabel={`${Math.min(currentIndex + 1, allSnippets.length)} / ${allSnippets.length}`}
+              panelStyle={{
+                background: activeTheme.panel,
+                borderColor: activeTheme.panelBorder,
+                boxShadow: activeTheme.panelGlow,
+              }}
               className={cn(
                 "absolute inset-0 transition-all duration-300 ease-out",
                 index === currentIndex

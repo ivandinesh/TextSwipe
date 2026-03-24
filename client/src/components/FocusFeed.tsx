@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Sparkles, Waves } from "lucide-react";
+import { Sparkles, Waves } from "lucide-react";
 import { useTopicService } from "@/services/topicService";
 import { LoadingScreen } from "./LoadingScreen";
 import { SwipeContainer } from "./SwipeContainer";
@@ -184,7 +184,7 @@ export function FocusFeed() {
     <div className="editorial-shell neon-grid min-h-screen bg-background">
       {currentView === "input" && (
         <div className="relative min-h-screen overflow-hidden px-5 py-8 md:px-8 md:py-10">
-          <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl flex-col justify-between gap-12">
+          <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl flex-col justify-between gap-10">
             <header className="flex items-center justify-between">
               <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs uppercase tracking-[0.28em] text-primary/80">
                 <Sparkles className="h-3.5 w-3.5" />
@@ -192,33 +192,27 @@ export function FocusFeed() {
               </div>
               <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-muted-foreground md:flex">
                 <Waves className="h-3.5 w-3.5 text-primary" />
-                Dark-first editorial mode
+                Minimal reading mode
               </div>
             </header>
 
-            <section className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-              <div className="max-w-2xl">
+            <section className="grid items-center gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+              <div className="max-w-xl">
                 <p className="font-display text-xs font-semibold uppercase tracking-[0.34em] text-primary/80">
-                  Swipeable Learning, Reimagined
+                  Swipeable learning
                 </p>
-                <h1 className="text-glow mt-5 max-w-4xl font-display text-5xl font-bold leading-[0.94] text-foreground md:text-7xl">
-                  Next-gen focus feeds for curious minds.
+                <h1 className="text-glow mt-5 max-w-3xl font-display text-5xl font-bold leading-[0.94] text-foreground md:text-7xl">
+                  Learn one clear idea at a time.
                 </h1>
-                <p className="mt-6 max-w-xl text-base leading-8 text-muted-foreground md:text-lg">
-                  Turn any topic into a cinematic stream of concise insights,
-                  then keep drilling deeper with smart follow-up topics built for
-                  momentum, not overload.
+                <p className="mt-5 max-w-lg text-base leading-7 text-muted-foreground md:text-lg">
+                  Enter a topic and move through a clean 10-card deck built for focus.
                 </p>
-
-                <div className="mt-8 flex flex-wrap gap-3">
+                <div className="mt-7 flex flex-wrap gap-3">
                   <div className="chip-surface rounded-full px-4 py-2 text-sm text-foreground">
-                    Deep reading rhythm
+                    10-card focus deck
                   </div>
                   <div className="chip-surface rounded-full px-4 py-2 text-sm text-foreground">
-                    Mobile-first swipe flow
-                  </div>
-                  <div className="chip-surface rounded-full px-4 py-2 text-sm text-foreground">
-                    Related-topic branching
+                    Smart next branches
                   </div>
                 </div>
               </div>
@@ -230,16 +224,12 @@ export function FocusFeed() {
               </div>
             </section>
 
-            <footer className="flex flex-col gap-4 border-t border-white/8 pt-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
+            <footer className="flex flex-col gap-3 border-t border-white/8 pt-5 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
               <p>
                 {likedSnippets.length > 0
                   ? `${likedSnippets.length} saved insights ready to revisit`
-                  : "Start with a topic you know or one you want to explore next."}
+                  : "Start with a topic you want to understand better."}
               </p>
-              <div className="flex items-center gap-2 text-primary/80">
-                <span>Built for flow, not clutter</span>
-                <ArrowUpRight className="h-4 w-4" />
-              </div>
             </footer>
           </div>
         </div>
