@@ -1,6 +1,6 @@
 import { type Express, type Request, type Response } from "express";
 import { createServer, type Server } from "http";
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import { generateLearningSnippets } from "./openai";
 
 const limiter = rateLimit({
@@ -9,6 +9,7 @@ const limiter = rateLimit({
   message: "Too many generation requests from this IP, please try again later",
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: (req) => ipKeyGenerator(req.ip ?? ""),
 });
 
 function normalizeSnippets(topic: string, snippets: string[]) {
