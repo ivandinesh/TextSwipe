@@ -28,7 +28,13 @@ export function useAuth() {
       }
 
       if (!response.ok) {
-        throw new Error(await response.text());
+        const text = await response.text();
+        try {
+          const parsed = JSON.parse(text);
+          throw new Error(parsed?.error || parsed?.message || text);
+        } catch {
+          throw new Error(text);
+        }
       }
 
       return response.json();

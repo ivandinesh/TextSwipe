@@ -52,14 +52,20 @@ router.post("/api/auth/register", async (req, res) => {
     });
 
     req.session.userId = user.id;
+    return req.session.save((sessionError) => {
+      if (sessionError) {
+        console.error("Registration session save failed:", sessionError);
+        return res.status(500).json({ error: "Account created, but sign-in could not be completed." });
+      }
 
-    return res.status(201).json({
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        createdAt: user.createdAt,
-      },
+      return res.status(201).json({
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          createdAt: user.createdAt,
+        },
+      });
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -81,14 +87,20 @@ router.post("/api/auth/login", async (req, res) => {
     }
 
     req.session.userId = user.id;
+    return req.session.save((sessionError) => {
+      if (sessionError) {
+        console.error("Login session save failed:", sessionError);
+        return res.status(500).json({ error: "Signed in, but your session could not be saved." });
+      }
 
-    return res.json({
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        createdAt: user.createdAt,
-      },
+      return res.json({
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          createdAt: user.createdAt,
+        },
+      });
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

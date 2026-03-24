@@ -20,6 +20,7 @@ export function AuthDialog({ triggerLabel = "Sign in" }: AuthDialogProps) {
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     await login.mutateAsync({ email: loginEmail, password: loginPassword });
+    setLoginPassword("");
     setOpen(false);
   };
 
@@ -29,7 +30,24 @@ export function AuthDialog({ triggerLabel = "Sign in" }: AuthDialogProps) {
       email: registerEmail,
       password: registerPassword,
     });
+    setRegisterPassword("");
     setOpen(false);
+  };
+
+  const getFriendlyError = (error: unknown, fallback: string) => {
+    if (!(error instanceof Error)) {
+      return fallback;
+    }
+
+    const message = error.message.trim();
+    if (!message) {
+      return fallback;
+    }
+
+    return message
+      .replace(/^\d{3}:\s*/, "")
+      .replace(/^\{"error":"?/, "")
+      .replace(/"\}$/, "");
   };
 
   return (
@@ -67,7 +85,7 @@ export function AuthDialog({ triggerLabel = "Sign in" }: AuthDialogProps) {
               />
               {login.error && (
                 <p className="text-sm text-red-300">
-                  {login.error instanceof Error ? login.error.message : "Failed to sign in."}
+                  {getFriendlyError(login.error, "Failed to sign in.")}
                 </p>
               )}
               <Button type="submit" className="w-full">
@@ -91,7 +109,7 @@ export function AuthDialog({ triggerLabel = "Sign in" }: AuthDialogProps) {
               />
               {register.error && (
                 <p className="text-sm text-red-300">
-                  {register.error instanceof Error ? register.error.message : "Failed to create account."}
+                  {getFriendlyError(register.error, "Failed to create account.")}
                 </p>
               )}
               <Button type="submit" className="w-full">

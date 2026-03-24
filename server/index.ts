@@ -37,6 +37,7 @@ const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.set("trust proxy", 1);
 const MemoryStore = MemoryStoreFactory(session);
 const allowedOrigins = (process.env.APP_ALLOWED_ORIGINS || "")
   .split(",")
@@ -82,6 +83,7 @@ app.use(
     secret: process.env.SESSION_SECRET || "focusfeed-dev-secret",
     resave: false,
     saveUninitialized: false,
+    proxy: process.env.NODE_ENV === "production",
     cookie: {
       httpOnly: true,
       sameSite: "lax",

@@ -38,6 +38,14 @@ type ThemeName = "midnight" | "aurora" | "ember" | "petal" | "sage";
 type FontName = "sans" | "display" | "mono";
 type TextToneName = "default" | "soft" | "high-contrast";
 
+function eventTargetsCardSurface(target: EventTarget | null) {
+  if (!(target instanceof Element)) {
+    return false;
+  }
+
+  return Boolean(target.closest("[data-card-surface='true']"));
+}
+
 const THEMES: Record<
   ThemeName,
   {
@@ -75,7 +83,7 @@ const THEMES: Record<
     muted: "#A6B1CF",
     textTones: {
       default: { text: "#F6F8FF", muted: "#A6B1CF" },
-      soft: { text: "#CFE3FF", muted: "#9CB5E8" },
+      soft: { text: "#9AE6FF", muted: "#75CBE8" },
       "high-contrast": { text: "#FFFFFF", muted: "#D7E0FF" },
     },
   },
@@ -94,7 +102,7 @@ const THEMES: Record<
     muted: "#B4AED1",
     textTones: {
       default: { text: "#F7F4FF", muted: "#B4AED1" },
-      soft: { text: "#F2DEFF", muted: "#C8B0E6" },
+      soft: { text: "#FFCFF6", muted: "#E6AFDA" },
       "high-contrast": { text: "#FFF9FF", muted: "#D9D0F6" },
     },
   },
@@ -113,7 +121,7 @@ const THEMES: Record<
     muted: "#D7B3BE",
     textTones: {
       default: { text: "#FFF5F5", muted: "#D7B3BE" },
-      soft: { text: "#FFDCD8", muted: "#E2AAB8" },
+      soft: { text: "#FFD8A8", muted: "#E9B993" },
       "high-contrast": { text: "#FFFDFC", muted: "#F0CDD6" },
     },
   },
@@ -132,7 +140,7 @@ const THEMES: Record<
     muted: "#E4BED2",
     textTones: {
       default: { text: "#FFF7FB", muted: "#E4BED2" },
-      soft: { text: "#FFDDEE", muted: "#F4C5D9" },
+      soft: { text: "#FFD1EC", muted: "#F0B5D4" },
       "high-contrast": { text: "#FFFFFF", muted: "#FFE4F1" },
     },
   },
@@ -151,7 +159,7 @@ const THEMES: Record<
     muted: "#B8D6CC",
     textTones: {
       default: { text: "#F5FFF9", muted: "#B8D6CC" },
-      soft: { text: "#D9FFED", muted: "#A5D7C4" },
+      soft: { text: "#C8FFF1", muted: "#97DCC8" },
       "high-contrast": { text: "#FFFFFF", muted: "#D9F5E8" },
     },
   },
@@ -400,7 +408,11 @@ export function SwipeContainer({
           return;
         }
 
-        if (Math.abs(deltaY) < 12 && Math.abs(deltaX) < 12) {
+        if (
+          Math.abs(deltaY) < 12 &&
+          Math.abs(deltaX) < 12 &&
+          eventTargetsCardSurface(e.target)
+        ) {
           setShowChrome((current) => !current);
         }
       }}
@@ -426,6 +438,7 @@ export function SwipeContainer({
               variant="ghost"
               size="icon"
               onClick={onBack}
+              data-chrome-control="true"
               className="h-11 w-11 shrink-0 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
               data-testid="button-back"
             >
@@ -470,6 +483,7 @@ export function SwipeContainer({
                 variant="ghost"
                 size="icon"
                 onClick={cycleBackground}
+                data-chrome-control="true"
                 className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
                 aria-label="Change visual theme"
               >
@@ -479,6 +493,7 @@ export function SwipeContainer({
                 variant="ghost"
                 size="icon"
                 onClick={cycleFont}
+                data-chrome-control="true"
                 className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
                 aria-label="Change font"
               >
@@ -488,6 +503,7 @@ export function SwipeContainer({
                 variant="ghost"
                 size="icon"
                 onClick={cycleTextTone}
+                data-chrome-control="true"
                 className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
                 aria-label="Change text color"
               >
@@ -501,6 +517,7 @@ export function SwipeContainer({
               variant="ghost"
               size="icon"
               onClick={cycleBackground}
+              data-chrome-control="true"
               className="h-9 w-9 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
               aria-label="Change visual theme"
             >
@@ -510,6 +527,7 @@ export function SwipeContainer({
               variant="ghost"
               size="icon"
               onClick={cycleFont}
+              data-chrome-control="true"
               className="h-9 w-9 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
               aria-label="Change font"
             >
@@ -519,6 +537,7 @@ export function SwipeContainer({
               variant="ghost"
               size="icon"
               onClick={cycleTextTone}
+              data-chrome-control="true"
               className="h-9 w-9 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
               aria-label="Change text color"
             >

@@ -66,6 +66,7 @@ export function SwipeCard({
           <div
             className="relative min-h-[68vh] rounded-[2rem] border px-6 py-8 backdrop-blur-2xl transition-all duration-300 md:min-h-[72vh] md:px-12 md:py-10"
             style={panelStyle}
+            data-card-surface="true"
             onClick={() => {
               if (window.matchMedia("(hover: hover)").matches) {
                 onSurfaceTap?.();
