@@ -1,69 +1,184 @@
-# TextSwipe - Text-Based Swipe Learning App
+# FocusFeed
 
-**Updated with new features: Options generation, rate limiting, enhanced caching, and robust error handling**
+FocusFeed is a full-stack TypeScript app for swipe-based learning. Enter a topic, generate a deck of concise AI-curated cards, and keep exploring through related topic branches in a dark-first editorial UI built for mobile reading and fast navigation.
 
-TextSwipe is a full-stack TypeScript monorepo app inspired by TikTok-style scrolling cards, delivering AI-curated educational content for quick, engaging learning sessions. Users swipe through text-based cards on various topics, with real-time generation and personalization.
+## Highlights
 
-Live Demo: [focusfeed.me](https://focusfeed.me) (Hosted on Oracle Free Tier with HTTPS).
+- Vertical swipe learning flow with keyboard support
+- OpenRouter-backed content generation with fallback content handling
+- Related-topic suggestions after each generated deck
+- Dark-first "editorial neon" UI with glass surfaces and responsive reading layout
+- Local topic personalization via browser storage, plus mounted topic/chat API routes
+- Express rate limiting on generation endpoints
 
-## Features
-- **Swipe Interface**: Intuitive card swiping with Framer Motion animations.
-- **AI Content Generation**: Gemini AI (via Google Generative AI) creates dynamic cards with optional sub-topic suggestions based on user-selected topics.
-- **Robust Error Handling**: Enhanced JSON validation and sanitization for OpenRouter API responses, with graceful fallback mechanisms.
-- **Authentication**: Passport.js for user sessions.
-- **Database**: Postgres with Drizzle ORM for storing users, sessions, and future chat data.
-- **Real-Time**: WebSockets for live updates.
-- **Rate Limiting**: Prevents API abuse with express-rate-limit (3 requests per 15 minutes).
-- **Production Ready**: Static frontend serving, PM2 process manager, Nginx reverse proxy with HTTPS.
+## Stack
 
-## Tech Stack
-- **Frontend**: React, Vite, Tailwind CSS (v3.4.13), Radix UI, TanStack Query, Framer Motion.
-- **Backend**: Express.js, Passport.js, Drizzle ORM (Postgres), OpenRouter API with Meta Llama (meta-llama/llama-3.3-70b-instruct:free model), robust error handling and JSON validation.
-- **Shared**: Zod for validation.
-- **Build/Dev Tools**: esbuild/tsx for backend, Vite for frontend bundling.
-- **Deployment**: Oracle Free Tier (Ubuntu VM), PM2, Nginx, Certbot for SSL.
-- **Dependencies**: Node.js 18+, Postgres, Gemini API key, OpenRouter API key (fallback).
+- Frontend: React, Vite, Tailwind CSS, Framer Motion, Radix UI
+- Backend: Express, TypeScript, OpenRouter API integration
+- Data: Drizzle ORM with PostgreSQL-compatible setup, memory/dev fallback paths
+- Tooling: `tsx`, `esbuild`, `vite`, `typescript`
 
-## Installation
-1. Clone the repo: `git clone https://github.com/ivandinesh/TextSwipe.git`.
-2. Navigate: `cd TextSwipe`.
-3. Install deps: `npm install`.
-4. Set up env: Copy `.env.example` to `.env` and fill in `OPENROUTER_API_KEY`, `DATABASE_URL` (e.g., postgresql://user:pass@localhost:5432/db), `SESSION_SECRET`.
+## Requirements
 
-## Running Locally
-- Dev mode: `npm run dev` (Frontend: http://localhost:5173, Backend: http://localhost:5000).
-- Test API: `curl -X POST http://localhost:5000/api/generate -H "Content-Type: application/json" -d '{"topic":"Test", "generateOptions":true}'`
-- Build prod: `npm run build` (creates dist/public for static assets).
-- Run prod: `npm run start` (or use PM2: `pm2 start ecosystem.config.cjs`).
+- Node.js 18+
+- npm
+- `OPENROUTER_API_KEY` for AI generation
+- Optional PostgreSQL-compatible `DATABASE_URL` if you want DB-backed topic/chat routes
 
-## Database Setup
-- Install Postgres locally or use Neon/Supabase.
-- Run migrations: `npx drizzle-kit generate:pg && npx drizzle-kit migrate`.
-- Schema: Users, sessions (more tables planned for multiple chats).
+## Environment
+
+Create a `.env` file in the project root.
+
+Minimum local development variables:
+
+```env
+NODE_ENV=development
+OPENROUTER_API_KEY=your_openrouter_key
+PORT=5000
+SESSION_SECRET=replace_me_for_production
+```
+
+Optional variables:
+
+```env
+DATABASE_URL=postgresql://user:pass@localhost:5432/focusfeed
+APP_ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+```
+
+Notes:
+
+- `APP_ALLOWED_ORIGINS` is only used in production.
+- In production, the app expects `NODE_ENV`, `OPENROUTER_API_KEY`, and `SESSION_SECRET`.
+
+## Install
+
+```bash
+npm install
+```
+
+## Run Locally
+
+Start the app in development mode:
+
+```bash
+npm run dev
+```
+
+Default local server:
+
+- App/API: [http://localhost:5000](http://localhost:5000)
+
+Useful checks:
+
+```bash
+npm run check
+npm run build
+```
+
+## API Overview
+
+### `POST /api/generate`
+
+Generates a deck payload for the swipe view.
+
+Example request:
+
+```json
+{
+  "topic": "Quantum Computing",
+  "count": 10,
+  "generateOptions": true
+}
+```
+
+Example response:
+
+```json
+{
+  "cards": [
+    { "content": "Quantum bits can represent more than one state at once." }
+  ],
+  "options": [
+    {
+      "title": "Quantum Error Correction",
+      "description": "Learn how fragile quantum information is stabilized."
+    }
+  ]
+}
+```
+
+### `POST /api/generate-content`
+
+Generates a card list for the main client flow.
+
+Example response:
+
+```json
+{
+  "success": true,
+  "snippets": [
+    "Quantum bits can represent more than one state at once."
+  ],
+  "options": [
+    {
+      "title": "Quantum Error Correction",
+      "description": "Learn how fragile quantum information is stabilized."
+    }
+  ]
+}
+```
+
+### Other mounted routes
+
+- `GET /api/health`
+- `POST /api/topic-interactions`
+- `GET /api/popular-topics`
+- `GET /api/global-popular-topics`
+- `GET /api/chats`
+- `POST /api/chats`
+
+## UI Notes
+
+The current UI is intentionally:
+
+- Dark-first
+- Mobile-first
+- Reading-focused
+- High-contrast with restrained neon accents
+
+The main visual work lives in:
+
+- `client/src/index.css`
+- `client/src/components/FocusFeed.tsx`
+- `client/src/components/SwipeContainer.tsx`
+- `client/src/components/SwipeCard.tsx`
+- `client/src/components/OptionsCard.tsx`
+
+## Project Structure
+
+```text
+client/   React frontend
+server/   Express server and API routes
+shared/   Shared schema/types
+dist/     Production build output
+```
 
 ## Deployment
-- **Oracle VM**: Free Tier E2.Micro (Ubuntu), IP 79.76.32.221. Clone repo, install Node/Postgres, run PM2.
-- **Nginx**: Config for HTTPS redirect/proxy to port 5000. Use Certbot for SSL.
-- **Domain**: Point A record to VM IP (e.g., focusfeed.me via Strato).
-- **CI/CD**: Planned with GitHub Actions (SSH deploy).
 
-## Known Changes from Original
-- AI swapped from OpenAI to Gemini for cost/efficiency (with fallback on errors).
-- Build fixes: Tailwind downgrade, PostCSS config, ESM polyfills.
-- Security: .gitignore enhanced for .env/logs/secrets.
-- Hosting: Oracle with iptables/UFW tweaks.
-- Error Handling: Added JSON sanitization and validation for OpenRouter API responses.
+Production build:
 
-## Forward Plan
-- **Milestone 2: Multiple Chats**: Add chats table (id, user_id, topic), API routes, UI list component, persist cards per chat.
-- **Milestone 2.5: Options Generation**: Generate 3-4 related sub-topics after 10 cards using OpenRouter API, allow sub-topic selection.
-- **Milestone 3: Scaling**: Redis cache, user profiles, rate-limiting, Google Analytics, PWA push.
-- **Milestone 4: Maintenance**: Jest tests, Sentry monitoring, Stripe integration, backups.
+```bash
+npm run build
+npm run start
+```
 
-## Contributing
-Fork the repo, create a branch (e.g., `git checkout -b feature/multi-chats`), commit changes, push, and open a PR. Use Zed/VS Code with OpenRouter AI for assistance.
+The server serves the built frontend from `dist/public` and the API from the same Express process.
+
+## Current Caveats
+
+- Topic/chat persistence is partially DB-aware, but some routes are still most useful with a configured database.
+- There are a few legacy dependencies and server-side experiments still present in `package.json`; the active generation path is OpenRouter-based.
 
 ## License
-MIT License (see LICENSE file for details).
 
-For issues, open a GitHub ticket. Contributions welcome!
+MIT
