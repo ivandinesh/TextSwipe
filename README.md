@@ -1,65 +1,66 @@
 # FocusFeed
 
-FocusFeed is a full-stack TypeScript app for swipe-based learning. Enter a topic, generate a deck of concise AI-curated cards, and keep exploring through related topic branches in a dark-first editorial UI built for mobile reading and fast navigation.
+FocusFeed is a full-stack TypeScript app for swipe-based learning. Enter a topic, get a 10-card AI-generated deck, swipe through one idea at a time, then branch into related follow-up topics. The current product includes account support, a personal dashboard, persistent topic caching, and a dark-first reading UI optimized for mobile and desktop.
 
-## Highlights
+## What It Does
 
-- Vertical swipe learning flow with keyboard support
-- OpenRouter-backed content generation with fallback content handling
-- Related-topic suggestions after each generated deck
-- Dark-first "editorial neon" UI with glass surfaces and responsive reading layout
-- Local topic personalization via browser storage, plus mounted topic/chat API routes
-- Express rate limiting on generation endpoints
+- Generates swipeable learning decks for any topic
+- Suggests follow-up branches after each 10-card session
+- Supports account registration with email + password
+- Saves liked cards, learning sessions, and topic interactions for signed-in users
+- Shows a personal dashboard with learning minutes, streaks, saved cards, and recommended topics
+- Persists generated topic decks to disk so repeat topics can be served from cache
+- Uses OpenRouter with an env-configurable model, defaulting to `google/gemini-2.5-flash-lite`
 
 ## Stack
 
-- Frontend: React, Vite, Tailwind CSS, Framer Motion, Radix UI
-- Backend: Express, TypeScript, OpenRouter API integration
-- Data: Drizzle ORM with PostgreSQL-compatible setup, memory/dev fallback paths
-- Tooling: `tsx`, `esbuild`, `vite`, `typescript`
+- Frontend: React, Vite, Tailwind CSS, Framer Motion, Radix UI, Wouter
+- Backend: Express, TypeScript
+- Data: Drizzle ORM with PostgreSQL support and in-memory fallback paths for some flows
+- AI: OpenRouter chat completions
+- Build tools: `vite`, `esbuild`, `tsx`, `typescript`
 
 ## Requirements
 
 - Node.js 18+
 - npm
-- `OPENROUTER_API_KEY` for AI generation
-- Optional PostgreSQL-compatible `DATABASE_URL` if you want DB-backed topic/chat routes
+- OpenRouter API key
+- PostgreSQL for production account/dashboard persistence
 
-## Environment
+## Environment Variables
 
 Create a `.env` file in the project root.
 
-Minimum local development variables:
+Example local setup:
 
 ```env
+PORT=5000
 NODE_ENV=development
+
 OPENROUTER_API_KEY=your_openrouter_key
 OPENROUTER_MODEL=google/gemini-2.5-flash-lite
-PORT=5000
-SESSION_SECRET=replace_me_for_production
+
+SESSION_SECRET=replace-with-a-long-random-secret
+
 GENERATION_RATE_LIMIT_MAX_REQUESTS=10
 GENERATION_RATE_LIMIT_WINDOW_MS=900000
+
 TOPIC_CACHE_ENABLED=true
 TOPIC_CACHE_DIR=cache
-```
 
-Optional variables:
-
-```env
-DATABASE_URL=postgresql://user:pass@localhost:5432/focusfeed
-APP_ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+DATABASE_URL=postgresql://user:password@localhost:5432/focusfeed
+APP_ALLOWED_ORIGINS=https://focusfeed.me,https://www.focusfeed.me
 ```
 
 Notes:
 
+- `OPENROUTER_MODEL` lets you switch providers/models without changing code.
+- `SESSION_SECRET` is required in production because auth uses cookie sessions.
+- `DATABASE_URL` is required in production if you want account, dashboard, likes, and learning history to persist in Postgres.
 - `APP_ALLOWED_ORIGINS` is only used in production.
-- In production, the app expects `NODE_ENV`, `OPENROUTER_API_KEY`, and `SESSION_SECRET`.
-- `OPENROUTER_MODEL` is optional in code, but recommended in env so you can switch providers/models without editing the server.
-- `GENERATION_RATE_LIMIT_MAX_REQUESTS` controls how many generation requests are allowed per rate-limit window.
-- `GENERATION_RATE_LIMIT_WINDOW_MS` controls the rate-limit window length in milliseconds.
-- With the current UI generating 10 cards per request, `GENERATION_RATE_LIMIT_MAX_REQUESTS=10` is effectively about 100 cards per window.
-- `TOPIC_CACHE_ENABLED` turns the persistent topic cache on or off.
-- `TOPIC_CACHE_DIR` sets the cache root directory; the app stores one JSON file per topic under `topics/` plus a `topic-index.json` lookup file.
+- `GENERATION_RATE_LIMIT_MAX_REQUESTS` and `GENERATION_RATE_LIMIT_WINDOW_MS` control the current generation window.
+- `TOPIC_CACHE_DIR` stores one JSON file per cached topic plus `topic-index.json`.
+- Do not commit real secrets to source control.
 
 ## Install
 
@@ -67,17 +68,13 @@ Notes:
 npm install
 ```
 
-## Run Locally
+## Development
 
-Start the app in development mode:
+Run the app:
 
 ```bash
 npm run dev
 ```
-
-Default local server:
-
-- App/API: [http://localhost:5000](http://localhost:5000)
 
 Useful checks:
 
@@ -86,17 +83,42 @@ npm run check
 npm run build
 ```
 
+Default local URL:
+
+- App + API: [http://localhost:5000](http://localhost:5000)
+
+## Database Setup
+
+The app uses Drizzle with PostgreSQL.
+
+To apply the current schema:
+
+```bash
+npm run db:push
+```
+
+Current schema includes support for:
+
+- `users`
+- `learning_sessions`
+- `user_liked_cards`
+- `user_topic_interactions`
+- `chats`
+- `chat_cards`
+
+If you are deploying auth/dashboard for the first time, make sure `DATABASE_URL` is set before running `npm run db:push`.
+
 ## API Overview
 
 ### `POST /api/generate`
 
-Generates a deck payload for the swipe view.
+Returns deck-shaped card data for the swipe flow.
 
 Example request:
 
 ```json
 {
-  "topic": "Quantum Computing",
+  "topic": "Renewable Energy",
   "count": 10,
   "generateOptions": true
 }
@@ -107,12 +129,12 @@ Example response:
 ```json
 {
   "cards": [
-    { "content": "Quantum bits can represent more than one state at once." }
+    { "content": "Renewable energy comes from natural sources that replenish themselves." }
   ],
   "options": [
     {
-      "title": "Quantum Error Correction",
-      "description": "Learn how fragile quantum information is stabilized."
+      "title": "Solar Storage",
+      "description": "Learn how renewable power is stored for later use."
     }
   ]
 }
@@ -120,7 +142,7 @@ Example response:
 
 ### `POST /api/generate-content`
 
-Generates a card list for the main client flow.
+Returns the snippet array used by the main learning flow.
 
 Example response:
 
@@ -128,18 +150,34 @@ Example response:
 {
   "success": true,
   "snippets": [
-    "Quantum bits can represent more than one state at once."
+    "Renewable energy comes from natural sources that replenish themselves."
   ],
   "options": [
     {
-      "title": "Quantum Error Correction",
-      "description": "Learn how fragile quantum information is stabilized."
+      "title": "Solar Storage",
+      "description": "Learn how renewable power is stored for later use."
     }
   ]
 }
 ```
 
-### Other mounted routes
+### Auth Routes
+
+- `GET /api/auth/me`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/logout`
+
+### Dashboard Routes
+
+- `GET /api/dashboard/summary`
+- `GET /api/dashboard/liked-cards`
+- `GET /api/dashboard/recommended-topics`
+- `POST /api/dashboard/learning-sessions`
+- `POST /api/dashboard/liked-cards`
+- `POST /api/dashboard/topic-interactions`
+
+### Other Routes
 
 - `GET /api/health`
 - `POST /api/topic-interactions`
@@ -148,47 +186,77 @@ Example response:
 - `GET /api/chats`
 - `POST /api/chats`
 
+## Topic Cache
+
+FocusFeed includes a persistent server-side topic cache.
+
+Behavior:
+
+- Cache key uses normalized topic + model + count + option mode
+- One file is stored per topic entry
+- Metadata is stored in `topic-index.json`
+- Successful generations are written to memory and disk
+- Repeat requests for the same normalized topic/settings can be served without calling the AI again
+
+Default layout:
+
+```text
+cache/
+  topic-index.json
+  topics/
+    renewable-energy--a1b2c3d4.json
+```
+
 ## UI Notes
 
-The current UI is intentionally:
+The current UI is designed to be:
 
 - Dark-first
-- Mobile-first
 - Reading-focused
-- High-contrast with restrained neon accents
+- Mobile-friendly
+- Minimal on the homepage
+- Immersive in the card view, with tap-to-reveal controls
 
-The main visual work lives in:
-
-- `client/src/index.css`
-- `client/src/components/FocusFeed.tsx`
-- `client/src/components/SwipeContainer.tsx`
-- `client/src/components/SwipeCard.tsx`
-- `client/src/components/OptionsCard.tsx`
+Theme/font/text controls exist in the reading view, and the card surfaces now change with the active theme.
 
 ## Project Structure
 
 ```text
 client/   React frontend
-server/   Express server and API routes
-shared/   Shared schema/types
+server/   Express server, API routes, auth, AI integration, topic cache
+shared/   Shared database schema and types
 dist/     Production build output
 ```
 
-## Deployment
+## Production Deployment
 
-Production build:
+Typical production flow:
 
 ```bash
+npm install
 npm run build
+npm run db:push
 npm run start
 ```
 
-The server serves the built frontend from `dist/public` and the API from the same Express process.
+If you use PM2, restart the process after build/env changes.
 
-## Current Caveats
+Important production notes:
 
-- Topic/chat persistence is partially DB-aware, but some routes are still most useful with a configured database.
-- There are a few legacy dependencies and server-side experiments still present in `package.json`; the active generation path is OpenRouter-based.
+- The app expects HTTPS in production because session cookies are `secure`.
+- Set `APP_ALLOWED_ORIGINS` to your real domain(s).
+- Set `DATABASE_URL` before `npm run db:push`.
+- The repo no longer depends on the unused `@tailwindcss/vite` or `openai` packages, which were removed to avoid production install conflicts.
+
+## Troubleshooting
+
+### `npm install` peer dependency errors
+
+If you still see old peer-resolution errors on a server, make sure the server has the latest committed `package.json` and `package-lock.json` after pulling recent changes.
+
+### `npm run build` works locally but not in this Codex environment
+
+Some local build attempts in the sandbox can fail with `spawn EPERM`. That is an execution-environment restriction here, not a project build issue. The project build itself has been verified successfully.
 
 ## License
 
