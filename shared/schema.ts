@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, text, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -8,11 +8,16 @@ export const users = pgTable("users", {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
+  email: true,
   password: true,
 });
 
@@ -61,3 +66,54 @@ export const insertChatCardSchema = createInsertSchema(chatCards).pick({
 
 export type InsertChatCard = z.infer<typeof insertChatCardSchema>;
 export type ChatCard = typeof chatCards.$inferSelect;
+
+export const userTopicInteractions = pgTable("user_topic_interactions", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  topic: text("topic").notNull(),
+  interactionCount: integer("interaction_count").notNull().default(1),
+  likeCount: integer("like_count").notNull().default(0),
+  isLiked: boolean("is_liked").notNull().default(false),
+  lastInteraction: text("last_interaction")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export const userLikedCards = pgTable("user_liked_cards", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  topic: text("topic").notNull(),
+  content: text("content").notNull(),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export const learningSessions = pgTable("learning_sessions", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  topic: text("topic").notNull(),
+  durationSeconds: integer("duration_seconds").notNull(),
+  cardsCompleted: integer("cards_completed").notNull().default(0),
+  startedAt: text("started_at").notNull(),
+  endedAt: text("ended_at").notNull(),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export type UserTopicInteraction = typeof userTopicInteractions.$inferSelect;
+export type UserLikedCard = typeof userLikedCards.$inferSelect;
+export type LearningSession = typeof learningSessions.$inferSelect;

@@ -6,9 +6,13 @@ import url from "url";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import cors from "cors";
+import session from "express-session";
+import MemoryStoreFactory from "memorystore";
 import { initializeDB } from "./db";
 import chatRoutes from "./routes/chats";
 import topicRoutes from "./routes/topicRoutes";
+import authRoutes from "./routes/authRoutes";
+import dashboardRoutes from "./routes/dashboardRoutes";
 
 // Load environment variables from .env file
 const dotenvResult = dotenv.config();
@@ -33,6 +37,7 @@ const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const MemoryStore = MemoryStoreFactory(session);
 const allowedOrigins = (process.env.APP_ALLOWED_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim())
@@ -72,6 +77,23 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(
+  session({
+    name: "focusfeed.sid",
+    secret: process.env.SESSION_SECRET || "focusfeed-dev-secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 1000 * 60 * 60 * 24 * 30,
+    },
+    store: new MemoryStore({
+      checkPeriod: 1000 * 60 * 60 * 24,
+    }),
+  }),
+);
+app.use(
   (req: Request, res: Response, next: NextFunction) => {
     const start = Date.now();
     const requestPath = req.path;
@@ -91,6 +113,8 @@ app.use(
 (async () => {
   await initializeDB();
   const server = await registerRoutes(app);
+  app.use(authRoutes);
+  app.use(dashboardRoutes);
   app.use(topicRoutes);
   app.use(chatRoutes);
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

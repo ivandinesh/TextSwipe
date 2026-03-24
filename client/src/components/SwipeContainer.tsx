@@ -34,7 +34,7 @@ interface GenerateResponse {
   options?: TopicOption[];
 }
 
-type ThemeName = "midnight" | "aurora" | "ember";
+type ThemeName = "midnight" | "aurora" | "ember" | "petal" | "sage";
 type FontName = "sans" | "display" | "mono";
 type TextToneName = "default" | "soft" | "high-contrast";
 
@@ -47,6 +47,7 @@ const THEMES: Record<
     panel: string;
     panelBorder: string;
     panelGlow: string;
+    backlight: string;
     tile: string;
     text: string;
     muted: string;
@@ -67,12 +68,14 @@ const THEMES: Record<
     panel: "linear-gradient(180deg, rgba(18, 24, 54, 0.92), rgba(10, 14, 34, 0.82))",
     panelBorder: "rgba(116, 161, 255, 0.18)",
     panelGlow: "0 24px 80px rgba(4, 10, 34, 0.52), inset 0 1px 0 rgba(255,255,255,0.08)",
+    backlight:
+      "radial-gradient(circle, rgba(112,173,255,0.32) 0%, rgba(112,173,255,0.14) 36%, rgba(112,173,255,0) 72%)",
     tile: "rgba(255,255,255,0.04)",
     text: "#F6F8FF",
     muted: "#A6B1CF",
     textTones: {
       default: { text: "#F6F8FF", muted: "#A6B1CF" },
-      soft: { text: "#DCE5FF", muted: "#93A0C6" },
+      soft: { text: "#CFE3FF", muted: "#9CB5E8" },
       "high-contrast": { text: "#FFFFFF", muted: "#D7E0FF" },
     },
   },
@@ -84,12 +87,14 @@ const THEMES: Record<
     panel: "linear-gradient(180deg, rgba(33, 25, 70, 0.9), rgba(16, 18, 45, 0.84))",
     panelBorder: "rgba(160, 132, 255, 0.22)",
     panelGlow: "0 24px 80px rgba(22, 12, 62, 0.46), inset 0 1px 0 rgba(255,255,255,0.1)",
+    backlight:
+      "radial-gradient(circle, rgba(201,176,255,0.38) 0%, rgba(116,220,255,0.18) 34%, rgba(201,176,255,0) 72%)",
     tile: "rgba(255,255,255,0.05)",
     text: "#F7F4FF",
     muted: "#B4AED1",
     textTones: {
       default: { text: "#F7F4FF", muted: "#B4AED1" },
-      soft: { text: "#E6E0FA", muted: "#A29BC6" },
+      soft: { text: "#F2DEFF", muted: "#C8B0E6" },
       "high-contrast": { text: "#FFF9FF", muted: "#D9D0F6" },
     },
   },
@@ -101,13 +106,53 @@ const THEMES: Record<
     panel: "linear-gradient(180deg, rgba(48, 24, 36, 0.9), rgba(22, 12, 20, 0.84))",
     panelBorder: "rgba(255, 154, 115, 0.2)",
     panelGlow: "0 24px 80px rgba(34, 10, 18, 0.5), inset 0 1px 0 rgba(255,255,255,0.08)",
+    backlight:
+      "radial-gradient(circle, rgba(255,189,161,0.32) 0%, rgba(255,129,173,0.18) 38%, rgba(255,189,161,0) 72%)",
     tile: "rgba(255,255,255,0.045)",
     text: "#FFF5F5",
     muted: "#D7B3BE",
     textTones: {
       default: { text: "#FFF5F5", muted: "#D7B3BE" },
-      soft: { text: "#F7E3E7", muted: "#C9A0AD" },
+      soft: { text: "#FFDCD8", muted: "#E2AAB8" },
       "high-contrast": { text: "#FFFDFC", muted: "#F0CDD6" },
+    },
+  },
+  petal: {
+    surface:
+      "bg-[radial-gradient(circle_at_top_left,rgba(255,202,230,0.22),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(255,243,186,0.2),transparent_25%),linear-gradient(180deg,rgba(38,24,40,0.96),rgba(20,14,24,1))]",
+    shell: "rgba(38, 24, 40, 0.84)",
+    overlay: "rgba(255,255,255,0.08)",
+    panel: "linear-gradient(180deg, rgba(74, 43, 73, 0.84), rgba(37, 22, 39, 0.82))",
+    panelBorder: "rgba(255, 202, 230, 0.24)",
+    panelGlow: "0 24px 80px rgba(57, 26, 56, 0.5), inset 0 1px 0 rgba(255,255,255,0.1)",
+    backlight:
+      "radial-gradient(circle, rgba(255,203,229,0.38) 0%, rgba(255,239,182,0.18) 40%, rgba(255,203,229,0) 72%)",
+    tile: "rgba(255,255,255,0.06)",
+    text: "#FFF7FB",
+    muted: "#E4BED2",
+    textTones: {
+      default: { text: "#FFF7FB", muted: "#E4BED2" },
+      soft: { text: "#FFDDEE", muted: "#F4C5D9" },
+      "high-contrast": { text: "#FFFFFF", muted: "#FFE4F1" },
+    },
+  },
+  sage: {
+    surface:
+      "bg-[radial-gradient(circle_at_top,rgba(190,241,217,0.2),transparent_23%),radial-gradient(circle_at_bottom_right,rgba(176,229,255,0.16),transparent_24%),linear-gradient(180deg,rgba(22,35,35,0.96),rgba(12,20,20,1))]",
+    shell: "rgba(22, 35, 35, 0.84)",
+    overlay: "rgba(255,255,255,0.08)",
+    panel: "linear-gradient(180deg, rgba(33, 57, 54, 0.84), rgba(18, 31, 31, 0.82))",
+    panelBorder: "rgba(176, 241, 217, 0.22)",
+    panelGlow: "0 24px 80px rgba(9, 30, 24, 0.48), inset 0 1px 0 rgba(255,255,255,0.1)",
+    backlight:
+      "radial-gradient(circle, rgba(194,244,220,0.34) 0%, rgba(171,224,255,0.18) 38%, rgba(194,244,220,0) 72%)",
+    tile: "rgba(255,255,255,0.05)",
+    text: "#F5FFF9",
+    muted: "#B8D6CC",
+    textTones: {
+      default: { text: "#F5FFF9", muted: "#B8D6CC" },
+      soft: { text: "#D9FFED", muted: "#A5D7C4" },
+      "high-contrast": { text: "#FFFFFF", muted: "#D9F5E8" },
     },
   },
 };
@@ -118,7 +163,7 @@ const FONT_CLASSES: Record<FontName, string> = {
   mono: "font-mono",
 };
 
-const themeOrder: ThemeName[] = ["midnight", "aurora", "ember"];
+const themeOrder: ThemeName[] = ["midnight", "aurora", "ember", "petal", "sage"];
 const fontOrder: FontName[] = ["sans", "display", "mono"];
 const textToneOrder: TextToneName[] = ["default", "soft", "high-contrast"];
 
@@ -148,6 +193,7 @@ export function SwipeContainer({
   const [fontName, setFontName] = useState<FontName>("sans");
   const [textToneName, setTextToneName] = useState<TextToneName>("default");
   const [showOptions, setShowOptions] = useState(false);
+  const [showChrome, setShowChrome] = useState(false);
   const [touchStart, setTouchStart] = useState({ x: 0, y: 0 });
 
   const activeTheme = THEMES[themeName];
@@ -174,6 +220,7 @@ export function SwipeContainer({
   useEffect(() => {
     setAllSnippets(snippets);
     setShowOptions(false);
+    setShowChrome(false);
   }, [snippets, topic]);
 
   const cycleBackground = useCallback(
@@ -247,10 +294,12 @@ export function SwipeContainer({
         setAllSnippets(nextSnippets);
         onIndexChange(0);
         setShowOptions(false);
+        setShowChrome(false);
       } catch (error) {
         console.error("Error generating content:", error);
         setAllSnippets(["Error generating content. Please try again."]);
         onIndexChange(0);
+        setShowChrome(true);
       } finally {
         setIsLoading(false);
       }
@@ -266,11 +315,13 @@ export function SwipeContainer({
 
     if (currentIndex >= allSnippets.length - 1) {
       setShowOptions(true);
+      setShowChrome(true);
       return;
     }
 
     const next = currentIndex + 1;
     onIndexChange(next);
+    setShowChrome(false);
   }, [allSnippets.length, currentIndex, onIndexChange, showOptions]);
 
   const previousCard = useCallback(() => {
@@ -281,7 +332,8 @@ export function SwipeContainer({
 
     const previous = currentIndex > 0 ? currentIndex - 1 : 0;
     onIndexChange(previous);
-  }, [allSnippets.length, currentIndex, onIndexChange, showOptions]);
+    setShowChrome(false);
+  }, [currentIndex, onIndexChange, showOptions]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -345,11 +397,23 @@ export function SwipeContainer({
           } else {
             previousCard();
           }
+          return;
+        }
+
+        if (Math.abs(deltaY) < 12 && Math.abs(deltaX) < 12) {
+          setShowChrome((current) => !current);
         }
       }}
       data-testid="swipe-container"
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 px-4 pt-4 md:px-6">
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 top-0 z-10 px-4 pt-4 transition-all duration-300 md:px-6",
+          showOptions || showChrome
+            ? "translate-y-0 opacity-100"
+            : "-translate-y-4 opacity-0",
+        )}
+      >
         <div
           className="glass-panel pointer-events-auto rounded-[1.6rem] px-4 py-3 md:px-5"
           style={{
@@ -470,7 +534,8 @@ export function SwipeContainer({
 
       <div
         className={cn(
-          "relative pt-28 sm:pt-32",
+          "relative transition-all duration-300",
+          showOptions || showChrome ? "pt-28 sm:pt-32" : "pt-6 sm:pt-8",
           showOptions ? "min-h-full" : "h-full",
         )}
       >
@@ -515,11 +580,14 @@ export function SwipeContainer({
               mutedTextColor={activeTextTone.muted}
               fontClass={fontClass}
               progressLabel={`${Math.min(currentIndex + 1, allSnippets.length)} / ${allSnippets.length}`}
+              showChrome={showChrome}
+              onSurfaceTap={() => setShowChrome((current) => !current)}
               panelStyle={{
                 background: activeTheme.panel,
                 borderColor: activeTheme.panelBorder,
                 boxShadow: activeTheme.panelGlow,
               }}
+              backlightStyle={{ background: activeTheme.backlight }}
               className={cn(
                 "absolute inset-0 transition-all duration-300 ease-out",
                 index === currentIndex
@@ -535,11 +603,14 @@ export function SwipeContainer({
 
       {!showOptions && (
         <div
-          className="safe-bottom absolute bottom-0 left-1/2 w-full max-w-sm -translate-x-1/2 px-6 pb-4 text-center text-sm md:hidden"
+          className={cn(
+            "safe-bottom absolute bottom-0 left-1/2 w-full max-w-sm -translate-x-1/2 px-6 pb-4 text-center text-sm transition-all duration-300 md:hidden",
+            showChrome ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
+          )}
           style={{ color: activeTextTone.muted }}
         >
           <div className="rounded-full border border-white/10 bg-black/20 px-4 py-2 backdrop-blur-md">
-            <p>Swipe up or down to move through the deck</p>
+            <p>Swipe to move. Tap the card when you want controls.</p>
           </div>
         </div>
       )}

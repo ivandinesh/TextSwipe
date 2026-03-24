@@ -73,6 +73,16 @@ export class HybridStorage implements IStorage {
     }
     return this.memoryFallback.getUserByUsername(username);
   }
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    if (db) {
+      const result = await db
+        .select()
+        .from(schema.users)
+        .where(eq(schema.users.email, email));
+      return result[0];
+    }
+    return this.memoryFallback.getUserByEmail(email);
+  }
   async createUser(user: InsertUser): Promise<User> {
     if (db) {
       const result = await db.insert(schema.users).values(user).returning();

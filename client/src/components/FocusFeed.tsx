@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
-import { Sparkles, Waves } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { LayoutDashboard, LogOut, Sparkles, Waves } from "lucide-react";
+import { useLocation } from "wouter";
 import { useTopicService } from "@/services/topicService";
+import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import { AuthDialog } from "./AuthDialog";
 import { LoadingScreen } from "./LoadingScreen";
 import { SwipeContainer } from "./SwipeContainer";
 import { TopicInput } from "./TopicInput";
@@ -50,7 +55,9 @@ function getUrlState() {
 }
 
 export function FocusFeed() {
+  const [, setLocation] = useLocation();
   const topicService = useTopicService();
+  const { user, logout } = useAuth();
   const [currentView, setCurrentView] = useState<"input" | "loading" | "learning">(
     "input",
   );
@@ -59,6 +66,8 @@ export function FocusFeed() {
   const [currentOptions, setCurrentOptions] = useState<TopicOption[]>([]);
   const [likedSnippets, setLikedSnippets] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const sessionStartRef = useRef<string | null>(null);
+  const highestCardSeenRef = useRef(0);
 
   const updateLearningUrl = (topic: string, index: number) => {
     window.history.pushState(
@@ -68,9 +77,59 @@ export function FocusFeed() {
     );
   };
 
+  const syncTopicInteraction = async (topic: string, isLiked?: boolean, increment = 1) => {
+    if (!user) {
+      return;
+    }
+
+    try {
+      await apiRequest("POST", "/api/dashboard/topic-interactions", {
+        topic,
+        increment,
+        isLiked,
+      });
+    } catch (error) {
+      console.error("Failed to sync topic interaction:", error);
+    }
+  };
+
+  const flushLearningSession = async () => {
+    if (!user || !sessionStartRef.current || !currentTopic) {
+      return;
+    }
+
+    const startedAt = new Date(sessionStartRef.current);
+    const endedAt = new Date();
+    const durationSeconds = Math.max(
+      0,
+      Math.round((endedAt.getTime() - startedAt.getTime()) / 1000),
+    );
+
+    sessionStartRef.current = null;
+
+    if (durationSeconds < 5) {
+      return;
+    }
+
+    try {
+      await apiRequest("POST", "/api/dashboard/learning-sessions", {
+        topic: currentTopic,
+        durationSeconds,
+        cardsCompleted: Math.max(highestCardSeenRef.current, 1),
+        startedAt: startedAt.toISOString(),
+        endedAt: endedAt.toISOString(),
+      });
+    } catch (error) {
+      console.error("Failed to save learning session:", error);
+    }
+  };
+
   const loadTopic = async (topic: string, index = 0) => {
+    await flushLearningSession();
     setCurrentTopic(topic);
     setCurrentIndex(index);
+    highestCardSeenRef.current = Math.max(index + 1, 1);
+    sessionStartRef.current = new Date().toISOString();
     setCurrentView("loading");
 
     try {
@@ -99,6 +158,7 @@ export function FocusFeed() {
       setCurrentIndex(boundedIndex);
       setCurrentView("learning");
       updateLearningUrl(topic, boundedIndex);
+      await syncTopicInteraction(topic, undefined, 1);
     } catch (error) {
       console.error("Error loading content:", error);
       setLearningSnippets([
@@ -107,6 +167,7 @@ export function FocusFeed() {
       ]);
       setCurrentOptions([]);
       setCurrentIndex(0);
+      highestCardSeenRef.current = 1;
       setCurrentView("learning");
       updateLearningUrl(topic, 0);
     }
@@ -120,6 +181,12 @@ export function FocusFeed() {
   }, []);
 
   useEffect(() => {
+    if (currentView === "learning") {
+      highestCardSeenRef.current = Math.max(highestCardSeenRef.current, currentIndex + 1);
+    }
+  }, [currentIndex, currentView]);
+
+  useEffect(() => {
     const saved = localStorage.getItem("focusfeed-liked");
     if (!saved) {
       return;
@@ -131,6 +198,44 @@ export function FocusFeed() {
       console.error("Error loading liked snippets:", error);
     }
   }, []);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (!user || !sessionStartRef.current || !currentTopic) {
+        return;
+      }
+
+      const startedAt = new Date(sessionStartRef.current);
+      const endedAt = new Date();
+      const durationSeconds = Math.max(
+        0,
+        Math.round((endedAt.getTime() - startedAt.getTime()) / 1000),
+      );
+
+      if (durationSeconds < 5) {
+        return;
+      }
+
+      navigator.sendBeacon(
+        "/api/dashboard/learning-sessions",
+        new Blob(
+          [
+            JSON.stringify({
+              topic: currentTopic,
+              durationSeconds,
+              cardsCompleted: Math.max(highestCardSeenRef.current, 1),
+              startedAt: startedAt.toISOString(),
+              endedAt: endedAt.toISOString(),
+            }),
+          ],
+          { type: "application/json" },
+        ),
+      );
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [currentTopic, user]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -162,6 +267,7 @@ export function FocusFeed() {
   };
 
   const handleBack = () => {
+    void flushLearningSession();
     setCurrentView("input");
     setCurrentTopic("");
     setLearningSnippets([]);
@@ -171,13 +277,25 @@ export function FocusFeed() {
   };
 
   const handleLike = (content: string) => {
-    const updatedLiked = likedSnippets.includes(content)
+    const isCurrentlyLiked = likedSnippets.includes(content);
+    const updatedLiked = isCurrentlyLiked
       ? likedSnippets.filter((snippet) => snippet !== content)
       : [...likedSnippets, content];
 
     setLikedSnippets(updatedLiked);
     localStorage.setItem("focusfeed-liked", JSON.stringify(updatedLiked));
-    topicService.trackTopicLike(currentTopic, !likedSnippets.includes(content));
+    topicService.trackTopicLike(currentTopic, !isCurrentlyLiked);
+    void syncTopicInteraction(currentTopic, !isCurrentlyLiked, 0);
+
+    if (user) {
+      void apiRequest("POST", "/api/dashboard/liked-cards", {
+        topic: currentTopic,
+        content,
+        liked: !isCurrentlyLiked,
+      }).catch((error) => {
+        console.error("Failed to sync liked card:", error);
+      });
+    }
   };
 
   return (
@@ -190,9 +308,35 @@ export function FocusFeed() {
                 <Sparkles className="h-3.5 w-3.5" />
                 FocusFeed
               </div>
-              <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-muted-foreground md:flex">
-                <Waves className="h-3.5 w-3.5 text-primary" />
-                Minimal reading mode
+              <div className="flex items-center gap-2">
+                <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-muted-foreground md:flex">
+                  <Waves className="h-3.5 w-3.5 text-primary" />
+                  Minimal reading mode
+                </div>
+                {user ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      className="rounded-full border-white/10 bg-white/[0.04] text-foreground"
+                      onClick={() => setLocation("/dashboard")}
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      Dashboard
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="rounded-full border-white/10 bg-white/[0.04] text-foreground"
+                      onClick={async () => {
+                        await logout.mutateAsync();
+                      }}
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign out
+                    </Button>
+                  </>
+                ) : (
+                  <AuthDialog />
+                )}
               </div>
             </header>
 

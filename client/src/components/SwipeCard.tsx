@@ -17,6 +17,9 @@ interface SwipeCardProps {
   fontClass?: string;
   progressLabel?: string;
   panelStyle?: React.CSSProperties;
+  backlightStyle?: React.CSSProperties;
+  showChrome?: boolean;
+  onSurfaceTap?: () => void;
 }
 
 export function SwipeCard({
@@ -34,6 +37,9 @@ export function SwipeCard({
   fontClass,
   progressLabel,
   panelStyle,
+  backlightStyle,
+  showChrome = true,
+  onSurfaceTap,
 }: SwipeCardProps) {
   const handleLike = () => {
     onLike?.(content);
@@ -49,46 +55,98 @@ export function SwipeCard({
       data-testid={`card-learn-${index}`}
     >
       <div className="mx-auto flex h-full w-full max-w-[min(92vw,72rem)] flex-col justify-between">
-        <div
-          className="min-h-[68vh] rounded-[2rem] border px-6 py-8 backdrop-blur-2xl md:min-h-[72vh] md:px-12 md:py-10"
-          style={panelStyle}
-        >
-          <div className="mb-8 flex items-center justify-between gap-4">
-            <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary/80">
-              Insight {index + 1}
-            </div>
+        <div className="relative flex-1">
+          <div
+            className={cn(
+              "pointer-events-none absolute inset-x-[8%] top-[14%] h-[58%] rounded-full blur-3xl transition-all duration-300 md:inset-x-[16%]",
+              showChrome ? "opacity-90 scale-100" : "opacity-75 scale-110",
+            )}
+            style={backlightStyle}
+          />
+          <div
+            className="relative min-h-[68vh] rounded-[2rem] border px-6 py-8 backdrop-blur-2xl transition-all duration-300 md:min-h-[72vh] md:px-12 md:py-10"
+            style={panelStyle}
+            onClick={() => {
+              if (window.matchMedia("(hover: hover)").matches) {
+                onSurfaceTap?.();
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onSurfaceTap?.();
+              }
+            }}
+          >
             <div
-              className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1 text-xs"
-              style={{ color: mutedTextColor || textColor }}
-            >
-              Keep swiping
-            </div>
-          </div>
-
-          <div className="flex min-h-[42vh] items-center justify-center">
-            <p
               className={cn(
-                "mx-auto max-w-3xl text-balance text-center text-2xl font-medium leading-[1.55] md:text-4xl md:leading-[1.45]",
-                fontClass || "",
+                "mb-8 flex items-center justify-between gap-4 transition-all duration-250",
+                showChrome
+                  ? "pointer-events-auto translate-y-0 opacity-100"
+                  : "pointer-events-none -translate-y-2 opacity-0",
               )}
-              style={textColor ? { color: textColor } : {}}
-              data-testid={`text-content-${index}`}
             >
-              {content}
-            </p>
-          </div>
+              <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary/80">
+                Insight {index + 1}
+              </div>
+              <div
+                className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1 text-xs"
+                style={{ color: mutedTextColor || textColor }}
+              >
+                Keep swiping
+              </div>
+            </div>
 
-          <div className="mt-8 flex items-center justify-center">
+            <div className="flex min-h-[42vh] items-center justify-center overflow-visible py-4 md:min-h-[46vh]">
+              <div className="w-full py-2">
+                <p
+                  className={cn(
+                    "mx-auto max-w-[16ch] overflow-visible text-center text-2xl font-medium leading-[1.42] tracking-[-0.02em] md:max-w-[18ch] md:text-[clamp(2.8rem,4vw,4.4rem)] md:leading-[1.26]",
+                    fontClass || "",
+                  )}
+                  style={
+                    textColor
+                      ? {
+                          color: textColor,
+                          textShadow: "0 8px 30px rgba(0,0,0,0.18)",
+                        }
+                      : {}
+                  }
+                  data-testid={`text-content-${index}`}
+                >
+                  {content}
+                </p>
+              </div>
+            </div>
+
             <div
-              className="max-w-xl text-center text-sm leading-6"
-              style={{ color: mutedTextColor || textColor }}
+              className={cn(
+                "mt-8 flex items-center justify-center transition-all duration-250",
+                showChrome
+                  ? "pointer-events-auto translate-y-0 opacity-100"
+                  : "pointer-events-none translate-y-2 opacity-0",
+              )}
             >
-              One focused idea per card. Swipe when this one feels fully absorbed.
+              <div
+                className="max-w-xl text-center text-sm leading-6"
+                style={{ color: mutedTextColor || textColor }}
+              >
+                One focused idea per card. Tap to reveal controls when you want them.
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="safe-bottom mt-5 flex items-center justify-between gap-4 px-1">
+        <div
+          className={cn(
+            "safe-bottom mt-5 flex items-center justify-between gap-4 px-1 transition-all duration-250",
+            showChrome
+              ? "pointer-events-auto translate-y-0 opacity-100"
+              : "pointer-events-none translate-y-4 opacity-0",
+          )}
+        >
           <Button
             variant="ghost"
             size="icon"
@@ -106,7 +164,10 @@ export function SwipeCard({
 
           <div className="min-w-0 flex-1">
             <div className="mb-2 flex items-center justify-between gap-3">
-              <span className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+              <span
+                className="text-xs uppercase tracking-[0.22em]"
+                style={{ color: mutedTextColor || textColor }}
+              >
                 Progress
               </span>
               <span
