@@ -7,6 +7,11 @@ import * as dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import {
+  buildTopicCacheKey,
+  readTopicCache,
+  writeTopicCache,
+} from "./topicCache";
 
 // Load environment variables
 dotenv.config();
@@ -16,6 +21,7 @@ const snippetCache = new Map<
   string,
   { snippets: string[]; options?: { title: string; description: string }[] }
 >();
+const inFlightGenerations = new Map<string, Promise<LearningSnippetResult>>();
 
 // Get __dirname equivalent in ES modules
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -130,7 +136,7 @@ function logRequest(
 /**
  * Generates learning snippets using OpenRouter API
  */
-export async function generateLearningSnippets(
+async function generateLearningSnippetsFromApi(
   topic: string,
   count: number = 10,
   generateOptions: boolean = false,
@@ -480,6 +486,74 @@ RESPONSE FORMAT: STRICT JSON ONLY
       ];
     }
     return fallbackResult;
+  }
+}
+
+export async function generateLearningSnippets(
+  topic: string,
+  count: number = 10,
+  generateOptions: boolean = false,
+): Promise<LearningSnippetResult> {
+  const model = getOpenRouterModel();
+  const cacheKey = buildTopicCacheKey({
+    topic,
+    model,
+    count,
+    generateOptions,
+  });
+
+  if (snippetCache.has(cacheKey)) {
+    console.log(`âš¡ Cache hit for topic: ${topic}`);
+    return snippetCache.get(cacheKey)!;
+  }
+
+  const persistedCache = await readTopicCache({
+    topic,
+    model,
+    count,
+    generateOptions,
+  });
+  if (persistedCache) {
+    console.log(`âš¡ Persistent cache hit for topic: ${topic}`);
+    snippetCache.set(cacheKey, persistedCache);
+    return persistedCache;
+  }
+
+  const existingGeneration = inFlightGenerations.get(cacheKey);
+  if (existingGeneration) {
+    return existingGeneration;
+  }
+
+  const generationPromise = (async () => {
+    const result = await generateLearningSnippetsFromApi(
+      topic,
+      count,
+      generateOptions,
+    );
+
+    snippetCache.set(cacheKey, result);
+
+    if (process.env.OPENROUTER_API_KEY) {
+      await writeTopicCache(
+        {
+          topic,
+          model,
+          count,
+          generateOptions,
+        },
+        result,
+      );
+    }
+
+    return result;
+  })();
+
+  inFlightGenerations.set(cacheKey, generationPromise);
+
+  try {
+    return await generationPromise;
+  } finally {
+    inFlightGenerations.delete(cacheKey);
   }
 }
 

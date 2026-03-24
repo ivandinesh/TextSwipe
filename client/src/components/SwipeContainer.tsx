@@ -322,10 +322,18 @@ export function SwipeContainer({
         className,
       )}
       style={{ transition: "background-color 0.3s ease, color 0.3s ease" }}
-      onTouchStart={(e) =>
-        setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY })
-      }
+      onTouchStart={(e) => {
+        if (showOptions) {
+          return;
+        }
+
+        setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+      }}
       onTouchEnd={(e) => {
+        if (showOptions) {
+          return;
+        }
+
         const endX = e.changedTouches[0].clientX;
         const endY = e.changedTouches[0].clientY;
         const deltaX = touchStart.x - endX;
@@ -525,14 +533,16 @@ export function SwipeContainer({
         )}
       </div>
 
-      <div
-        className="safe-bottom absolute bottom-0 left-1/2 w-full max-w-sm -translate-x-1/2 px-6 pb-4 text-center text-sm md:hidden"
-        style={{ color: activeTextTone.muted }}
-      >
-        <div className="rounded-full border border-white/10 bg-black/20 px-4 py-2 backdrop-blur-md">
-          <p>Swipe up or down to move through the deck</p>
+      {!showOptions && (
+        <div
+          className="safe-bottom absolute bottom-0 left-1/2 w-full max-w-sm -translate-x-1/2 px-6 pb-4 text-center text-sm md:hidden"
+          style={{ color: activeTextTone.muted }}
+        >
+          <div className="rounded-full border border-white/10 bg-black/20 px-4 py-2 backdrop-blur-md">
+            <p>Swipe up or down to move through the deck</p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

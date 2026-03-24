@@ -39,6 +39,8 @@ PORT=5000
 SESSION_SECRET=replace_me_for_production
 GENERATION_RATE_LIMIT_MAX_REQUESTS=10
 GENERATION_RATE_LIMIT_WINDOW_MS=900000
+TOPIC_CACHE_ENABLED=true
+TOPIC_CACHE_DIR=cache
 ```
 
 Optional variables:
@@ -56,6 +58,8 @@ Notes:
 - `GENERATION_RATE_LIMIT_MAX_REQUESTS` controls how many generation requests are allowed per rate-limit window.
 - `GENERATION_RATE_LIMIT_WINDOW_MS` controls the rate-limit window length in milliseconds.
 - With the current UI generating 10 cards per request, `GENERATION_RATE_LIMIT_MAX_REQUESTS=10` is effectively about 100 cards per window.
+- `TOPIC_CACHE_ENABLED` turns the persistent topic cache on or off.
+- `TOPIC_CACHE_DIR` sets the cache root directory; the app stores one JSON file per topic under `topics/` plus a `topic-index.json` lookup file.
 
 ## Install
 
