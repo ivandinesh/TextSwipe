@@ -14,6 +14,18 @@ import topicRoutes from "./routes/topicRoutes";
 import authRoutes from "./routes/authRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
 
+function isSecureCookieEnabled() {
+  const override = process.env.SESSION_COOKIE_SECURE;
+  if (override === "true") {
+    return true;
+  }
+  if (override === "false") {
+    return false;
+  }
+
+  return process.env.NODE_ENV === "production";
+}
+
 // Load environment variables from .env file
 const dotenvResult = dotenv.config();
 if (dotenvResult.error) {
@@ -87,7 +99,7 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: isSecureCookieEnabled(),
       maxAge: 1000 * 60 * 60 * 24 * 30,
     },
     store: new MemoryStore({
