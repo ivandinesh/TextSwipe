@@ -102,7 +102,6 @@ export function SwipeContainer({
   onOptionsChange,
   className,
 }: SwipeContainerProps) {
-  const [totalCards, setTotalCards] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
   const [allSnippets, setAllSnippets] = useState<string[]>(snippets);
   const [themeName, setThemeName] = useState<ThemeName>("midnight");
@@ -130,12 +129,6 @@ export function SwipeContainer({
     setAllSnippets(snippets);
     setShowOptions(false);
   }, [snippets, topic]);
-
-  useEffect(() => {
-    if (allSnippets.length > 0) {
-      setTotalCards(showOptions ? Math.max(currentIndex + 1, 10) : allSnippets.length);
-    }
-  }, [allSnippets.length, currentIndex, showOptions]);
 
   const cycleBackground = useCallback(
     debounce(() => {
@@ -201,25 +194,13 @@ export function SwipeContainer({
         const nextOptions = data.options ?? [];
         onOptionsChange(nextOptions);
 
-        if (findNewTopics) {
-          setAllSnippets(nextSnippets);
-          onIndexChange(0);
-          setShowOptions(false);
-          return;
-        }
-
-        setAllSnippets((prev) => {
-          const merged = [...prev, ...nextSnippets];
-          onIndexChange(prev.length);
-          return merged;
-        });
+        setAllSnippets(nextSnippets);
+        onIndexChange(0);
         setShowOptions(false);
       } catch (error) {
         console.error("Error generating content:", error);
-        setAllSnippets((prev) => [
-          ...prev,
-          "Error generating content. Please try again.",
-        ]);
+        setAllSnippets(["Error generating content. Please try again."]);
+        onIndexChange(0);
       } finally {
         setIsLoading(false);
       }
@@ -233,18 +214,14 @@ export function SwipeContainer({
       return;
     }
 
-    if (currentIndex === 9 && allSnippets.length === 10) {
+    if (currentIndex >= allSnippets.length - 1) {
       setShowOptions(true);
       return;
     }
 
-    const next = (currentIndex + 1) % allSnippets.length;
+    const next = currentIndex + 1;
     onIndexChange(next);
-
-    if (currentIndex >= allSnippets.length - 3 && allSnippets.length > 10 && !isLoading) {
-      void generateMoreContent(false);
-    }
-  }, [allSnippets.length, currentIndex, generateMoreContent, isLoading, onIndexChange, showOptions]);
+  }, [allSnippets.length, currentIndex, onIndexChange, showOptions]);
 
   const previousCard = useCallback(() => {
     if (showOptions) {
@@ -252,7 +229,7 @@ export function SwipeContainer({
       return;
     }
 
-    const previous = currentIndex > 0 ? currentIndex - 1 : allSnippets.length - 1;
+    const previous = currentIndex > 0 ? currentIndex - 1 : 0;
     onIndexChange(previous);
   }, [allSnippets.length, currentIndex, onIndexChange, showOptions]);
 
@@ -352,13 +329,13 @@ export function SwipeContainer({
               </h1>
               <div className="mt-2 flex items-center gap-3">
                 <p className="text-xs md:text-sm" style={{ color: activeTheme.muted }}>
-                  Card {currentIndex + 1} of {totalCards}
+                  Card {Math.min(currentIndex + 1, allSnippets.length)} of {allSnippets.length}
                 </p>
                 <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/8">
                   <div
                     className="h-full rounded-full bg-primary transition-all duration-300"
                     style={{
-                      width: `${Math.max(((currentIndex + 1) / Math.max(totalCards, 1)) * 100, 8)}%`,
+                      width: `${Math.max(((Math.min(currentIndex + 1, allSnippets.length)) / Math.max(allSnippets.length, 1)) * 100, 8)}%`,
                     }}
                   />
                 </div>
@@ -464,7 +441,7 @@ export function SwipeContainer({
               textColor={activeTheme.text}
               mutedTextColor={activeTheme.muted}
               fontClass={fontClass}
-              progressLabel={`${currentIndex + 1} / ${totalCards}`}
+              progressLabel={`${Math.min(currentIndex + 1, allSnippets.length)} / ${allSnippets.length}`}
               className={cn(
                 "absolute inset-0 transition-all duration-300 ease-out",
                 index === currentIndex

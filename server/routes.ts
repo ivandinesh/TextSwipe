@@ -3,10 +3,33 @@ import { createServer, type Server } from "http";
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import { generateLearningSnippets } from "./openai";
 
+const DEFAULT_GENERATION_WINDOW_MS = 15 * 60 * 1000;
+const DEFAULT_GENERATION_MAX_REQUESTS = 10;
+
+function getPositiveIntegerEnv(name: string, fallback: number) {
+  const rawValue = process.env[name];
+  if (!rawValue) {
+    return fallback;
+  }
+
+  const parsed = Number.parseInt(rawValue, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+const generationRateLimitWindowMs = getPositiveIntegerEnv(
+  "GENERATION_RATE_LIMIT_WINDOW_MS",
+  DEFAULT_GENERATION_WINDOW_MS,
+);
+const generationRateLimitMaxRequests = getPositiveIntegerEnv(
+  "GENERATION_RATE_LIMIT_MAX_REQUESTS",
+  DEFAULT_GENERATION_MAX_REQUESTS,
+);
+
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 3,
-  message: "Too many generation requests from this IP, please try again later",
+  windowMs: generationRateLimitWindowMs,
+  max: generationRateLimitMaxRequests,
+  message:
+    "Generation limit reached for this window. Please wait a bit before creating more cards.",
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => ipKeyGenerator(req.ip ?? ""),

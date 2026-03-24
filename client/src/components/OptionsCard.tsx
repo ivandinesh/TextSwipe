@@ -68,8 +68,8 @@ export function OptionsCard({
                 className="mt-3 max-w-xl text-sm leading-7 md:text-base"
                 style={{ color: mutedTextColor || textColor }}
               >
-                Choose a branch to deepen the thread, or refresh the deck to stay
-                broad and exploratory.
+                Start a fresh 10-card branch, regenerate this topic, or ask for a
+                new set of related directions.
               </p>
             </div>
             <div
@@ -112,7 +112,7 @@ export function OptionsCard({
                       </p>
                     </div>
                     <div className="mt-5 flex items-center gap-2 text-sm font-medium text-primary">
-                      Open branch
+                      Start new 10-card branch
                       <ArrowRight className="h-4 w-4" />
                     </div>
                   </div>
@@ -132,7 +132,7 @@ export function OptionsCard({
               data-testid="generate-more-button"
             >
               <RefreshCcw className="h-4 w-4" />
-              Generate More on {topic}
+              Restart this topic with 10 new cards
             </Button>
             <Button
               onClick={() => onGenerateMore(true)}
@@ -144,7 +144,7 @@ export function OptionsCard({
               data-testid="find-more-topics-button"
             >
               <Search className="h-4 w-4" />
-              Find More Relevant Topics
+              Show different branch ideas
             </Button>
           </div>
 
