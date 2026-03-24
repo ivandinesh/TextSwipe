@@ -36,6 +36,7 @@ interface GenerateResponse {
 
 type ThemeName = "midnight" | "aurora" | "ember";
 type FontName = "sans" | "display" | "mono";
+type TextToneName = "default" | "soft" | "high-contrast";
 
 const THEMES: Record<
   ThemeName,
@@ -49,6 +50,13 @@ const THEMES: Record<
     tile: string;
     text: string;
     muted: string;
+    textTones: Record<
+      TextToneName,
+      {
+        text: string;
+        muted: string;
+      }
+    >;
   }
 > = {
   midnight: {
@@ -62,6 +70,11 @@ const THEMES: Record<
     tile: "rgba(255,255,255,0.04)",
     text: "#F6F8FF",
     muted: "#A6B1CF",
+    textTones: {
+      default: { text: "#F6F8FF", muted: "#A6B1CF" },
+      soft: { text: "#DCE5FF", muted: "#93A0C6" },
+      "high-contrast": { text: "#FFFFFF", muted: "#D7E0FF" },
+    },
   },
   aurora: {
     surface:
@@ -74,6 +87,11 @@ const THEMES: Record<
     tile: "rgba(255,255,255,0.05)",
     text: "#F7F4FF",
     muted: "#B4AED1",
+    textTones: {
+      default: { text: "#F7F4FF", muted: "#B4AED1" },
+      soft: { text: "#E6E0FA", muted: "#A29BC6" },
+      "high-contrast": { text: "#FFF9FF", muted: "#D9D0F6" },
+    },
   },
   ember: {
     surface:
@@ -86,6 +104,11 @@ const THEMES: Record<
     tile: "rgba(255,255,255,0.045)",
     text: "#FFF5F5",
     muted: "#D7B3BE",
+    textTones: {
+      default: { text: "#FFF5F5", muted: "#D7B3BE" },
+      soft: { text: "#F7E3E7", muted: "#C9A0AD" },
+      "high-contrast": { text: "#FFFDFC", muted: "#F0CDD6" },
+    },
   },
 };
 
@@ -97,6 +120,7 @@ const FONT_CLASSES: Record<FontName, string> = {
 
 const themeOrder: ThemeName[] = ["midnight", "aurora", "ember"];
 const fontOrder: FontName[] = ["sans", "display", "mono"];
+const textToneOrder: TextToneName[] = ["default", "soft", "high-contrast"];
 
 const debounce = (func: () => void, delay: number) => {
   let timeoutId: ReturnType<typeof setTimeout>;
@@ -122,22 +146,28 @@ export function SwipeContainer({
   const [allSnippets, setAllSnippets] = useState<string[]>(snippets);
   const [themeName, setThemeName] = useState<ThemeName>("midnight");
   const [fontName, setFontName] = useState<FontName>("sans");
+  const [textToneName, setTextToneName] = useState<TextToneName>("default");
   const [showOptions, setShowOptions] = useState(false);
   const [touchStart, setTouchStart] = useState({ x: 0, y: 0 });
 
   const activeTheme = THEMES[themeName];
+  const activeTextTone = activeTheme.textTones[textToneName];
   const fontClass = FONT_CLASSES[fontName];
   const likedSet = new Set(likedSnippets);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("focusfeed-theme") as ThemeName | null;
     const savedFont = localStorage.getItem("focusfeed-font-theme") as FontName | null;
+    const savedTextTone = localStorage.getItem("focusfeed-text-tone") as TextToneName | null;
 
     if (savedTheme && savedTheme in THEMES) {
       setThemeName(savedTheme);
     }
     if (savedFont && savedFont in FONT_CLASSES) {
       setFontName(savedFont);
+    }
+    if (savedTextTone && textToneOrder.includes(savedTextTone)) {
+      setTextToneName(savedTextTone);
     }
   }, []);
 
@@ -163,8 +193,12 @@ export function SwipeContainer({
     localStorage.setItem("focusfeed-font-theme", nextFont);
   };
 
-  const rotateThemeAccent = () => {
-    cycleBackground();
+  const cycleTextTone = () => {
+    const currentTextToneIndex = textToneOrder.indexOf(textToneName);
+    const nextTextTone =
+      textToneOrder[(currentTextToneIndex + 1) % textToneOrder.length];
+    setTextToneName(nextTextTone);
+    localStorage.setItem("focusfeed-text-tone", nextTextTone);
   };
 
   const generateMoreContent = useCallback(
@@ -281,7 +315,8 @@ export function SwipeContainer({
   return (
     <div
       className={cn(
-        "relative h-screen overflow-hidden transition-all duration-300 ease-in-out",
+        "relative h-screen transition-all duration-300 ease-in-out",
+        showOptions ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden",
         activeTheme.surface,
         fontClass,
         className,
@@ -338,13 +373,13 @@ export function SwipeContainer({
               </div>
               <h1
                 className="mt-1 truncate text-left text-lg font-semibold md:text-2xl"
-                style={{ color: activeTheme.text }}
+                style={{ color: activeTextTone.text }}
                 data-testid="text-topic-title"
               >
                 {topic}
               </h1>
               <div className="mt-2 flex items-center gap-3">
-                <p className="text-xs md:text-sm" style={{ color: activeTheme.muted }}>
+                <p className="text-xs md:text-sm" style={{ color: activeTextTone.muted }}>
                   Card {Math.min(currentIndex + 1, allSnippets.length)} of {allSnippets.length}
                 </p>
                 <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/8">
@@ -380,9 +415,9 @@ export function SwipeContainer({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={rotateThemeAccent}
+                onClick={cycleTextTone}
                 className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
-                aria-label="Rotate theme accent"
+                aria-label="Change text color"
               >
                 <Paintbrush className="h-4 w-4" />
               </Button>
@@ -411,9 +446,9 @@ export function SwipeContainer({
             <Button
               variant="ghost"
               size="icon"
-              onClick={rotateThemeAccent}
+              onClick={cycleTextTone}
               className="h-9 w-9 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
-              aria-label="Rotate theme accent"
+              aria-label="Change text color"
             >
               <Paintbrush className="h-4 w-4" />
             </Button>
@@ -425,7 +460,12 @@ export function SwipeContainer({
         </div>
       </div>
 
-      <div className="relative h-full pt-28 sm:pt-32">
+      <div
+        className={cn(
+          "relative pt-28 sm:pt-32",
+          showOptions ? "min-h-full" : "h-full",
+        )}
+      >
         {showOptions ? (
           <OptionsCard
             options={options}
@@ -438,8 +478,8 @@ export function SwipeContainer({
               setShowOptions(false);
               void generateMoreContent(findNewTopics);
             }}
-            textColor={activeTheme.text}
-            mutedTextColor={activeTheme.muted}
+            textColor={activeTextTone.text}
+            mutedTextColor={activeTextTone.muted}
             fontClass={fontClass}
             panelStyle={{
               background: activeTheme.panel,
@@ -463,8 +503,8 @@ export function SwipeContainer({
               onPrevious={previousCard}
               onLike={onLike}
               isLiked={likedSet.has(snippet)}
-              textColor={activeTheme.text}
-              mutedTextColor={activeTheme.muted}
+              textColor={activeTextTone.text}
+              mutedTextColor={activeTextTone.muted}
               fontClass={fontClass}
               progressLabel={`${Math.min(currentIndex + 1, allSnippets.length)} / ${allSnippets.length}`}
               panelStyle={{
@@ -487,7 +527,7 @@ export function SwipeContainer({
 
       <div
         className="safe-bottom absolute bottom-0 left-1/2 w-full max-w-sm -translate-x-1/2 px-6 pb-4 text-center text-sm md:hidden"
-        style={{ color: activeTheme.muted }}
+        style={{ color: activeTextTone.muted }}
       >
         <div className="rounded-full border border-white/10 bg-black/20 px-4 py-2 backdrop-blur-md">
           <p>Swipe up or down to move through the deck</p>

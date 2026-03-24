@@ -46,24 +46,28 @@ export function OptionsCard({
   return (
     <div
       className={cn(
-        "relative h-screen w-full px-5 pb-8 pt-4 transition-all duration-300 md:px-8",
+        "relative min-h-full w-full px-4 pb-24 pt-3 transition-all duration-300 md:px-8 md:pb-10 md:pt-4",
         className,
       )}
       data-testid="options-card"
     >
-      <div className="mx-auto flex h-full w-full max-w-[min(94vw,78rem)] flex-col justify-between">
+      <div className="mx-auto flex w-full max-w-[min(94vw,78rem)] flex-col">
         <div
-          className="rounded-[2rem] border px-6 py-8 backdrop-blur-2xl md:px-8"
+          className="rounded-[2rem] border px-5 py-6 backdrop-blur-2xl md:px-8 md:py-8"
           style={panelStyle}
         >
-          <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div className="mb-6 flex justify-center md:hidden">
+            <div className="h-1.5 w-14 rounded-full bg-white/15" />
+          </div>
+
+          <div className="mb-6 flex flex-col gap-3 md:mb-8 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
               <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary/80">
                 Continue The Session
               </p>
               <h2
                 className={cn(
-                  "mt-3 text-3xl font-semibold md:text-4xl",
+                  "mt-3 text-2xl font-semibold leading-tight md:text-4xl",
                   fontClass || "",
                 )}
                 style={textColor ? { color: textColor } : {}}
@@ -72,7 +76,7 @@ export function OptionsCard({
                 Pick the next direction for {topic}
               </h2>
               <p
-                className="mt-3 max-w-xl text-sm leading-7 md:text-base"
+                className="mt-3 max-w-xl text-sm leading-6 md:text-base md:leading-7"
                 style={{ color: mutedTextColor || textColor }}
               >
                 Start a fresh 10-card branch, regenerate this topic, or ask for a
@@ -80,11 +84,18 @@ export function OptionsCard({
               </p>
             </div>
             <div
-              className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm"
+              className="w-fit rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm"
               style={{ color: mutedTextColor || textColor }}
             >
               {options.length > 0 ? `${options.length} curated follow-ups` : "No follow-ups yet"}
             </div>
+          </div>
+
+          <div
+            className="mb-5 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-sm md:hidden"
+            style={{ color: mutedTextColor || textColor }}
+          >
+            Scroll to explore all follow-up branches.
           </div>
 
           <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
@@ -98,7 +109,7 @@ export function OptionsCard({
                 <Button
                   onClick={() => handleOptionSelect(option.title)}
                   className={cn(
-                    "flex h-full min-h-[12rem] w-full min-w-0 flex-col items-start justify-between whitespace-normal break-words rounded-[1.5rem] border p-5 text-left transition-all duration-200 hover:border-primary/35 hover:bg-white/[0.07]",
+                    "flex h-full min-h-[12rem] w-full min-w-0 flex-col items-start justify-between whitespace-normal break-words rounded-[1.5rem] border p-4 text-left transition-all duration-200 hover:border-primary/35 hover:bg-white/[0.07] md:p-5",
                     selectedOption === option.title && "border-primary bg-primary/10",
                   )}
                   style={tileStyle}
@@ -107,7 +118,7 @@ export function OptionsCard({
                   <div className="flex min-h-[9rem] w-full min-w-0 flex-col justify-between">
                     <div className="min-w-0">
                       <h3
-                        className={cn("text-lg font-semibold leading-tight break-words", fontClass || "")}
+                        className={cn("text-base font-semibold leading-tight break-words md:text-lg", fontClass || "")}
                         style={textColor ? { color: textColor } : {}}
                       >
                         {option.title}
@@ -129,12 +140,12 @@ export function OptionsCard({
             ))}
           </div>
 
-          <div className="mt-8 flex flex-col gap-3 border-t border-white/8 pt-6 md:flex-row">
+          <div className="mt-6 flex flex-col gap-3 border-t border-white/8 pt-5 md:mt-8 md:flex-row md:pt-6">
             <Button
               onClick={() => onGenerateMore(false)}
               variant="outline"
               className={cn(
-                "h-12 rounded-2xl border-white/10 bg-white/[0.04] px-5 text-foreground",
+                "min-h-12 rounded-2xl border-white/10 bg-white/[0.04] px-5 py-3 text-foreground",
                 fontClass || "",
               )}
               data-testid="generate-more-button"
@@ -146,7 +157,7 @@ export function OptionsCard({
               onClick={() => onGenerateMore(true)}
               variant="outline"
               className={cn(
-                "h-12 rounded-2xl border-white/10 bg-white/[0.04] px-5 text-foreground",
+                "min-h-12 rounded-2xl border-white/10 bg-white/[0.04] px-5 py-3 text-foreground",
                 fontClass || "",
               )}
               data-testid="find-more-topics-button"
