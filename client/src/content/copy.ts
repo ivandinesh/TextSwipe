@@ -35,6 +35,7 @@ export interface AppCopy {
     topicEyebrow: string;
     loadingBadge: string;
     styleHint: string;
+    styleHintDesktop: string;
     previousHint: string;
     nextHint: string;
     helper: string;
@@ -173,6 +174,7 @@ export const appCopy: AppCopy = {
     topicEyebrow: "Now spinning",
     loadingBadge: "Loading",
     styleHint: "Swipe up for the vibe",
+    styleHintDesktop: "Theme the vibe",
     previousHint: "Swipe left for the last one",
     nextHint: "Swipe right for the next hit",
     helper: "One clean hit at a time. Double tap to save it.",

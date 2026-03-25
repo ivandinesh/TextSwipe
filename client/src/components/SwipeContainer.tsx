@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { appCopy } from "@/content/copy";
 import { cn } from "@/lib/utils";
+import { CardProgressTrail } from "./CardProgressTrail";
 import { OptionsCard } from "./OptionsCard";
 import { SwipeCard } from "./SwipeCard";
 
@@ -563,9 +564,14 @@ export function SwipeContainer({
             </div>
 
             <div className="hidden items-center gap-2 sm:flex">
-              <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
-                {appCopy.card.styleHint}
-              </div>
+              <button
+                type="button"
+                onClick={() => setControlsOpen((open) => !open)}
+                className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] uppercase tracking-[0.24em] text-muted-foreground transition hover:bg-white/[0.08]"
+                data-chrome-control="true"
+              >
+                {appCopy.card.styleHintDesktop}
+              </button>
             </div>
           </div>
         </div>
@@ -720,7 +726,7 @@ export function SwipeContainer({
                             background:
                               textToneName === choice.id
                                 ? "rgba(255,255,255,0.12)"
-                                : activeTheme.textTones[choice.id].muted,
+                                : activeTheme.tile,
                           }}
                         >
                           {appCopy.card.controls.textTones[choice.id]}
@@ -771,6 +777,15 @@ export function SwipeContainer({
           />
         ) : (
         <div className="relative h-full">
+            <CardProgressTrail
+              currentIndex={currentIndex}
+              total={allSnippets.length}
+              activeTheme={{
+                overlay: activeTheme.overlay,
+                tile: activeTheme.tile,
+              }}
+              activeTextTone={activeTextTone}
+            />
             <div
               className="pointer-events-none absolute inset-x-4 inset-y-3 rounded-[2.1rem] border opacity-45 md:inset-x-8 md:inset-y-5"
               style={{
