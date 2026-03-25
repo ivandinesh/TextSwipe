@@ -13,11 +13,9 @@ interface SwipeCardProps {
   cardLabel?: string;
   panelStyle?: React.CSSProperties;
   backlightStyle?: React.CSSProperties;
-  showChrome?: boolean;
   showSwipeHint?: boolean;
   isLiked?: boolean;
   onLike?: () => void;
-  onSurfaceTap?: () => void;
 }
 
 export function SwipeCard({
@@ -32,11 +30,9 @@ export function SwipeCard({
   cardLabel,
   panelStyle,
   backlightStyle,
-  showChrome = true,
   showSwipeHint = false,
   isLiked = false,
   onLike,
-  onSurfaceTap,
 }: SwipeCardProps) {
   return (
     <div
@@ -52,7 +48,7 @@ export function SwipeCard({
           <div
             className={cn(
               "pointer-events-none absolute inset-x-[8%] top-[14%] h-[58%] rounded-full blur-3xl transition-all duration-300 md:inset-x-[16%]",
-              showChrome ? "opacity-90 scale-100" : "opacity-75 scale-110",
+              "opacity-90 scale-100",
             )}
             style={backlightStyle}
           />
@@ -60,11 +56,6 @@ export function SwipeCard({
             className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border px-5 py-5 backdrop-blur-2xl transition-all duration-300 md:px-12 md:py-8"
             style={panelStyle}
             data-card-surface="true"
-            onClick={() => {
-              if (window.matchMedia("(hover: hover)").matches) {
-                onSurfaceTap?.();
-              }
-            }}
             onDoubleClick={(event) => {
               event.stopPropagation();
               onLike?.();
@@ -72,28 +63,18 @@ export function SwipeCard({
             role="button"
             tabIndex={0}
             onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
+              if (event.key.toLowerCase() === "f") {
                 event.preventDefault();
-                onSurfaceTap?.();
+                onLike?.();
               }
             }}
           >
-            <div
-              className={cn(
-                "mb-5 flex items-center justify-between gap-4 transition-all duration-250 md:mb-7",
-                showChrome
-                  ? "pointer-events-auto translate-y-0 opacity-100"
-                  : "pointer-events-none -translate-y-2 opacity-0",
-              )}
-            >
-              <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary/80">
-                {cardLabel || `Card ${index + 1} of ${total}`}
-              </div>
+            <div className="mb-5 flex items-center justify-start gap-4 md:mb-7">
               <div
-                className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1 text-xs"
+                className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.24em]"
                 style={{ color: mutedTextColor || textColor }}
               >
-                Focus mode
+                {cardLabel || `Card ${index + 1} of ${total}`}
               </div>
             </div>
 
@@ -153,19 +134,12 @@ export function SwipeCard({
               </div>
             </div>
 
-            <div
-              className={cn(
-                "mt-5 flex items-center justify-center transition-all duration-250 md:mt-6",
-                showChrome
-                  ? "pointer-events-auto translate-y-0 opacity-100"
-                  : "pointer-events-none translate-y-2 opacity-0",
-              )}
-            >
+            <div className="mt-5 flex items-center justify-center md:mt-6">
               <div
                 className="max-w-xl text-center text-sm leading-6"
                 style={{ color: mutedTextColor || textColor }}
               >
-                One focused idea per card. Tap to reveal controls when you want them.
+                One focused idea per card. Swipe up for styles and double tap to save.
               </div>
             </div>
           </div>

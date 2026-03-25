@@ -7,6 +7,13 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { OptionsCard } from "./OptionsCard";
 import { SwipeCard } from "./SwipeCard";
@@ -38,14 +45,6 @@ type ThemeName = "midnight" | "aurora" | "ember" | "petal" | "sage";
 type FontName = "sans" | "display" | "mono";
 type TextToneName = "default" | "soft" | "high-contrast";
 
-function eventTargetsCardSurface(target: EventTarget | null) {
-  if (!(target instanceof Element)) {
-    return false;
-  }
-
-  return Boolean(target.closest("[data-card-surface='true']"));
-}
-
 const THEMES: Record<
   ThemeName,
   {
@@ -70,97 +69,97 @@ const THEMES: Record<
 > = {
   midnight: {
     surface:
-      "bg-[radial-gradient(circle_at_top,rgba(58,227,255,0.12),transparent_24%),linear-gradient(180deg,rgba(12,15,34,0.95),rgba(6,10,24,1))]",
+      "bg-[radial-gradient(circle_at_top,rgba(129,220,255,0.18),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(181,197,255,0.18),transparent_24%),linear-gradient(180deg,rgba(11,15,34,0.98),rgba(6,10,24,1))]",
     shell: "rgba(8, 12, 28, 0.86)",
     overlay: "rgba(255,255,255,0.06)",
-    panel: "linear-gradient(180deg, rgba(18, 24, 54, 0.92), rgba(10, 14, 34, 0.82))",
-    panelBorder: "rgba(116, 161, 255, 0.18)",
+    panel: "linear-gradient(180deg, rgba(20, 28, 64, 0.94), rgba(10, 15, 38, 0.86))",
+    panelBorder: "rgba(147, 186, 255, 0.26)",
     panelGlow: "0 24px 80px rgba(4, 10, 34, 0.52), inset 0 1px 0 rgba(255,255,255,0.08)",
     backlight:
-      "radial-gradient(circle, rgba(112,173,255,0.32) 0%, rgba(112,173,255,0.14) 36%, rgba(112,173,255,0) 72%)",
-    tile: "rgba(255,255,255,0.04)",
-    text: "#F6F8FF",
-    muted: "#A6B1CF",
+      "radial-gradient(circle, rgba(156,210,255,0.42) 0%, rgba(140,170,255,0.18) 38%, rgba(156,210,255,0) 74%)",
+    tile: "rgba(255,255,255,0.06)",
+    text: "#FCFDFF",
+    muted: "#B8C4E4",
     textTones: {
-      default: { text: "#F6F8FF", muted: "#A6B1CF" },
-      soft: { text: "#9AE6FF", muted: "#75CBE8" },
-      "high-contrast": { text: "#FFFFFF", muted: "#D7E0FF" },
+      default: { text: "#FCFDFF", muted: "#B8C4E4" },
+      soft: { text: "#D7F1FF", muted: "#A5CCE7" },
+      "high-contrast": { text: "#FFFFFF", muted: "#E1E8FF" },
     },
   },
   aurora: {
     surface:
-      "bg-[radial-gradient(circle_at_top_left,rgba(58,227,255,0.15),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(152,92,255,0.22),transparent_26%),linear-gradient(180deg,rgba(18,19,47,0.96),rgba(9,11,33,1))]",
+      "bg-[radial-gradient(circle_at_top_left,rgba(166,239,255,0.2),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(222,178,255,0.24),transparent_28%),linear-gradient(180deg,rgba(20,21,50,0.98),rgba(10,11,34,1))]",
     shell: "rgba(18, 19, 47, 0.86)",
     overlay: "rgba(255,255,255,0.08)",
-    panel: "linear-gradient(180deg, rgba(33, 25, 70, 0.9), rgba(16, 18, 45, 0.84))",
-    panelBorder: "rgba(160, 132, 255, 0.22)",
+    panel: "linear-gradient(180deg, rgba(39, 31, 83, 0.92), rgba(18, 20, 48, 0.86))",
+    panelBorder: "rgba(204, 178, 255, 0.26)",
     panelGlow: "0 24px 80px rgba(22, 12, 62, 0.46), inset 0 1px 0 rgba(255,255,255,0.1)",
     backlight:
-      "radial-gradient(circle, rgba(201,176,255,0.38) 0%, rgba(116,220,255,0.18) 34%, rgba(201,176,255,0) 72%)",
-    tile: "rgba(255,255,255,0.05)",
-    text: "#F7F4FF",
-    muted: "#B4AED1",
+      "radial-gradient(circle, rgba(234,205,255,0.42) 0%, rgba(161,236,255,0.2) 36%, rgba(234,205,255,0) 74%)",
+    tile: "rgba(255,255,255,0.07)",
+    text: "#FFF9FF",
+    muted: "#CBC2EA",
     textTones: {
-      default: { text: "#F7F4FF", muted: "#B4AED1" },
-      soft: { text: "#FFCFF6", muted: "#E6AFDA" },
-      "high-contrast": { text: "#FFF9FF", muted: "#D9D0F6" },
+      default: { text: "#FFF9FF", muted: "#CBC2EA" },
+      soft: { text: "#FFE2F8", muted: "#EABCE0" },
+      "high-contrast": { text: "#FFFFFF", muted: "#E5DBFF" },
     },
   },
   ember: {
     surface:
-      "bg-[radial-gradient(circle_at_top_right,rgba(255,153,92,0.18),transparent_24%),radial-gradient(circle_at_left,rgba(255,96,143,0.14),transparent_20%),linear-gradient(180deg,rgba(31,16,28,0.96),rgba(14,9,18,1))]",
+      "bg-[radial-gradient(circle_at_top_right,rgba(255,196,156,0.2),transparent_24%),radial-gradient(circle_at_left,rgba(255,173,201,0.18),transparent_22%),linear-gradient(180deg,rgba(31,16,28,0.98),rgba(14,9,18,1))]",
     shell: "rgba(31, 16, 28, 0.86)",
     overlay: "rgba(255,255,255,0.07)",
-    panel: "linear-gradient(180deg, rgba(48, 24, 36, 0.9), rgba(22, 12, 20, 0.84))",
-    panelBorder: "rgba(255, 154, 115, 0.2)",
+    panel: "linear-gradient(180deg, rgba(54, 28, 40, 0.92), rgba(24, 12, 21, 0.86))",
+    panelBorder: "rgba(255, 201, 174, 0.24)",
     panelGlow: "0 24px 80px rgba(34, 10, 18, 0.5), inset 0 1px 0 rgba(255,255,255,0.08)",
     backlight:
-      "radial-gradient(circle, rgba(255,189,161,0.32) 0%, rgba(255,129,173,0.18) 38%, rgba(255,189,161,0) 72%)",
-    tile: "rgba(255,255,255,0.045)",
-    text: "#FFF5F5",
-    muted: "#D7B3BE",
+      "radial-gradient(circle, rgba(255,212,185,0.4) 0%, rgba(255,171,197,0.2) 40%, rgba(255,212,185,0) 74%)",
+    tile: "rgba(255,255,255,0.06)",
+    text: "#FFF8F7",
+    muted: "#E1BDC5",
     textTones: {
-      default: { text: "#FFF5F5", muted: "#D7B3BE" },
-      soft: { text: "#FFD8A8", muted: "#E9B993" },
-      "high-contrast": { text: "#FFFDFC", muted: "#F0CDD6" },
+      default: { text: "#FFF8F7", muted: "#E1BDC5" },
+      soft: { text: "#FFE4C5", muted: "#EDC29F" },
+      "high-contrast": { text: "#FFFFFF", muted: "#F4D7DE" },
     },
   },
   petal: {
     surface:
-      "bg-[radial-gradient(circle_at_top_left,rgba(255,202,230,0.22),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(255,243,186,0.2),transparent_25%),linear-gradient(180deg,rgba(38,24,40,0.96),rgba(20,14,24,1))]",
+      "bg-[radial-gradient(circle_at_top_left,rgba(255,223,238,0.24),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(255,245,204,0.22),transparent_26%),linear-gradient(180deg,rgba(38,24,40,0.98),rgba(20,14,24,1))]",
     shell: "rgba(38, 24, 40, 0.84)",
     overlay: "rgba(255,255,255,0.08)",
-    panel: "linear-gradient(180deg, rgba(74, 43, 73, 0.84), rgba(37, 22, 39, 0.82))",
-    panelBorder: "rgba(255, 202, 230, 0.24)",
+    panel: "linear-gradient(180deg, rgba(80, 48, 79, 0.88), rgba(39, 24, 41, 0.84))",
+    panelBorder: "rgba(255, 220, 236, 0.28)",
     panelGlow: "0 24px 80px rgba(57, 26, 56, 0.5), inset 0 1px 0 rgba(255,255,255,0.1)",
     backlight:
-      "radial-gradient(circle, rgba(255,203,229,0.38) 0%, rgba(255,239,182,0.18) 40%, rgba(255,203,229,0) 72%)",
-    tile: "rgba(255,255,255,0.06)",
-    text: "#FFF7FB",
-    muted: "#E4BED2",
+      "radial-gradient(circle, rgba(255,224,238,0.44) 0%, rgba(255,244,202,0.2) 42%, rgba(255,224,238,0) 74%)",
+    tile: "rgba(255,255,255,0.075)",
+    text: "#FFF9FC",
+    muted: "#E9C8D9",
     textTones: {
-      default: { text: "#FFF7FB", muted: "#E4BED2" },
-      soft: { text: "#FFD1EC", muted: "#F0B5D4" },
-      "high-contrast": { text: "#FFFFFF", muted: "#FFE4F1" },
+      default: { text: "#FFF9FC", muted: "#E9C8D9" },
+      soft: { text: "#FFE6F4", muted: "#F2C4DD" },
+      "high-contrast": { text: "#FFFFFF", muted: "#FFE7F2" },
     },
   },
   sage: {
     surface:
-      "bg-[radial-gradient(circle_at_top,rgba(190,241,217,0.2),transparent_23%),radial-gradient(circle_at_bottom_right,rgba(176,229,255,0.16),transparent_24%),linear-gradient(180deg,rgba(22,35,35,0.96),rgba(12,20,20,1))]",
+      "bg-[radial-gradient(circle_at_top,rgba(214,246,225,0.22),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(199,234,255,0.2),transparent_26%),linear-gradient(180deg,rgba(22,35,35,0.98),rgba(12,20,20,1))]",
     shell: "rgba(22, 35, 35, 0.84)",
     overlay: "rgba(255,255,255,0.08)",
-    panel: "linear-gradient(180deg, rgba(33, 57, 54, 0.84), rgba(18, 31, 31, 0.82))",
-    panelBorder: "rgba(176, 241, 217, 0.22)",
+    panel: "linear-gradient(180deg, rgba(37, 62, 58, 0.88), rgba(18, 31, 31, 0.84))",
+    panelBorder: "rgba(210, 245, 225, 0.24)",
     panelGlow: "0 24px 80px rgba(9, 30, 24, 0.48), inset 0 1px 0 rgba(255,255,255,0.1)",
     backlight:
-      "radial-gradient(circle, rgba(194,244,220,0.34) 0%, rgba(171,224,255,0.18) 38%, rgba(194,244,220,0) 72%)",
-    tile: "rgba(255,255,255,0.05)",
-    text: "#F5FFF9",
-    muted: "#B8D6CC",
+      "radial-gradient(circle, rgba(219,247,229,0.38) 0%, rgba(199,232,255,0.2) 40%, rgba(219,247,229,0) 74%)",
+    tile: "rgba(255,255,255,0.065)",
+    text: "#F8FFFB",
+    muted: "#C5DED5",
     textTones: {
-      default: { text: "#F5FFF9", muted: "#B8D6CC" },
-      soft: { text: "#C8FFF1", muted: "#97DCC8" },
-      "high-contrast": { text: "#FFFFFF", muted: "#D9F5E8" },
+      default: { text: "#F8FFFB", muted: "#C5DED5" },
+      soft: { text: "#D6FFF1", muted: "#A8DFCB" },
+      "high-contrast": { text: "#FFFFFF", muted: "#E0F7EC" },
     },
   },
 };
@@ -202,12 +201,11 @@ export function SwipeContainer({
   const [fontName, setFontName] = useState<FontName>("sans");
   const [textToneName, setTextToneName] = useState<TextToneName>("default");
   const [showOptions, setShowOptions] = useState(false);
-  const [showChrome, setShowChrome] = useState(false);
+  const [controlsOpen, setControlsOpen] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [swipeDirection, setSwipeDirection] = useState<1 | -1>(1);
   const [touchStart, setTouchStart] = useState({ x: 0, y: 0 });
   const lastTapRef = useRef(0);
-  const tapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const activeTheme = THEMES[themeName];
   const activeTextTone = activeTheme.textTones[textToneName];
@@ -232,18 +230,10 @@ export function SwipeContainer({
   useEffect(() => {
     setAllSnippets(snippets);
     setShowOptions(false);
-    setShowChrome(false);
+    setControlsOpen(false);
     setShowSwipeHint(true);
     setSwipeDirection(1);
   }, [snippets, topic]);
-
-  useEffect(() => {
-    return () => {
-      if (tapTimeoutRef.current) {
-        clearTimeout(tapTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const cycleBackground = useCallback(
     debounce(() => {
@@ -316,12 +306,12 @@ export function SwipeContainer({
         setAllSnippets(nextSnippets);
         onIndexChange(0);
         setShowOptions(false);
-        setShowChrome(false);
+        setControlsOpen(false);
       } catch (error) {
         console.error("Error generating content:", error);
         setAllSnippets(["Error generating content. Please try again."]);
         onIndexChange(0);
-        setShowChrome(true);
+        setControlsOpen(false);
       } finally {
         setIsLoading(false);
       }
@@ -340,13 +330,13 @@ export function SwipeContainer({
 
     if (currentIndex >= allSnippets.length - 1) {
       setShowOptions(true);
-      setShowChrome(true);
+      setControlsOpen(false);
       return;
     }
 
     const next = currentIndex + 1;
     onIndexChange(next);
-    setShowChrome(false);
+    setControlsOpen(false);
   }, [allSnippets.length, currentIndex, onIndexChange, showOptions]);
 
   const previousCard = useCallback(() => {
@@ -355,17 +345,17 @@ export function SwipeContainer({
 
     if (showOptions) {
       setShowOptions(false);
-      setShowChrome(true);
+      setControlsOpen(false);
       return;
     }
 
     if (currentIndex <= 0) {
-      setShowChrome(true);
+      setControlsOpen(false);
       return;
     }
 
     onIndexChange(currentIndex - 1);
-    setShowChrome(false);
+    setControlsOpen(false);
   }, [currentIndex, onIndexChange, showOptions]);
 
   const toggleLikeCurrent = useCallback(() => {
@@ -383,6 +373,12 @@ export function SwipeContainer({
       } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
         e.preventDefault();
         previousCard();
+      } else if (e.key.toLowerCase() === "w") {
+        e.preventDefault();
+        setControlsOpen(true);
+      } else if (e.key === "Escape" && controlsOpen) {
+        e.preventDefault();
+        setControlsOpen(false);
       } else if (e.key.toLowerCase() === "f") {
         e.preventDefault();
         toggleLikeCurrent();
@@ -397,7 +393,7 @@ export function SwipeContainer({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [nextCard, onBack, previousCard, showOptions, toggleLikeCurrent]);
+  }, [controlsOpen, nextCard, onBack, previousCard, showOptions, toggleLikeCurrent]);
 
   if (!allSnippets.length) {
     return (
@@ -435,6 +431,7 @@ export function SwipeContainer({
         const deltaY = touchStart.y - endY;
 
         if (Math.abs(deltaX) > swipeThreshold && Math.abs(deltaX) > Math.abs(deltaY)) {
+          setControlsOpen(false);
           if (deltaX > 0) {
             previousCard();
           } else {
@@ -443,39 +440,87 @@ export function SwipeContainer({
           return;
         }
 
-        if (
-          Math.abs(deltaY) < 12 &&
-          Math.abs(deltaX) < 12 &&
-          eventTargetsCardSurface(e.target)
-        ) {
-          const now = Date.now();
+        if (Math.abs(deltaY) > 34 && Math.abs(deltaY) > Math.abs(deltaX)) {
+          if (deltaY > 0) {
+            setControlsOpen(true);
+          } else if (controlsOpen) {
+            setControlsOpen(false);
+          }
+          return;
+        }
 
+        if (Math.abs(deltaY) < 12 && Math.abs(deltaX) < 12) {
+          const target = e.target;
+          if (!(target instanceof Element) || !target.closest("[data-card-surface='true']")) {
+            return;
+          }
+
+          const now = Date.now();
           if (now - lastTapRef.current < 280) {
-            if (tapTimeoutRef.current) {
-              clearTimeout(tapTimeoutRef.current);
-              tapTimeoutRef.current = null;
-            }
             lastTapRef.current = 0;
             toggleLikeCurrent();
-            setShowChrome(true);
             return;
           }
 
           lastTapRef.current = now;
-          tapTimeoutRef.current = setTimeout(() => {
-            setShowChrome((current) => !current);
-            tapTimeoutRef.current = null;
-          }, 210);
         }
       }}
       data-testid="swipe-container"
     >
+      <Drawer open={controlsOpen && !showOptions} onOpenChange={setControlsOpen}>
+        <DrawerContent className="border-white/10 bg-[rgba(11,15,30,0.96)] text-foreground backdrop-blur-3xl">
+          <DrawerHeader className="px-5 pb-2 pt-4 text-left">
+            <DrawerTitle className="font-display text-lg text-foreground">
+              Reading controls
+            </DrawerTitle>
+            <DrawerDescription className="text-sm text-muted-foreground">
+              Fine-tune the card mood without leaving the deck.
+            </DrawerDescription>
+          </DrawerHeader>
+          <div className="px-5 pb-6">
+            <div className="grid gap-3">
+              <button
+                type="button"
+                onClick={cycleBackground}
+                className="flex min-h-14 items-center justify-between rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-left transition-colors hover:bg-white/[0.08]"
+              >
+                <div>
+                  <p className="text-sm font-medium text-foreground">Background palette</p>
+                  <p className="text-xs text-muted-foreground">Cycle through soft pastel scenes</p>
+                </div>
+                <Palette className="h-4 w-4 text-primary" />
+              </button>
+              <button
+                type="button"
+                onClick={cycleFont}
+                className="flex min-h-14 items-center justify-between rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-left transition-colors hover:bg-white/[0.08]"
+              >
+                <div>
+                  <p className="text-sm font-medium text-foreground">Typography</p>
+                  <p className="text-xs text-muted-foreground">Switch between calm reading styles</p>
+                </div>
+                <Type className="h-4 w-4 text-primary" />
+              </button>
+              <button
+                type="button"
+                onClick={cycleTextTone}
+                className="flex min-h-14 items-center justify-between rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-left transition-colors hover:bg-white/[0.08]"
+              >
+                <div>
+                  <p className="text-sm font-medium text-foreground">Text contrast</p>
+                  <p className="text-xs text-muted-foreground">Adjust the card copy emphasis</p>
+                </div>
+                <Paintbrush className="h-4 w-4 text-primary" />
+              </button>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
       <div
         className={cn(
           "pointer-events-none absolute inset-x-0 top-0 z-10 px-4 pt-4 transition-all duration-300 md:px-6",
-          showOptions || showChrome
-            ? "translate-y-0 opacity-100"
-            : "-translate-y-4 opacity-0",
+          showOptions || controlsOpen ? "translate-y-0 opacity-100" : "translate-y-0 opacity-100",
         )}
       >
         <div
@@ -518,70 +563,10 @@ export function SwipeContainer({
             </div>
 
             <div className="hidden items-center gap-2 sm:flex">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={cycleBackground}
-                data-chrome-control="true"
-                className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
-                aria-label="Change visual theme"
-              >
-                <Palette className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={cycleFont}
-                data-chrome-control="true"
-                className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
-                aria-label="Change font"
-              >
-                <Type className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={cycleTextTone}
-                data-chrome-control="true"
-                className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
-                aria-label="Change text color"
-              >
-                <Paintbrush className="h-4 w-4" />
-              </Button>
+              <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+                Swipe up for styles
+              </div>
             </div>
-          </div>
-
-          <div className="mt-3 flex items-center gap-2 sm:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={cycleBackground}
-              data-chrome-control="true"
-              className="h-9 w-9 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
-              aria-label="Change visual theme"
-            >
-              <Palette className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={cycleFont}
-              data-chrome-control="true"
-              className="h-9 w-9 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
-              aria-label="Change font"
-            >
-              <Type className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={cycleTextTone}
-              data-chrome-control="true"
-              className="h-9 w-9 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
-              aria-label="Change text color"
-            >
-              <Paintbrush className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </div>
@@ -589,7 +574,7 @@ export function SwipeContainer({
       <div
         className={cn(
           "relative transition-all duration-300",
-          showOptions || showChrome ? "pt-28 sm:pt-32" : "pt-6 sm:pt-8",
+          "pt-28 sm:pt-32",
           showOptions
             ? "min-h-full"
             : "h-[calc(100dvh-1rem)] sm:h-[calc(100dvh-1.5rem)]",
@@ -621,7 +606,7 @@ export function SwipeContainer({
             }}
           />
         ) : (
-          <div className="relative h-full">
+        <div className="relative h-full">
             <div
               className="pointer-events-none absolute inset-x-4 inset-y-3 rounded-[2.1rem] border opacity-45 md:inset-x-8 md:inset-y-5"
               style={{
@@ -689,14 +674,12 @@ export function SwipeContainer({
                   mutedTextColor={activeTextTone.muted}
                   fontClass={fontClass}
                   cardLabel={`Card ${Math.min(currentIndex + 1, allSnippets.length)} of ${allSnippets.length}`}
-                  showChrome={showChrome}
                   showSwipeHint={showSwipeHint && currentIndex === 0}
                   isLiked={Boolean(
                     allSnippets[currentIndex] &&
                       _likedSnippets.includes(allSnippets[currentIndex]),
                   )}
                   onLike={toggleLikeCurrent}
-                  onSurfaceTap={() => setShowChrome((current) => !current)}
                   panelStyle={{
                     background: activeTheme.panel,
                     borderColor: activeTheme.panelBorder,
