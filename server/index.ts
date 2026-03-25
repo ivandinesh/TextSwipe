@@ -9,8 +9,8 @@ import cors from "cors";
 import session from "express-session";
 import MemoryStoreFactory from "memorystore";
 import { initializeDB } from "./db";
-import chatRoutes from "./routes/chats";
-import topicRoutes from "./routes/topicRoutes";
+import chatRoutes from "./routes/chatsRuntime";
+import topicRoutes from "./routes/topicRoutesRuntime";
 import authRoutes from "./routes/authRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
 

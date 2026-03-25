@@ -5,7 +5,7 @@
 
 import express from 'express';
 import { sql } from 'drizzle-orm';
-import { getDB } from '../db';
+import { db as initializedDb } from '../db';
 
 const router = express.Router();
 
@@ -15,18 +15,11 @@ const DEFAULT_TOPICS = [
   "Genetic Engineering", "Renewable Energy", "Consciousness", "Time Dilation"
 ];
 
-let db: any = null;
+const getRouteDb = () => initializedDb;
 
-try {
-  if (process.env.NODE_ENV === 'production') {
-    db = getDB();
     console.log('🔶 Topic routes using PostgreSQL database');
-  } else {
     console.log('🔶 Topic routes running in development mode (no database)');
-  }
-} catch (error) {
   console.error('⚠️ Database not available, running in memory-only mode:', error);
-  db = null;
 }
 
 // Save topic interactions from client

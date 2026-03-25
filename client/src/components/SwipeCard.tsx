@@ -48,13 +48,13 @@ export function SwipeCard({
   return (
     <div
       className={cn(
-        "relative h-screen w-full px-5 pb-8 pt-6 transition-all duration-300 md:px-8 md:pb-10",
+        "relative h-full w-full px-4 pb-6 pt-4 transition-all duration-300 md:h-screen md:px-8 md:pb-10 md:pt-6",
         isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
         className,
       )}
       data-testid={`card-learn-${index}`}
     >
-      <div className="mx-auto flex h-full w-full max-w-[min(92vw,72rem)] flex-col justify-between">
+      <div className="mx-auto flex min-h-full w-full max-w-[min(92vw,72rem)] flex-col justify-between">
         <div className="relative flex-1">
           <div
             className={cn(
@@ -64,7 +64,7 @@ export function SwipeCard({
             style={backlightStyle}
           />
           <div
-            className="relative min-h-[68vh] rounded-[2rem] border px-6 py-8 backdrop-blur-2xl transition-all duration-300 md:min-h-[72vh] md:px-12 md:py-10"
+            className="relative flex min-h-[70svh] flex-col justify-between rounded-[2rem] border px-5 py-6 backdrop-blur-2xl transition-all duration-300 md:min-h-[72vh] md:px-12 md:py-10"
             style={panelStyle}
             data-card-surface="true"
             onClick={() => {
@@ -100,11 +100,11 @@ export function SwipeCard({
               </div>
             </div>
 
-            <div className="flex min-h-[42vh] items-center justify-center overflow-visible py-4 md:min-h-[46vh]">
+            <div className="flex flex-1 items-center justify-center overflow-visible py-3 md:min-h-[46vh] md:py-4">
               <div className="w-full py-2">
                 <p
                   className={cn(
-                    "mx-auto max-w-[16ch] overflow-visible text-center text-2xl font-medium leading-[1.42] tracking-[-0.02em] md:max-w-[18ch] md:text-[clamp(2.8rem,4vw,4.4rem)] md:leading-[1.26]",
+                    "mx-auto max-w-[15ch] overflow-visible text-center text-[clamp(2rem,7vw,2.7rem)] font-medium leading-[1.36] tracking-[-0.02em] md:max-w-[18ch] md:text-[clamp(2.8rem,4vw,4.4rem)] md:leading-[1.26]",
                     fontClass || "",
                   )}
                   style={
