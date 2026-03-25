@@ -1,14 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
+  LayoutDashboard,
   Paintbrush,
   Palette,
   Type,
+  LogOut,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { appCopy } from "@/content/copy";
 import { cn } from "@/lib/utils";
+import type { AuthUser } from "@/hooks/use-auth";
+import { AuthDialog } from "./AuthDialog";
 import { CardProgressTrail } from "./CardProgressTrail";
 import { OptionsCard } from "./OptionsCard";
 import { SwipeCard } from "./SwipeCard";
@@ -28,6 +32,9 @@ interface SwipeContainerProps {
   currentIndex: number;
   onIndexChange: (index: number) => void;
   onOptionsChange: (options: TopicOption[]) => void;
+  user?: AuthUser | null;
+  onOpenDashboard?: () => void;
+  onLogout?: () => Promise<void> | void;
   className?: string;
 }
 
@@ -228,6 +235,9 @@ export function SwipeContainer({
   currentIndex,
   onIndexChange,
   onOptionsChange,
+  user,
+  onOpenDashboard,
+  onLogout,
   className,
 }: SwipeContainerProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -564,6 +574,34 @@ export function SwipeContainer({
             </div>
 
             <div className="hidden items-center gap-2 sm:flex">
+              {user ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onOpenDashboard}
+                    className="h-10 rounded-full border-white/10 bg-white/[0.04] px-3 text-foreground"
+                    data-chrome-control="true"
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    <span className="hidden lg:inline">{appCopy.home.dashboardButton}</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={async () => {
+                      await onLogout?.();
+                    }}
+                    className="h-10 rounded-full border-white/10 bg-white/[0.04] px-3 text-foreground"
+                    data-chrome-control="true"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span className="hidden lg:inline">{appCopy.home.signOutButton}</span>
+                  </Button>
+                </>
+              ) : (
+                <AuthDialog triggerLabel={appCopy.auth.tabs.login} />
+              )}
               <button
                 type="button"
                 onClick={() => setControlsOpen((open) => !open)}

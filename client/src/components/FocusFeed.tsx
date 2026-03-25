@@ -399,6 +399,11 @@ export function FocusFeed() {
             updateLearningUrl(currentTopic, index);
           }}
           onOptionsChange={setCurrentOptions}
+          user={user}
+          onOpenDashboard={() => setLocation("/dashboard")}
+          onLogout={async () => {
+            await logout.mutateAsync();
+          }}
         />
       )}
     </div>
