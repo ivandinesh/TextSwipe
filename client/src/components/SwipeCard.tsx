@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SwipeCardProps {
@@ -7,10 +5,6 @@ interface SwipeCardProps {
   index: number;
   total: number;
   isActive: boolean;
-  onNext: () => void;
-  onPrevious: () => void;
-  onLike?: (content: string) => void;
-  isLiked?: boolean;
   className?: string;
   textColor?: string;
   mutedTextColor?: string;
@@ -19,6 +13,7 @@ interface SwipeCardProps {
   panelStyle?: React.CSSProperties;
   backlightStyle?: React.CSSProperties;
   showChrome?: boolean;
+  showSwipeHint?: boolean;
   onSurfaceTap?: () => void;
 }
 
@@ -27,10 +22,6 @@ export function SwipeCard({
   index,
   total,
   isActive,
-  onNext,
-  onPrevious,
-  onLike,
-  isLiked = false,
   className,
   textColor,
   mutedTextColor,
@@ -39,17 +30,14 @@ export function SwipeCard({
   panelStyle,
   backlightStyle,
   showChrome = true,
+  showSwipeHint = false,
   onSurfaceTap,
 }: SwipeCardProps) {
-  const handleLike = () => {
-    onLike?.(content);
-  };
-
   return (
     <div
       className={cn(
         "relative h-full w-full px-4 pb-6 pt-4 transition-all duration-300 md:h-screen md:px-8 md:pb-10 md:pt-6",
-        isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+        isActive ? "opacity-100" : "opacity-0",
         className,
       )}
       data-testid={`card-learn-${index}`}
@@ -124,6 +112,20 @@ export function SwipeCard({
 
             <div
               className={cn(
+                "pointer-events-none absolute inset-x-5 bottom-24 flex items-center justify-between gap-3 transition-all duration-300 md:inset-x-10 md:bottom-28",
+                showSwipeHint ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
+              )}
+            >
+              <div className="rounded-full border border-white/10 bg-black/20 px-3 py-2 text-[11px] font-medium tracking-[0.16em] text-white/80 backdrop-blur-md md:text-xs">
+                Swipe left to save
+              </div>
+              <div className="rounded-full border border-white/10 bg-black/20 px-3 py-2 text-[11px] font-medium tracking-[0.16em] text-white/80 backdrop-blur-md md:text-xs">
+                Swipe right for next
+              </div>
+            </div>
+
+            <div
+              className={cn(
                 "mt-8 flex items-center justify-center transition-all duration-250",
                 showChrome
                   ? "pointer-events-auto translate-y-0 opacity-100"
@@ -142,28 +144,13 @@ export function SwipeCard({
 
         <div
           className={cn(
-            "safe-bottom mt-5 flex items-center justify-between gap-4 px-1 transition-all duration-250",
+            "safe-bottom mt-5 px-1 transition-all duration-250",
             showChrome
               ? "pointer-events-auto translate-y-0 opacity-100"
               : "pointer-events-none translate-y-4 opacity-0",
           )}
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleLike}
-            className={cn(
-              "h-12 w-12 rounded-full border border-white/10 bg-white/[0.04]",
-              isLiked
-                ? "text-red-400 shadow-[0_0_24px_rgba(248,113,113,0.25)]"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-            data-testid={`button-like-${index}`}
-          >
-            <Heart className={cn("h-5 w-5", isLiked && "fill-current")} />
-          </Button>
-
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0">
             <div className="mb-2 flex items-center justify-between gap-3">
               <span
                 className="text-xs uppercase tracking-[0.22em]"

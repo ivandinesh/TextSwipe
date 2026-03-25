@@ -189,7 +189,7 @@ export function SwipeContainer({
   topic,
   onBack,
   onLike,
-  likedSnippets = [],
+  likedSnippets: _likedSnippets = [],
   currentIndex,
   onIndexChange,
   onOptionsChange,
@@ -202,12 +202,12 @@ export function SwipeContainer({
   const [textToneName, setTextToneName] = useState<TextToneName>("default");
   const [showOptions, setShowOptions] = useState(false);
   const [showChrome, setShowChrome] = useState(false);
+  const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [touchStart, setTouchStart] = useState({ x: 0, y: 0 });
 
   const activeTheme = THEMES[themeName];
   const activeTextTone = activeTheme.textTones[textToneName];
   const fontClass = FONT_CLASSES[fontName];
-  const likedSet = new Set(likedSnippets);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("focusfeed-theme") as ThemeName | null;
@@ -229,6 +229,7 @@ export function SwipeContainer({
     setAllSnippets(snippets);
     setShowOptions(false);
     setShowChrome(false);
+    setShowSwipeHint(true);
   }, [snippets, topic]);
 
   const cycleBackground = useCallback(
@@ -316,6 +317,8 @@ export function SwipeContainer({
   );
 
   const nextCard = useCallback(() => {
+    setShowSwipeHint(false);
+
     if (showOptions) {
       setShowOptions(false);
       return;
@@ -332,25 +335,22 @@ export function SwipeContainer({
     setShowChrome(false);
   }, [allSnippets.length, currentIndex, onIndexChange, showOptions]);
 
-  const previousCard = useCallback(() => {
-    if (showOptions) {
-      setShowOptions(false);
-      return;
+  const likeAndAdvance = useCallback(() => {
+    const currentSnippet = allSnippets[currentIndex];
+    if (currentSnippet) {
+      onLike?.(currentSnippet);
     }
-
-    const previous = currentIndex > 0 ? currentIndex - 1 : 0;
-    onIndexChange(previous);
-    setShowChrome(false);
-  }, [currentIndex, onIndexChange, showOptions]);
+    nextCard();
+  }, [allSnippets, currentIndex, nextCard, onLike]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowDown" || e.key === " ") {
+      if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " ") {
         e.preventDefault();
         nextCard();
-      } else if (e.key === "ArrowUp") {
+      } else if (e.key === "ArrowLeft") {
         e.preventDefault();
-        previousCard();
+        likeAndAdvance();
       } else if (e.key === "Escape") {
         if (showOptions) {
           setShowOptions(false);
@@ -362,7 +362,7 @@ export function SwipeContainer({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [nextCard, onBack, previousCard, showOptions]);
+  }, [likeAndAdvance, nextCard, onBack, showOptions]);
 
   if (!allSnippets.length) {
     return (
@@ -399,11 +399,11 @@ export function SwipeContainer({
         const deltaX = touchStart.x - endX;
         const deltaY = touchStart.y - endY;
 
-        if (Math.abs(deltaY) > 50 && Math.abs(deltaY) > Math.abs(deltaX)) {
-          if (deltaY > 0) {
-            nextCard();
+        if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) {
+          if (deltaX > 0) {
+            likeAndAdvance();
           } else {
-            previousCard();
+            nextCard();
           }
           return;
         }
@@ -591,15 +591,12 @@ export function SwipeContainer({
               index={index}
               total={allSnippets.length}
               isActive={index === currentIndex}
-              onNext={nextCard}
-              onPrevious={previousCard}
-              onLike={onLike}
-              isLiked={likedSet.has(snippet)}
               textColor={activeTextTone.text}
               mutedTextColor={activeTextTone.muted}
               fontClass={fontClass}
               progressLabel={`${Math.min(currentIndex + 1, allSnippets.length)} / ${allSnippets.length}`}
               showChrome={showChrome}
+              showSwipeHint={showSwipeHint && currentIndex === 0}
               onSurfaceTap={() => setShowChrome((current) => !current)}
               panelStyle={{
                 background: activeTheme.panel,
@@ -610,29 +607,15 @@ export function SwipeContainer({
               className={cn(
                 "absolute inset-0 transition-all duration-300 ease-out",
                 index === currentIndex
-                  ? "opacity-100 translate-y-0 scale-100"
+                  ? "opacity-100 translate-x-0 scale-100"
                   : index < currentIndex
-                    ? "opacity-0 -translate-y-full scale-95"
-                    : "opacity-0 translate-y-full scale-95",
+                    ? "opacity-0 -translate-x-full scale-95"
+                    : "opacity-0 translate-x-full scale-95",
               )}
             />
           ))
         )}
       </div>
-
-      {!showOptions && (
-        <div
-          className={cn(
-            "safe-bottom absolute bottom-0 left-1/2 w-full max-w-sm -translate-x-1/2 px-6 pb-4 text-center text-sm transition-all duration-300 md:hidden",
-            showChrome ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
-          )}
-          style={{ color: activeTextTone.muted }}
-        >
-          <div className="rounded-full border border-white/10 bg-black/20 px-4 py-2 backdrop-blur-md">
-            <p>Swipe to move. Tap the card when you want controls.</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
