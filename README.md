@@ -10,6 +10,8 @@ FocusFeed is a full-stack TypeScript app for swipe-based learning. Enter a topic
 - Saves liked cards, learning sessions, and topic interactions for signed-in users
 - Shows a personal dashboard with learning minutes, streaks, saved cards, and recommended topics
 - Persists generated topic decks to disk so repeat topics can be served from cache
+- Supports card favorites via heart button and double tap
+- Uses swipe-up controls in the reading view for theme, font, and text contrast tuning
 - Uses OpenRouter with an env-configurable model, defaulting to `google/gemini-2.5-flash-lite`
 
 ## Stack
@@ -215,9 +217,18 @@ The current UI is designed to be:
 - Reading-focused
 - Mobile-friendly
 - Minimal on the homepage
-- Immersive in the card view, with tap-to-reveal controls
+- Immersive in the card view, with swipe-up controls and persistent in-card progress labels
 
-Theme/font/text controls exist in the reading view, and the card surfaces now change with the active theme.
+Current card-view behavior:
+
+- Swipe right to move to the next card
+- Swipe left to go to the previous card
+- Tap the heart or double tap the card to favorite it
+- Swipe up to open the reading controls sheet
+- Swipe down or dismiss the sheet to close it
+- Card position is shown inside the card itself rather than in the top chrome
+
+Theme/font/text controls exist in the reading view, and the card surfaces now change with the active theme. The current visual direction is high-contrast dark mode with soft pastel scene backgrounds and glows.
 
 ## Project Structure
 

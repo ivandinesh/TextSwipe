@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowRight, RefreshCcw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { appCopy } from "@/content/copy";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -63,7 +64,7 @@ export function OptionsCard({
           <div className="mb-6 flex flex-col gap-3 md:mb-8 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
               <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary/80">
-                Continue The Session
+                {appCopy.options.eyebrow}
               </p>
               <h2
                 className={cn(
@@ -73,21 +74,22 @@ export function OptionsCard({
                 style={textColor ? { color: textColor } : {}}
                 data-testid="options-title"
               >
-                Pick the next direction for {topic}
+                {appCopy.options.title(topic)}
               </h2>
               <p
                 className="mt-3 max-w-xl text-sm leading-6 md:text-base md:leading-7"
                 style={{ color: mutedTextColor || textColor }}
               >
-                Start a fresh 10-card branch, regenerate this topic, or ask for a
-                new set of related directions.
+                {appCopy.options.description}
               </p>
             </div>
             <div
               className="w-fit rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm"
               style={{ color: mutedTextColor || textColor }}
             >
-              {options.length > 0 ? `${options.length} curated follow-ups` : "No follow-ups yet"}
+              {options.length > 0
+                ? appCopy.options.followUpsCount(options.length)
+                : appCopy.options.noFollowUps}
             </div>
           </div>
 
@@ -95,7 +97,7 @@ export function OptionsCard({
             className="mb-5 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-sm md:hidden"
             style={{ color: mutedTextColor || textColor }}
           >
-            Scroll to explore all follow-up branches.
+            {appCopy.options.mobileHint}
           </div>
 
           <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
@@ -131,7 +133,7 @@ export function OptionsCard({
                       </p>
                     </div>
                     <div className="mt-5 flex w-full items-center gap-2 whitespace-normal text-sm font-medium text-primary">
-                      Start new 10-card branch
+                      {appCopy.options.selectCta}
                       <ArrowRight className="h-4 w-4" />
                     </div>
                   </div>
@@ -151,7 +153,7 @@ export function OptionsCard({
               data-testid="generate-more-button"
             >
               <RefreshCcw className="h-4 w-4" />
-              Restart this topic with 10 new cards
+              {appCopy.options.regenerate}
             </Button>
             <Button
               onClick={() => onGenerateMore(true)}
@@ -163,7 +165,7 @@ export function OptionsCard({
               data-testid="find-more-topics-button"
             >
               <Search className="h-4 w-4" />
-              Show different branch ideas
+              {appCopy.options.explore}
             </Button>
           </div>
 
@@ -172,8 +174,7 @@ export function OptionsCard({
               className="mt-6 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-4 text-sm"
               style={{ color: mutedTextColor || textColor }}
             >
-              No related topics were returned this time, so you can refresh the
-              deck or ask for a different set of branches.
+              {appCopy.options.empty}
             </div>
           )}
         </div>

@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { appCopy } from "@/content/copy";
 import {
   Drawer,
   DrawerContent,
@@ -290,7 +291,7 @@ export function SwipeContainer({
           if (response.status === 429) {
             setAllSnippets((prev) => [
               ...prev,
-              "Rate limit reached. Please wait a moment before generating more content.",
+              appCopy.errors.rateLimit,
             ]);
             return;
           }
@@ -309,7 +310,7 @@ export function SwipeContainer({
         setControlsOpen(false);
       } catch (error) {
         console.error("Error generating content:", error);
-        setAllSnippets(["Error generating content. Please try again."]);
+        setAllSnippets([appCopy.errors.genericGenerate]);
         onIndexChange(0);
         setControlsOpen(false);
       } finally {
@@ -398,7 +399,7 @@ export function SwipeContainer({
   if (!allSnippets.length) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">No learning content available</p>
+        <p className="text-muted-foreground">{appCopy.errors.noCards}</p>
       </div>
     );
   }
@@ -471,10 +472,10 @@ export function SwipeContainer({
         <DrawerContent className="border-white/10 bg-[rgba(11,15,30,0.96)] text-foreground backdrop-blur-3xl">
           <DrawerHeader className="px-5 pb-2 pt-4 text-left">
             <DrawerTitle className="font-display text-lg text-foreground">
-              Reading controls
+              {appCopy.card.controlsTitle}
             </DrawerTitle>
             <DrawerDescription className="text-sm text-muted-foreground">
-              Fine-tune the card mood without leaving the deck.
+              {appCopy.card.controlsDescription}
             </DrawerDescription>
           </DrawerHeader>
           <div className="px-5 pb-6">
@@ -485,8 +486,8 @@ export function SwipeContainer({
                 className="flex min-h-14 items-center justify-between rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-left transition-colors hover:bg-white/[0.08]"
               >
                 <div>
-                  <p className="text-sm font-medium text-foreground">Background palette</p>
-                  <p className="text-xs text-muted-foreground">Cycle through soft pastel scenes</p>
+                  <p className="text-sm font-medium text-foreground">{appCopy.card.controls.backdropTitle}</p>
+                  <p className="text-xs text-muted-foreground">{appCopy.card.controls.backdropDescription}</p>
                 </div>
                 <Palette className="h-4 w-4 text-primary" />
               </button>
@@ -496,8 +497,8 @@ export function SwipeContainer({
                 className="flex min-h-14 items-center justify-between rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-left transition-colors hover:bg-white/[0.08]"
               >
                 <div>
-                  <p className="text-sm font-medium text-foreground">Typography</p>
-                  <p className="text-xs text-muted-foreground">Switch between calm reading styles</p>
+                  <p className="text-sm font-medium text-foreground">{appCopy.card.controls.typeTitle}</p>
+                  <p className="text-xs text-muted-foreground">{appCopy.card.controls.typeDescription}</p>
                 </div>
                 <Type className="h-4 w-4 text-primary" />
               </button>
@@ -507,8 +508,8 @@ export function SwipeContainer({
                 className="flex min-h-14 items-center justify-between rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-left transition-colors hover:bg-white/[0.08]"
               >
                 <div>
-                  <p className="text-sm font-medium text-foreground">Text contrast</p>
-                  <p className="text-xs text-muted-foreground">Adjust the card copy emphasis</p>
+                  <p className="text-sm font-medium text-foreground">{appCopy.card.controls.contrastTitle}</p>
+                  <p className="text-xs text-muted-foreground">{appCopy.card.controls.contrastDescription}</p>
                 </div>
                 <Paintbrush className="h-4 w-4 text-primary" />
               </button>
@@ -545,11 +546,11 @@ export function SwipeContainer({
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-display text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/80">
-                  Active Topic
+                  {appCopy.card.topicEyebrow}
                 </span>
                 {isLoading && (
                   <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-1 text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
-                    Loading
+                    {appCopy.card.loadingBadge}
                   </span>
                 )}
               </div>
@@ -564,7 +565,7 @@ export function SwipeContainer({
 
             <div className="hidden items-center gap-2 sm:flex">
               <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
-                Swipe up for styles
+                {appCopy.card.styleHint}
               </div>
             </div>
           </div>
@@ -673,7 +674,10 @@ export function SwipeContainer({
                   textColor={activeTextTone.text}
                   mutedTextColor={activeTextTone.muted}
                   fontClass={fontClass}
-                  cardLabel={`Card ${Math.min(currentIndex + 1, allSnippets.length)} of ${allSnippets.length}`}
+                  cardLabel={appCopy.card.cardLabel(
+                    Math.min(currentIndex + 1, allSnippets.length),
+                    allSnippets.length,
+                  )}
                   showSwipeHint={showSwipeHint && currentIndex === 0}
                   isLiked={Boolean(
                     allSnippets[currentIndex] &&

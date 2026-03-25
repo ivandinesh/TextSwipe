@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { appCopy } from "@/content/copy";
 import { useTopicService } from "@/services/topicService";
 import { cn } from "@/lib/utils";
 
@@ -58,19 +59,19 @@ export function TopicInput({ onSubmit, isLoading = false, className }: TopicInpu
       <div className="glass-panel rounded-[2rem] p-4 shadow-[0_24px_90px_rgba(0,0,0,0.35)] md:p-6">
         <div className="mb-5">
           <p className="font-display text-xs font-semibold uppercase tracking-[0.32em] text-primary/75">
-            Start Here
+            {appCopy.topicInput.eyebrow}
           </p>
           <h2 className="mt-2 text-xl font-semibold text-foreground md:text-2xl">
-            Pick a topic and enter the deck.
+            {appCopy.topicInput.title}
           </h2>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            type="text"
-            placeholder="Try renewable energy, lucid dreaming, dark matter..."
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
+            <Input
+              type="text"
+              placeholder={appCopy.topicInput.placeholder}
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
             disabled={isLoading}
             className="h-14 rounded-2xl border-white/10 bg-white/[0.04] px-5 text-left text-base text-foreground placeholder:text-muted-foreground/80 focus-visible:ring-primary"
             data-testid="input-topic"
@@ -83,7 +84,7 @@ export function TopicInput({ onSubmit, isLoading = false, className }: TopicInpu
               className="h-12 flex-1 rounded-2xl bg-primary text-primary-foreground shadow-[0_12px_34px_rgba(58,227,255,0.28)]"
               data-testid="button-start-focusing"
             >
-              {isLoading ? "Loading..." : "Start session"}
+              {isLoading ? appCopy.topicInput.submitLoading : appCopy.topicInput.submitIdle}
               <ArrowRight className="h-4 w-4" />
             </Button>
 
@@ -96,7 +97,7 @@ export function TopicInput({ onSubmit, isLoading = false, className }: TopicInpu
               data-testid="button-surprise-me"
             >
               <Sparkles className="h-4 w-4" />
-              Surprise me
+              {appCopy.topicInput.surprise}
             </Button>
           </div>
         </form>
@@ -104,7 +105,7 @@ export function TopicInput({ onSubmit, isLoading = false, className }: TopicInpu
 
       <div className="space-y-2">
         <p className="font-display text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-          Popular right now
+          {appCopy.topicInput.popularLabel}
         </p>
         <div className="flex flex-wrap gap-2.5">
           {popularTopics.map((popularTopic, index) => (

@@ -1,4 +1,5 @@
 import { Loader2, Sparkles } from "lucide-react";
+import { appCopy } from "@/content/copy";
 import { cn } from "@/lib/utils";
 
 interface LoadingScreenProps {
@@ -7,7 +8,7 @@ interface LoadingScreenProps {
 }
 
 export function LoadingScreen({
-  message = "Generating your learning content...",
+  message = appCopy.loading.defaultMessage,
   className,
 }: LoadingScreenProps) {
   return (
@@ -30,10 +31,10 @@ export function LoadingScreen({
 
           <div className="space-y-3">
             <p className="font-display text-xs font-semibold uppercase tracking-[0.32em] text-primary/75">
-              FocusFeed Engine
+              {appCopy.loading.eyebrow}
             </p>
             <h2 className="text-3xl font-semibold text-foreground md:text-4xl">
-              Building your next swipe set
+              {appCopy.loading.title}
             </h2>
             <p
               className="mx-auto max-w-sm text-sm leading-7 text-muted-foreground md:text-base"
@@ -57,8 +58,7 @@ export function LoadingScreen({
           </div>
 
           <div className="mt-8 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-left text-sm text-muted-foreground">
-            High-contrast cards, adaptive pacing, and a reading-first layout are
-            being prepared for this topic now.
+            {appCopy.loading.helper}
           </div>
         </div>
       </div>

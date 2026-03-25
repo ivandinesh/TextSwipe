@@ -1,4 +1,5 @@
 import { Heart } from "lucide-react";
+import { appCopy } from "@/content/copy";
 import { cn } from "@/lib/utils";
 
 interface SwipeCardProps {
@@ -113,7 +114,7 @@ export function SwipeCard({
                     ? "border-primary/50 bg-primary/20 text-primary"
                     : "border-white/10 bg-black/20 text-white/75 hover:bg-white/10",
                 )}
-                aria-label={isLiked ? "Remove favorite" : "Save favorite"}
+                aria-label={isLiked ? appCopy.card.unsaveLabel : appCopy.card.saveLabel}
                 data-chrome-control="true"
               >
                 <Heart className={cn("h-4.5 w-4.5", isLiked && "fill-current")} />
@@ -127,10 +128,10 @@ export function SwipeCard({
               )}
             >
               <div className="rounded-full border border-white/10 bg-black/20 px-3 py-2 text-[10px] font-medium tracking-[0.14em] text-white/80 backdrop-blur-md md:text-xs">
-                Swipe left for previous
+                {appCopy.card.previousHint}
               </div>
               <div className="rounded-full border border-white/10 bg-black/20 px-3 py-2 text-[10px] font-medium tracking-[0.14em] text-white/80 backdrop-blur-md md:text-xs">
-                Swipe right for next
+                {appCopy.card.nextHint}
               </div>
             </div>
 
@@ -139,7 +140,7 @@ export function SwipeCard({
                 className="max-w-xl text-center text-sm leading-6"
                 style={{ color: mutedTextColor || textColor }}
               >
-                One focused idea per card. Swipe up for styles and double tap to save.
+                {appCopy.card.helper}
               </div>
             </div>
           </div>

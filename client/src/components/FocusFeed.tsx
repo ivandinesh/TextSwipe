@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { LayoutDashboard, LogOut, Sparkles, Waves } from "lucide-react";
 import { useLocation } from "wouter";
+import { appCopy } from "@/content/copy";
 import { useTopicService } from "@/services/topicService";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
@@ -162,7 +163,7 @@ export function FocusFeed() {
     } catch (error) {
       console.error("Error loading content:", error);
       setLearningSnippets([
-        "Could not generate content. Please check your connection and try again.",
+        appCopy.errors.generateFailureCard,
         ...DEMO_CONTENT["python basics"].slice(1),
       ]);
       setCurrentOptions([]);
@@ -306,12 +307,12 @@ export function FocusFeed() {
             <header className="flex items-center justify-between">
               <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs uppercase tracking-[0.28em] text-primary/80">
                 <Sparkles className="h-3.5 w-3.5" />
-                FocusFeed
+                {appCopy.home.badge}
               </div>
               <div className="flex items-center gap-2">
                 <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-muted-foreground md:flex">
                   <Waves className="h-3.5 w-3.5 text-primary" />
-                  Minimal reading mode
+                  {appCopy.home.utilityBadge}
                 </div>
                 {user ? (
                   <>
@@ -321,7 +322,7 @@ export function FocusFeed() {
                       onClick={() => setLocation("/dashboard")}
                     >
                       <LayoutDashboard className="h-4 w-4" />
-                      Dashboard
+                      {appCopy.home.dashboardButton}
                     </Button>
                     <Button
                       variant="outline"
@@ -331,7 +332,7 @@ export function FocusFeed() {
                       }}
                     >
                       <LogOut className="h-4 w-4" />
-                      Sign out
+                      {appCopy.home.signOutButton}
                     </Button>
                   </>
                 ) : (
@@ -343,21 +344,20 @@ export function FocusFeed() {
             <section className="grid items-center gap-8 lg:grid-cols-[0.95fr_1.05fr]">
               <div className="max-w-xl">
                 <p className="font-display text-xs font-semibold uppercase tracking-[0.34em] text-primary/80">
-                  Swipeable learning
+                  {appCopy.home.heroEyebrow}
                 </p>
                 <h1 className="text-glow mt-5 max-w-3xl font-display text-5xl font-bold leading-[0.94] text-foreground md:text-7xl">
-                  Learn one clear idea at a time.
+                  {appCopy.home.heroTitle}
                 </h1>
                 <p className="mt-5 max-w-lg text-base leading-7 text-muted-foreground md:text-lg">
-                  Enter a topic and move through a clean 10-card deck built for focus.
+                  {appCopy.home.heroDescription}
                 </p>
                 <div className="mt-7 flex flex-wrap gap-3">
-                  <div className="chip-surface rounded-full px-4 py-2 text-sm text-foreground">
-                    10-card focus deck
-                  </div>
-                  <div className="chip-surface rounded-full px-4 py-2 text-sm text-foreground">
-                    Smart next branches
-                  </div>
+                  {appCopy.home.heroChips.map((chip) => (
+                    <div key={chip} className="chip-surface rounded-full px-4 py-2 text-sm text-foreground">
+                      {chip}
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -371,8 +371,8 @@ export function FocusFeed() {
             <footer className="flex flex-col gap-3 border-t border-white/8 pt-5 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
               <p>
                 {likedSnippets.length > 0
-                  ? `${likedSnippets.length} saved insights ready to revisit`
-                  : "Start with a topic you want to understand better."}
+                  ? appCopy.home.footerSaved(likedSnippets.length)
+                  : appCopy.home.footerEmpty}
               </p>
             </footer>
           </div>
@@ -381,7 +381,7 @@ export function FocusFeed() {
 
       {currentView === "loading" && (
         <LoadingScreen
-          message={`Creating amazing ${currentTopic} lessons just for you...`}
+          message={appCopy.loading.customMessage(currentTopic)}
         />
       )}
 

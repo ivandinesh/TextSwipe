@@ -3,13 +3,14 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { appCopy } from "@/content/copy";
 import { useAuth } from "@/hooks/use-auth";
 
 interface AuthDialogProps {
   triggerLabel?: string;
 }
 
-export function AuthDialog({ triggerLabel = "Sign in" }: AuthDialogProps) {
+export function AuthDialog({ triggerLabel = appCopy.auth.trigger }: AuthDialogProps) {
   const { login, register } = useAuth();
   const [open, setOpen] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
@@ -59,37 +60,37 @@ export function AuthDialog({ triggerLabel = "Sign in" }: AuthDialogProps) {
       </DialogTrigger>
       <DialogContent className="border-white/10 bg-[rgba(13,18,34,0.96)] text-foreground sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Account</DialogTitle>
+          <DialogTitle>{appCopy.auth.title}</DialogTitle>
           <DialogDescription>
-            Save your likes, keep your streak, and unlock a personal dashboard.
+            {appCopy.auth.description}
           </DialogDescription>
         </DialogHeader>
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-white/[0.04]">
-            <TabsTrigger value="login">Sign in</TabsTrigger>
-            <TabsTrigger value="register">Register</TabsTrigger>
+            <TabsTrigger value="login">{appCopy.auth.tabs.login}</TabsTrigger>
+            <TabsTrigger value="register">{appCopy.auth.tabs.register}</TabsTrigger>
           </TabsList>
           <TabsContent value="login">
             <form className="space-y-4" onSubmit={handleLogin}>
               <Input
                 type="email"
-                placeholder="Email"
+                placeholder={appCopy.auth.placeholders.email}
                 value={loginEmail}
                 onChange={(event) => setLoginEmail(event.target.value)}
               />
               <Input
                 type="password"
-                placeholder="Password"
+                placeholder={appCopy.auth.placeholders.password}
                 value={loginPassword}
                 onChange={(event) => setLoginPassword(event.target.value)}
               />
               {login.error && (
                 <p className="text-sm text-red-300">
-                  {getFriendlyError(login.error, "Failed to sign in.")}
+                  {getFriendlyError(login.error, appCopy.auth.loginFallbackError)}
                 </p>
               )}
               <Button type="submit" className="w-full">
-                {login.isPending ? "Signing in..." : "Sign in"}
+                {login.isPending ? appCopy.auth.loginPending : appCopy.auth.loginIdle}
               </Button>
             </form>
           </TabsContent>
@@ -97,23 +98,23 @@ export function AuthDialog({ triggerLabel = "Sign in" }: AuthDialogProps) {
             <form className="space-y-4" onSubmit={handleRegister}>
               <Input
                 type="email"
-                placeholder="Email"
+                placeholder={appCopy.auth.placeholders.email}
                 value={registerEmail}
                 onChange={(event) => setRegisterEmail(event.target.value)}
               />
               <Input
                 type="password"
-                placeholder="Password"
+                placeholder={appCopy.auth.placeholders.password}
                 value={registerPassword}
                 onChange={(event) => setRegisterPassword(event.target.value)}
               />
               {register.error && (
                 <p className="text-sm text-red-300">
-                  {getFriendlyError(register.error, "Failed to create account.")}
+                  {getFriendlyError(register.error, appCopy.auth.registerFallbackError)}
                 </p>
               )}
               <Button type="submit" className="w-full">
-                {register.isPending ? "Creating..." : "Create account"}
+                {register.isPending ? appCopy.auth.registerPending : appCopy.auth.registerIdle}
               </Button>
             </form>
           </TabsContent>

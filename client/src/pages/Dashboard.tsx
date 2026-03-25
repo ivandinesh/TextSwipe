@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { appCopy } from "@/content/copy";
 import { useAuth } from "@/hooks/use-auth";
 
 interface DashboardSummary {
@@ -48,12 +49,12 @@ export default function Dashboard() {
     return (
       <div className="editorial-shell neon-grid min-h-screen bg-background px-5 py-8 text-foreground md:px-8">
         <div className="mx-auto max-w-3xl rounded-[2rem] border border-white/10 bg-white/[0.04] p-8 text-center backdrop-blur-xl">
-          <h1 className="text-3xl font-semibold">Sign in to view your dashboard.</h1>
+          <h1 className="text-3xl font-semibold">{appCopy.dashboard.signedOutTitle}</h1>
           <p className="mt-3 text-muted-foreground">
-            Your learning time, streaks, likes, and recommendations will show up here.
+            {appCopy.dashboard.signedOutDescription}
           </p>
           <Button className="mt-6" onClick={() => setLocation("/")}>
-            Back to FocusFeed
+            {appCopy.dashboard.signedOutCta}
           </Button>
         </div>
       </div>
@@ -66,16 +67,16 @@ export default function Dashboard() {
         <div className="flex flex-col gap-4 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary/80">
-              Dashboard
+              {appCopy.dashboard.eyebrow}
             </p>
-            <h1 className="mt-2 text-3xl font-semibold">Welcome back, {user.email}</h1>
+            <h1 className="mt-2 text-3xl font-semibold">{appCopy.dashboard.title(user.email)}</h1>
             <p className="mt-2 text-muted-foreground">
-              Keep the rhythm going with one more focused session today.
+              {appCopy.dashboard.description}
             </p>
           </div>
           <div className="flex gap-3">
             <Button variant="outline" onClick={() => setLocation("/")}>
-              Continue learning
+              {appCopy.dashboard.primaryCta}
             </Button>
             <Button
               variant="outline"
@@ -84,17 +85,17 @@ export default function Dashboard() {
                 setLocation("/");
               }}
             >
-              Sign out
+              {appCopy.dashboard.signOutCta}
             </Button>
           </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-4">
           {[
-            { label: "Learning minutes", value: summary?.totalLearningMinutes ?? 0 },
-            { label: "Current streak", value: `${summary?.currentStreak ?? 0} days` },
-            { label: "Sessions this week", value: summary?.sessionsThisWeek ?? 0 },
-            { label: "Cards completed", value: summary?.cardsCompleted ?? 0 },
+            { label: appCopy.dashboard.metrics.totalMinutes, value: summary?.totalLearningMinutes ?? 0 },
+            { label: appCopy.dashboard.metrics.currentStreak, value: `${summary?.currentStreak ?? 0} days` },
+            { label: appCopy.dashboard.metrics.sessionsThisWeek, value: summary?.sessionsThisWeek ?? 0 },
+            { label: appCopy.dashboard.metrics.cardsCompleted, value: summary?.cardsCompleted ?? 0 },
           ].map((item) => (
             <div
               key={item.label}
@@ -109,9 +110,9 @@ export default function Dashboard() {
         <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">This week</h2>
+              <h2 className="text-xl font-semibold">{appCopy.dashboard.weekTitle}</h2>
               <p className="text-sm text-muted-foreground">
-                {summary?.likedCardsCount ?? 0} liked cards saved
+                {appCopy.dashboard.likedSaved(summary?.likedCardsCount ?? 0)}
               </p>
             </div>
             <div className="mt-6 grid grid-cols-7 gap-3">
@@ -136,7 +137,7 @@ export default function Dashboard() {
 
           <div className="space-y-4">
             <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
-              <h2 className="text-xl font-semibold">Recommended topics</h2>
+              <h2 className="text-xl font-semibold">{appCopy.dashboard.recommendedTitle}</h2>
               <div className="mt-4 flex flex-wrap gap-2.5">
                 {(recommendedTopics?.topics ?? []).map((topic) => (
                   <button
@@ -153,7 +154,7 @@ export default function Dashboard() {
             </div>
 
             <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
-              <h2 className="text-xl font-semibold">Recent topics</h2>
+              <h2 className="text-xl font-semibold">{appCopy.dashboard.recentTitle}</h2>
               <div className="mt-4 flex flex-wrap gap-2.5">
                 {(summary?.recentTopics ?? []).map((topic) => (
                   <div
@@ -169,7 +170,7 @@ export default function Dashboard() {
         </div>
 
         <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
-          <h2 className="text-xl font-semibold">Liked cards</h2>
+          <h2 className="text-xl font-semibold">{appCopy.dashboard.likedTitle}</h2>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {(likedCards?.likedCards ?? []).slice(0, 8).map((card) => (
               <div
@@ -184,7 +185,7 @@ export default function Dashboard() {
             ))}
             {(!likedCards?.likedCards || likedCards.likedCards.length === 0) && (
               <p className="text-sm text-muted-foreground">
-                Like cards while you learn and they’ll appear here.
+                {appCopy.dashboard.likedEmpty}
               </p>
             )}
           </div>
