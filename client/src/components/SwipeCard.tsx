@@ -10,7 +10,7 @@ interface SwipeCardProps {
   textColor?: string;
   mutedTextColor?: string;
   fontClass?: string;
-  progressLabel?: string;
+  cardLabel?: string;
   panelStyle?: React.CSSProperties;
   backlightStyle?: React.CSSProperties;
   showChrome?: boolean;
@@ -29,7 +29,7 @@ export function SwipeCard({
   textColor,
   mutedTextColor,
   fontClass,
-  progressLabel,
+  cardLabel,
   panelStyle,
   backlightStyle,
   showChrome = true,
@@ -57,7 +57,7 @@ export function SwipeCard({
             style={backlightStyle}
           />
           <div
-            className="relative flex h-full min-h-0 flex-col rounded-[2rem] border px-5 py-5 backdrop-blur-2xl transition-all duration-300 md:px-12 md:py-8"
+            className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border px-5 py-5 backdrop-blur-2xl transition-all duration-300 md:px-12 md:py-8"
             style={panelStyle}
             data-card-surface="true"
             onClick={() => {
@@ -80,14 +80,14 @@ export function SwipeCard({
           >
             <div
               className={cn(
-                "mb-8 flex items-center justify-between gap-4 transition-all duration-250",
+                "mb-5 flex items-center justify-between gap-4 transition-all duration-250 md:mb-7",
                 showChrome
                   ? "pointer-events-auto translate-y-0 opacity-100"
                   : "pointer-events-none -translate-y-2 opacity-0",
               )}
             >
               <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary/80">
-                Insight {index + 1}
+                {cardLabel || `Card ${index + 1} of ${total}`}
               </div>
               <div
                 className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1 text-xs"
@@ -97,11 +97,11 @@ export function SwipeCard({
               </div>
             </div>
 
-            <div className="flex min-h-0 flex-1 items-center justify-center overflow-visible py-2 md:py-3">
-              <div className="w-full py-1">
+            <div className="flex min-h-0 flex-1 items-center justify-center overflow-visible py-1 md:py-2">
+              <div className="w-full">
                 <p
                   className={cn(
-                    "mx-auto max-w-[15ch] overflow-visible text-center text-[clamp(1.9rem,7vw,2.55rem)] font-medium leading-[1.34] tracking-[-0.02em] md:max-w-[18ch] md:text-[clamp(2.8rem,4vw,4.4rem)] md:leading-[1.26]",
+                    "mx-auto max-w-[15ch] overflow-visible text-center text-[clamp(1.85rem,6.6vw,2.45rem)] font-medium leading-[1.32] tracking-[-0.02em] md:max-w-[18ch] md:text-[clamp(2.8rem,4vw,4.4rem)] md:leading-[1.24]",
                     fontClass || "",
                   )}
                   style={
@@ -141,14 +141,14 @@ export function SwipeCard({
 
             <div
               className={cn(
-                "pointer-events-none absolute inset-x-5 bottom-20 flex items-center justify-between gap-3 transition-all duration-300 md:inset-x-10 md:bottom-24",
+                "pointer-events-none absolute inset-x-4 bottom-20 flex items-center justify-between gap-2 transition-all duration-300 md:inset-x-10 md:bottom-24 md:gap-3",
                 showSwipeHint ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
               )}
             >
-              <div className="rounded-full border border-white/10 bg-black/20 px-3 py-2 text-[11px] font-medium tracking-[0.16em] text-white/80 backdrop-blur-md md:text-xs">
+              <div className="rounded-full border border-white/10 bg-black/20 px-3 py-2 text-[10px] font-medium tracking-[0.14em] text-white/80 backdrop-blur-md md:text-xs">
                 Swipe left for previous
               </div>
-              <div className="rounded-full border border-white/10 bg-black/20 px-3 py-2 text-[11px] font-medium tracking-[0.16em] text-white/80 backdrop-blur-md md:text-xs">
+              <div className="rounded-full border border-white/10 bg-black/20 px-3 py-2 text-[10px] font-medium tracking-[0.14em] text-white/80 backdrop-blur-md md:text-xs">
                 Swipe right for next
               </div>
             </div>
@@ -166,46 +166,6 @@ export function SwipeCard({
                 style={{ color: mutedTextColor || textColor }}
               >
                 One focused idea per card. Tap to reveal controls when you want them.
-              </div>
-            </div>
-            <div
-              className={cn(
-                "mt-5 transition-all duration-250 md:mt-6",
-                showChrome
-                  ? "pointer-events-auto translate-y-0 opacity-100"
-                  : "pointer-events-none translate-y-4 opacity-0",
-              )}
-            >
-              <div className="min-w-0">
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <span
-                    className="text-xs uppercase tracking-[0.22em]"
-                    style={{ color: mutedTextColor || textColor }}
-                  >
-                    Progress
-                  </span>
-                  <span
-                    className="text-sm font-medium"
-                    style={{ color: mutedTextColor || textColor }}
-                  >
-                    {progressLabel || `${index + 1} / ${total}`}
-                  </span>
-                </div>
-                <div className="grid grid-cols-5 gap-2">
-                  {Array.from({ length: 5 }).map((_, segment) => {
-                    const progress = ((index + 1) / Math.max(total, 1)) * 5;
-                    return (
-                      <div
-                        key={segment}
-                        className={cn(
-                          "h-1.5 rounded-full transition-all duration-300",
-                          progress > segment ? "bg-primary" : "bg-white/10",
-                        )}
-                        data-testid={`dot-${segment}`}
-                      />
-                    );
-                  })}
-                </div>
               </div>
             </div>
           </div>

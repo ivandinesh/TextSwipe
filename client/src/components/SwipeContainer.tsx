@@ -3,10 +3,9 @@ import {
   ArrowLeft,
   Paintbrush,
   Palette,
-  SkipBack,
-  Sparkles,
   Type,
 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { OptionsCard } from "./OptionsCard";
@@ -175,6 +174,7 @@ const FONT_CLASSES: Record<FontName, string> = {
 const themeOrder: ThemeName[] = ["midnight", "aurora", "ember", "petal", "sage"];
 const fontOrder: FontName[] = ["sans", "display", "mono"];
 const textToneOrder: TextToneName[] = ["default", "soft", "high-contrast"];
+const swipeThreshold = 42;
 
 const debounce = (func: () => void, delay: number) => {
   let timeoutId: ReturnType<typeof setTimeout>;
@@ -204,6 +204,7 @@ export function SwipeContainer({
   const [showOptions, setShowOptions] = useState(false);
   const [showChrome, setShowChrome] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
+  const [swipeDirection, setSwipeDirection] = useState<1 | -1>(1);
   const [touchStart, setTouchStart] = useState({ x: 0, y: 0 });
   const lastTapRef = useRef(0);
   const tapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -233,6 +234,7 @@ export function SwipeContainer({
     setShowOptions(false);
     setShowChrome(false);
     setShowSwipeHint(true);
+    setSwipeDirection(1);
   }, [snippets, topic]);
 
   useEffect(() => {
@@ -329,6 +331,7 @@ export function SwipeContainer({
 
   const nextCard = useCallback(() => {
     setShowSwipeHint(false);
+    setSwipeDirection(1);
 
     if (showOptions) {
       setShowOptions(false);
@@ -348,6 +351,7 @@ export function SwipeContainer({
 
   const previousCard = useCallback(() => {
     setShowSwipeHint(false);
+    setSwipeDirection(-1);
 
     if (showOptions) {
       setShowOptions(false);
@@ -430,7 +434,7 @@ export function SwipeContainer({
         const deltaX = touchStart.x - endX;
         const deltaY = touchStart.y - endY;
 
-        if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (Math.abs(deltaX) > swipeThreshold && Math.abs(deltaX) > Math.abs(deltaY)) {
           if (deltaX > 0) {
             previousCard();
           } else {
@@ -511,32 +515,9 @@ export function SwipeContainer({
               >
                 {topic}
               </h1>
-              <div className="mt-2 flex items-center gap-3">
-                <p className="text-xs md:text-sm" style={{ color: activeTextTone.muted }}>
-                  Card {Math.min(currentIndex + 1, allSnippets.length)} of {allSnippets.length}
-                </p>
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/8">
-                  <div
-                    className="h-full rounded-full bg-primary transition-all duration-300"
-                    style={{
-                      width: `${Math.max(((Math.min(currentIndex + 1, allSnippets.length)) / Math.max(allSnippets.length, 1)) * 100, 8)}%`,
-                    }}
-                  />
-                </div>
-              </div>
             </div>
 
             <div className="hidden items-center gap-2 sm:flex">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={previousCard}
-                data-chrome-control="true"
-                className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
-                aria-label="Previous card"
-              >
-                <SkipBack className="h-4 w-4" />
-              </Button>
               <Button
                 variant="ghost"
                 size="icon"
@@ -574,16 +555,6 @@ export function SwipeContainer({
             <Button
               variant="ghost"
               size="icon"
-              onClick={previousCard}
-              data-chrome-control="true"
-              className="h-9 w-9 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
-              aria-label="Previous card"
-            >
-              <SkipBack className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
               onClick={cycleBackground}
               data-chrome-control="true"
               className="h-9 w-9 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
@@ -611,10 +582,6 @@ export function SwipeContainer({
             >
               <Paintbrush className="h-4 w-4" />
             </Button>
-            <div className="ml-auto flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              Swipe Mode
-            </div>
           </div>
         </div>
       </div>
@@ -654,38 +621,93 @@ export function SwipeContainer({
             }}
           />
         ) : (
-          allSnippets.map((snippet, index) => (
-            <SwipeCard
-              key={`${topic}-${index}-${snippet.slice(0, 16)}`}
-              content={snippet}
-              index={index}
-              total={allSnippets.length}
-              isActive={index === currentIndex}
-              textColor={activeTextTone.text}
-              mutedTextColor={activeTextTone.muted}
-              fontClass={fontClass}
-              progressLabel={`${Math.min(currentIndex + 1, allSnippets.length)} / ${allSnippets.length}`}
-              showChrome={showChrome}
-              showSwipeHint={showSwipeHint && currentIndex === 0}
-              isLiked={Boolean(allSnippets[index] && _likedSnippets.includes(allSnippets[index]))}
-              onLike={toggleLikeCurrent}
-              onSurfaceTap={() => setShowChrome((current) => !current)}
-              panelStyle={{
+          <div className="relative h-full">
+            <div
+              className="pointer-events-none absolute inset-x-4 inset-y-3 rounded-[2.1rem] border opacity-45 md:inset-x-8 md:inset-y-5"
+              style={{
                 background: activeTheme.panel,
                 borderColor: activeTheme.panelBorder,
                 boxShadow: activeTheme.panelGlow,
+                transform: "translate3d(0, 12px, 0) scale(0.975)",
               }}
-              backlightStyle={{ background: activeTheme.backlight }}
-              className={cn(
-                "absolute inset-0 transition-all duration-300 ease-out",
-                index === currentIndex
-                  ? "opacity-100 translate-x-0 scale-100"
-                  : index < currentIndex
-                    ? "opacity-0 -translate-x-full scale-95"
-                    : "opacity-0 translate-x-full scale-95",
-              )}
             />
-          ))
+            <div
+              className="pointer-events-none absolute inset-x-4 inset-y-3 rounded-[2.1rem] border opacity-22 md:inset-x-8 md:inset-y-5"
+              style={{
+                background: activeTheme.panel,
+                borderColor: activeTheme.panelBorder,
+                transform: "translate3d(0, 22px, 0) scale(0.95)",
+              }}
+            />
+            <AnimatePresence initial={false} custom={swipeDirection} mode="popLayout">
+              <motion.div
+                key={`${topic}-${currentIndex}-${allSnippets[currentIndex]?.slice(0, 24) ?? "card"}`}
+                custom={swipeDirection}
+                variants={{
+                  enter: (direction: 1 | -1) => ({
+                    x: direction > 0 ? -88 : 88,
+                    opacity: 0,
+                    scale: 0.97,
+                    rotateZ: direction > 0 ? -1.5 : 1.5,
+                  }),
+                  center: {
+                    x: 0,
+                    opacity: 1,
+                    scale: 1,
+                    rotateZ: 0,
+                    transition: {
+                      x: { type: "spring", stiffness: 260, damping: 28, mass: 0.95 },
+                      scale: { type: "spring", stiffness: 240, damping: 26, mass: 0.92 },
+                      rotateZ: { type: "spring", stiffness: 260, damping: 30 },
+                      opacity: { duration: 0.18 },
+                    },
+                  },
+                  exit: (direction: 1 | -1) => ({
+                    x: direction > 0 ? 132 : -132,
+                    opacity: 0,
+                    scale: 0.985,
+                    rotateZ: direction > 0 ? 1.8 : -1.8,
+                    transition: {
+                      x: { type: "spring", stiffness: 260, damping: 30, mass: 0.95 },
+                      opacity: { duration: 0.16 },
+                      scale: { duration: 0.2 },
+                    },
+                  }),
+                }}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="absolute inset-0"
+              >
+                <SwipeCard
+                  key={`${topic}-${currentIndex}`}
+                  content={allSnippets[currentIndex]}
+                  index={currentIndex}
+                  total={allSnippets.length}
+                  isActive
+                  textColor={activeTextTone.text}
+                  mutedTextColor={activeTextTone.muted}
+                  fontClass={fontClass}
+                  cardLabel={`Card ${Math.min(currentIndex + 1, allSnippets.length)} of ${allSnippets.length}`}
+                  showChrome={showChrome}
+                  showSwipeHint={showSwipeHint && currentIndex === 0}
+                  isLiked={Boolean(
+                    allSnippets[currentIndex] &&
+                      _likedSnippets.includes(allSnippets[currentIndex]),
+                  )}
+                  onLike={toggleLikeCurrent}
+                  onSurfaceTap={() => setShowChrome((current) => !current)}
+                  panelStyle={{
+                    background: activeTheme.panel,
+                    borderColor: activeTheme.panelBorder,
+                    boxShadow: activeTheme.panelGlow,
+                  }}
+                  backlightStyle={{ background: activeTheme.backlight }}
+                  className="absolute inset-0"
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
         )}
       </div>
     </div>
