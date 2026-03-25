@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   Paintbrush,
   Palette,
+  SkipBack,
   Sparkles,
   Type,
 } from "lucide-react";
@@ -204,6 +205,8 @@ export function SwipeContainer({
   const [showChrome, setShowChrome] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [touchStart, setTouchStart] = useState({ x: 0, y: 0 });
+  const lastTapRef = useRef(0);
+  const tapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const activeTheme = THEMES[themeName];
   const activeTextTone = activeTheme.textTones[textToneName];
@@ -231,6 +234,14 @@ export function SwipeContainer({
     setShowChrome(false);
     setShowSwipeHint(true);
   }, [snippets, topic]);
+
+  useEffect(() => {
+    return () => {
+      if (tapTimeoutRef.current) {
+        clearTimeout(tapTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const cycleBackground = useCallback(
     debounce(() => {
@@ -335,22 +346,42 @@ export function SwipeContainer({
     setShowChrome(false);
   }, [allSnippets.length, currentIndex, onIndexChange, showOptions]);
 
-  const likeAndAdvance = useCallback(() => {
+  const previousCard = useCallback(() => {
+    setShowSwipeHint(false);
+
+    if (showOptions) {
+      setShowOptions(false);
+      setShowChrome(true);
+      return;
+    }
+
+    if (currentIndex <= 0) {
+      setShowChrome(true);
+      return;
+    }
+
+    onIndexChange(currentIndex - 1);
+    setShowChrome(false);
+  }, [currentIndex, onIndexChange, showOptions]);
+
+  const toggleLikeCurrent = useCallback(() => {
     const currentSnippet = allSnippets[currentIndex];
     if (currentSnippet) {
       onLike?.(currentSnippet);
     }
-    nextCard();
-  }, [allSnippets, currentIndex, nextCard, onLike]);
+  }, [allSnippets, currentIndex, onLike]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " ") {
         e.preventDefault();
         nextCard();
-      } else if (e.key === "ArrowLeft") {
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
         e.preventDefault();
-        likeAndAdvance();
+        previousCard();
+      } else if (e.key.toLowerCase() === "f") {
+        e.preventDefault();
+        toggleLikeCurrent();
       } else if (e.key === "Escape") {
         if (showOptions) {
           setShowOptions(false);
@@ -362,7 +393,7 @@ export function SwipeContainer({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [likeAndAdvance, nextCard, onBack, showOptions]);
+  }, [nextCard, onBack, previousCard, showOptions, toggleLikeCurrent]);
 
   if (!allSnippets.length) {
     return (
@@ -401,7 +432,7 @@ export function SwipeContainer({
 
         if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) {
           if (deltaX > 0) {
-            likeAndAdvance();
+            previousCard();
           } else {
             nextCard();
           }
@@ -413,7 +444,24 @@ export function SwipeContainer({
           Math.abs(deltaX) < 12 &&
           eventTargetsCardSurface(e.target)
         ) {
-          setShowChrome((current) => !current);
+          const now = Date.now();
+
+          if (now - lastTapRef.current < 280) {
+            if (tapTimeoutRef.current) {
+              clearTimeout(tapTimeoutRef.current);
+              tapTimeoutRef.current = null;
+            }
+            lastTapRef.current = 0;
+            toggleLikeCurrent();
+            setShowChrome(true);
+            return;
+          }
+
+          lastTapRef.current = now;
+          tapTimeoutRef.current = setTimeout(() => {
+            setShowChrome((current) => !current);
+            tapTimeoutRef.current = null;
+          }, 210);
         }
       }}
       data-testid="swipe-container"
@@ -482,6 +530,16 @@ export function SwipeContainer({
               <Button
                 variant="ghost"
                 size="icon"
+                onClick={previousCard}
+                data-chrome-control="true"
+                className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
+                aria-label="Previous card"
+              >
+                <SkipBack className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={cycleBackground}
                 data-chrome-control="true"
                 className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
@@ -513,6 +571,16 @@ export function SwipeContainer({
           </div>
 
           <div className="mt-3 flex items-center gap-2 sm:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={previousCard}
+              data-chrome-control="true"
+              className="h-9 w-9 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
+              aria-label="Previous card"
+            >
+              <SkipBack className="h-4 w-4" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"
@@ -555,7 +623,9 @@ export function SwipeContainer({
         className={cn(
           "relative transition-all duration-300",
           showOptions || showChrome ? "pt-28 sm:pt-32" : "pt-6 sm:pt-8",
-          showOptions ? "min-h-full" : "h-full",
+          showOptions
+            ? "min-h-full"
+            : "h-[calc(100dvh-1rem)] sm:h-[calc(100dvh-1.5rem)]",
         )}
       >
         {showOptions ? (
@@ -597,6 +667,8 @@ export function SwipeContainer({
               progressLabel={`${Math.min(currentIndex + 1, allSnippets.length)} / ${allSnippets.length}`}
               showChrome={showChrome}
               showSwipeHint={showSwipeHint && currentIndex === 0}
+              isLiked={Boolean(allSnippets[index] && _likedSnippets.includes(allSnippets[index]))}
+              onLike={toggleLikeCurrent}
               onSurfaceTap={() => setShowChrome((current) => !current)}
               panelStyle={{
                 background: activeTheme.panel,
