@@ -8,13 +8,6 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { appCopy } from "@/content/copy";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { OptionsCard } from "./OptionsCard";
 import { SwipeCard } from "./SwipeCard";
@@ -45,6 +38,20 @@ interface GenerateResponse {
 type ThemeName = "midnight" | "aurora" | "ember" | "petal" | "sage";
 type FontName = "sans" | "display" | "mono";
 type TextToneName = "default" | "soft" | "high-contrast";
+
+type ThemeChoice = {
+  id: ThemeName;
+  swatch: string;
+};
+
+type FontChoice = {
+  id: FontName;
+  icon: typeof Type;
+};
+
+type TextToneChoice = {
+  id: TextToneName;
+};
 
 const THEMES: Record<
   ThemeName,
@@ -171,18 +178,44 @@ const FONT_CLASSES: Record<FontName, string> = {
   mono: "font-mono",
 };
 
-const themeOrder: ThemeName[] = ["midnight", "aurora", "ember", "petal", "sage"];
-const fontOrder: FontName[] = ["sans", "display", "mono"];
-const textToneOrder: TextToneName[] = ["default", "soft", "high-contrast"];
+const THEME_CHOICES: ThemeChoice[] = [
+  {
+    id: "midnight",
+    swatch:
+      "linear-gradient(135deg, rgba(129,220,255,0.8), rgba(11,15,34,1) 58%, rgba(6,10,24,1))",
+  },
+  {
+    id: "aurora",
+    swatch:
+      "linear-gradient(135deg, rgba(166,239,255,0.82), rgba(95,72,168,0.95) 52%, rgba(10,11,34,1))",
+  },
+  {
+    id: "ember",
+    swatch:
+      "linear-gradient(135deg, rgba(255,196,156,0.82), rgba(182,76,118,0.92) 48%, rgba(14,9,18,1))",
+  },
+  {
+    id: "petal",
+    swatch:
+      "linear-gradient(135deg, rgba(255,223,238,0.9), rgba(171,107,146,0.9) 46%, rgba(20,14,24,1))",
+  },
+  {
+    id: "sage",
+    swatch:
+      "linear-gradient(135deg, rgba(214,246,225,0.84), rgba(77,133,120,0.92) 50%, rgba(12,20,20,1))",
+  },
+];
+const FONT_CHOICES: FontChoice[] = [
+  { id: "sans", icon: Type },
+  { id: "display", icon: Palette },
+  { id: "mono", icon: Paintbrush },
+];
+const TEXT_TONE_CHOICES: TextToneChoice[] = [
+  { id: "default" },
+  { id: "soft" },
+  { id: "high-contrast" },
+];
 const swipeThreshold = 42;
-
-const debounce = (func: () => void, delay: number) => {
-  let timeoutId: ReturnType<typeof setTimeout>;
-  return () => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(func, delay);
-  };
-};
 
 export function SwipeContainer({
   snippets,
@@ -207,6 +240,7 @@ export function SwipeContainer({
   const [swipeDirection, setSwipeDirection] = useState<1 | -1>(1);
   const [touchStart, setTouchStart] = useState({ x: 0, y: 0 });
   const lastTapRef = useRef(0);
+  const themePanelRef = useRef<HTMLDivElement | null>(null);
 
   const activeTheme = THEMES[themeName];
   const activeTextTone = activeTheme.textTones[textToneName];
@@ -223,7 +257,10 @@ export function SwipeContainer({
     if (savedFont && savedFont in FONT_CLASSES) {
       setFontName(savedFont);
     }
-    if (savedTextTone && textToneOrder.includes(savedTextTone)) {
+    if (
+      savedTextTone &&
+      TEXT_TONE_CHOICES.some((choice) => choice.id === savedTextTone)
+    ) {
       setTextToneName(savedTextTone);
     }
   }, []);
@@ -236,30 +273,20 @@ export function SwipeContainer({
     setSwipeDirection(1);
   }, [snippets, topic]);
 
-  const cycleBackground = useCallback(
-    debounce(() => {
-      const currentThemeIndex = themeOrder.indexOf(themeName);
-      const nextTheme = themeOrder[(currentThemeIndex + 1) % themeOrder.length];
-      setThemeName(nextTheme);
-      localStorage.setItem("focusfeed-theme", nextTheme);
-    }, 240),
-    [themeName],
-  );
+  const selectTheme = useCallback((nextTheme: ThemeName) => {
+    setThemeName(nextTheme);
+    localStorage.setItem("focusfeed-theme", nextTheme);
+  }, []);
 
-  const cycleFont = () => {
-    const currentFontIndex = fontOrder.indexOf(fontName);
-    const nextFont = fontOrder[(currentFontIndex + 1) % fontOrder.length];
+  const selectFont = useCallback((nextFont: FontName) => {
     setFontName(nextFont);
     localStorage.setItem("focusfeed-font-theme", nextFont);
-  };
+  }, []);
 
-  const cycleTextTone = () => {
-    const currentTextToneIndex = textToneOrder.indexOf(textToneName);
-    const nextTextTone =
-      textToneOrder[(currentTextToneIndex + 1) % textToneOrder.length];
+  const selectTextTone = useCallback((nextTextTone: TextToneName) => {
     setTextToneName(nextTextTone);
     localStorage.setItem("focusfeed-text-tone", nextTextTone);
-  };
+  }, []);
 
   const generateMoreContent = useCallback(
     async (findNewTopics = false, subtopic?: string) => {
@@ -396,6 +423,28 @@ export function SwipeContainer({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [controlsOpen, nextCard, onBack, previousCard, showOptions, toggleLikeCurrent]);
 
+  useEffect(() => {
+    if (!controlsOpen || showOptions) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      if (themePanelRef.current?.contains(target)) {
+        return;
+      }
+
+      setControlsOpen(false);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [controlsOpen, showOptions]);
+
   if (!allSnippets.length) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -468,56 +517,6 @@ export function SwipeContainer({
       }}
       data-testid="swipe-container"
     >
-      <Drawer open={controlsOpen && !showOptions} onOpenChange={setControlsOpen}>
-        <DrawerContent className="border-white/10 bg-[rgba(11,15,30,0.96)] text-foreground backdrop-blur-3xl">
-          <DrawerHeader className="px-5 pb-2 pt-4 text-left">
-            <DrawerTitle className="font-display text-lg text-foreground">
-              {appCopy.card.controlsTitle}
-            </DrawerTitle>
-            <DrawerDescription className="text-sm text-muted-foreground">
-              {appCopy.card.controlsDescription}
-            </DrawerDescription>
-          </DrawerHeader>
-          <div className="px-5 pb-6">
-            <div className="grid gap-3">
-              <button
-                type="button"
-                onClick={cycleBackground}
-                className="flex min-h-14 items-center justify-between rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-left transition-colors hover:bg-white/[0.08]"
-              >
-                <div>
-                  <p className="text-sm font-medium text-foreground">{appCopy.card.controls.backdropTitle}</p>
-                  <p className="text-xs text-muted-foreground">{appCopy.card.controls.backdropDescription}</p>
-                </div>
-                <Palette className="h-4 w-4 text-primary" />
-              </button>
-              <button
-                type="button"
-                onClick={cycleFont}
-                className="flex min-h-14 items-center justify-between rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-left transition-colors hover:bg-white/[0.08]"
-              >
-                <div>
-                  <p className="text-sm font-medium text-foreground">{appCopy.card.controls.typeTitle}</p>
-                  <p className="text-xs text-muted-foreground">{appCopy.card.controls.typeDescription}</p>
-                </div>
-                <Type className="h-4 w-4 text-primary" />
-              </button>
-              <button
-                type="button"
-                onClick={cycleTextTone}
-                className="flex min-h-14 items-center justify-between rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-left transition-colors hover:bg-white/[0.08]"
-              >
-                <div>
-                  <p className="text-sm font-medium text-foreground">{appCopy.card.controls.contrastTitle}</p>
-                  <p className="text-xs text-muted-foreground">{appCopy.card.controls.contrastDescription}</p>
-                </div>
-                <Paintbrush className="h-4 w-4 text-primary" />
-              </button>
-            </div>
-          </div>
-        </DrawerContent>
-      </Drawer>
-
       <div
         className={cn(
           "pointer-events-none absolute inset-x-0 top-0 z-10 px-4 pt-4 transition-all duration-300 md:px-6",
@@ -571,6 +570,170 @@ export function SwipeContainer({
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {controlsOpen && !showOptions && (
+          <motion.div
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-4 pb-5 md:px-8 md:pb-8"
+            initial={{ opacity: 0, y: 26 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 18 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+            <div className="mx-auto flex max-w-3xl justify-center">
+              <div
+                ref={themePanelRef}
+                className="pointer-events-auto w-full rounded-[2rem] border px-4 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl md:px-5"
+                style={{
+                  background: `linear-gradient(180deg, ${activeTheme.shell}, rgba(10,12,24,0.48))`,
+                  borderColor: activeTheme.overlay,
+                }}
+                data-theme-panel="true"
+              >
+                <div className="mb-4 flex items-start justify-between gap-4">
+                  <div>
+                    <p
+                      className="font-display text-sm font-semibold"
+                      style={{ color: activeTextTone.text }}
+                    >
+                      {appCopy.card.controlsTitle}
+                    </p>
+                    <p
+                      className="mt-1 text-xs"
+                      style={{ color: activeTextTone.muted }}
+                    >
+                      {appCopy.card.controlsDescription}
+                    </p>
+                  </div>
+                  <div
+                    className="rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.24em]"
+                    style={{
+                      color: activeTextTone.muted,
+                      borderColor: activeTheme.overlay,
+                      background: activeTheme.tile,
+                    }}
+                  >
+                    {appCopy.card.controlsCloseHint}
+                  </div>
+                </div>
+
+                <div className="grid gap-3">
+                  <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] px-3 py-3">
+                    <div className="mb-2 flex items-center gap-2">
+                      <Palette className="h-4 w-4 text-primary" />
+                      <p className="text-sm font-medium" style={{ color: activeTextTone.text }}>
+                        {appCopy.card.controls.backdropTitle}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {THEME_CHOICES.map((choice) => (
+                        <button
+                          key={choice.id}
+                          type="button"
+                          onClick={() => selectTheme(choice.id)}
+                          className={cn(
+                            "flex items-center gap-2 rounded-full border px-2.5 py-2 text-xs transition-transform hover:-translate-y-0.5",
+                            themeName === choice.id && "ring-2 ring-primary/40",
+                          )}
+                          style={{
+                            color: activeTextTone.text,
+                            borderColor:
+                              themeName === choice.id
+                                ? "rgba(58,227,255,0.44)"
+                                : activeTheme.overlay,
+                            background:
+                              themeName === choice.id ? "rgba(255,255,255,0.12)" : activeTheme.tile,
+                          }}
+                        >
+                          <span
+                            className="h-5 w-5 rounded-full border border-white/20"
+                            style={{ background: choice.swatch }}
+                            aria-hidden="true"
+                          />
+                          {appCopy.card.controls.themes[choice.id]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] px-3 py-3">
+                    <div className="mb-2 flex items-center gap-2">
+                      <Type className="h-4 w-4 text-primary" />
+                      <p className="text-sm font-medium" style={{ color: activeTextTone.text }}>
+                        {appCopy.card.controls.typeTitle}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {FONT_CHOICES.map((choice) => {
+                        const Icon = choice.icon;
+                        return (
+                          <button
+                            key={choice.id}
+                            type="button"
+                            onClick={() => selectFont(choice.id)}
+                            className={cn(
+                              "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm transition-transform hover:-translate-y-0.5",
+                              FONT_CLASSES[choice.id],
+                              fontName === choice.id && "ring-2 ring-primary/40",
+                            )}
+                            style={{
+                              color: activeTextTone.text,
+                              borderColor:
+                                fontName === choice.id
+                                  ? "rgba(58,227,255,0.44)"
+                                  : activeTheme.overlay,
+                              background:
+                                fontName === choice.id ? "rgba(255,255,255,0.12)" : activeTheme.tile,
+                            }}
+                          >
+                            <Icon className="h-3.5 w-3.5" />
+                            {appCopy.card.controls.fonts[choice.id]}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] px-3 py-3">
+                    <div className="mb-2 flex items-center gap-2">
+                      <Paintbrush className="h-4 w-4 text-primary" />
+                      <p className="text-sm font-medium" style={{ color: activeTextTone.text }}>
+                        {appCopy.card.controls.contrastTitle}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {TEXT_TONE_CHOICES.map((choice) => (
+                        <button
+                          key={choice.id}
+                          type="button"
+                          onClick={() => selectTextTone(choice.id)}
+                          className={cn(
+                            "rounded-full border px-3 py-2 text-sm transition-transform hover:-translate-y-0.5",
+                            textToneName === choice.id && "ring-2 ring-primary/40",
+                          )}
+                          style={{
+                            color: activeTheme.textTones[choice.id].text,
+                            borderColor:
+                              textToneName === choice.id
+                                ? "rgba(58,227,255,0.44)"
+                                : activeTheme.overlay,
+                            background:
+                              textToneName === choice.id
+                                ? "rgba(255,255,255,0.12)"
+                                : activeTheme.textTones[choice.id].muted,
+                          }}
+                        >
+                          {appCopy.card.controls.textTones[choice.id]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div
         className={cn(

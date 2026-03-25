@@ -43,13 +43,14 @@ export interface AppCopy {
     cardLabel: (index: number, total: number) => string;
     controlsTitle: string;
     controlsDescription: string;
+    controlsCloseHint: string;
     controls: {
       backdropTitle: string;
-      backdropDescription: string;
       typeTitle: string;
-      typeDescription: string;
       contrastTitle: string;
-      contrastDescription: string;
+      themes: Record<"midnight" | "aurora" | "ember" | "petal" | "sage", string>;
+      fonts: Record<"sans" | "display" | "mono", string>;
+      textTones: Record<"default" | "soft" | "high-contrast", string>;
     };
   };
   options: {
@@ -180,13 +181,28 @@ export const appCopy: AppCopy = {
     cardLabel: (index, total) => `Hit ${index} of ${total}`,
     controlsTitle: "Pick your vibe",
     controlsDescription: "Tweak the look without breaking the run.",
+    controlsCloseHint: "Tap anywhere to close",
     controls: {
       backdropTitle: "Backdrop",
-      backdropDescription: "Flip through fresh scenes",
       typeTitle: "Type mood",
-      typeDescription: "Swap the feel in one tap",
       contrastTitle: "Text pop",
-      contrastDescription: "Turn the contrast up or down",
+      themes: {
+        midnight: "Midnight",
+        aurora: "Aurora",
+        ember: "Ember",
+        petal: "Petal",
+        sage: "Sage",
+      },
+      fonts: {
+        sans: "Sans",
+        display: "Display",
+        mono: "Mono",
+      },
+      textTones: {
+        default: "Default",
+        soft: "Soft",
+        "high-contrast": "Sharp",
+      },
     },
   },
   options: {
