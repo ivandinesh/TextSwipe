@@ -744,7 +744,7 @@ export function SwipeContainer({
       <div
         className={cn(
           "relative transition-all duration-300",
-          "pt-28 sm:pt-32",
+          "pt-36 sm:pt-40",
           showOptions
             ? "min-h-full"
             : "h-[calc(100dvh-1rem)] sm:h-[calc(100dvh-1.5rem)]",
@@ -777,15 +777,25 @@ export function SwipeContainer({
           />
         ) : (
         <div className="relative h-full">
-            <CardProgressTrail
-              currentIndex={currentIndex}
-              total={allSnippets.length}
-              activeTheme={{
-                overlay: activeTheme.overlay,
-                tile: activeTheme.tile,
-              }}
-              activeTextTone={activeTextTone}
-            />
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center px-6">
+              <div
+                className="rounded-full border px-3 py-2 backdrop-blur-md"
+                style={{
+                  borderColor: activeTheme.overlay,
+                  background: activeTheme.tile,
+                }}
+              >
+                <CardProgressTrail
+                  currentIndex={currentIndex}
+                  total={allSnippets.length}
+                  activeTheme={{
+                    overlay: activeTheme.overlay,
+                    tile: activeTheme.tile,
+                  }}
+                  activeTextTone={activeTextTone}
+                />
+              </div>
+            </div>
             <div
               className="pointer-events-none absolute inset-x-4 inset-y-3 rounded-[2.1rem] border opacity-45 md:inset-x-8 md:inset-y-5"
               style={{
@@ -847,15 +857,10 @@ export function SwipeContainer({
                   key={`${topic}-${currentIndex}`}
                   content={allSnippets[currentIndex]}
                   index={currentIndex}
-                  total={allSnippets.length}
                   isActive
                   textColor={activeTextTone.text}
                   mutedTextColor={activeTextTone.muted}
                   fontClass={fontClass}
-                  cardLabel={appCopy.card.cardLabel(
-                    Math.min(currentIndex + 1, allSnippets.length),
-                    allSnippets.length,
-                  )}
                   showSwipeHint={showSwipeHint && currentIndex === 0}
                   isLiked={Boolean(
                     allSnippets[currentIndex] &&

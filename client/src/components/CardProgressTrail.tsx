@@ -28,63 +28,62 @@ export function CardProgressTrail({
   return (
     <div
       className={cn(
-        "pointer-events-none absolute right-3 top-1/2 z-10 flex -translate-y-1/2 flex-col items-center gap-3 md:right-5",
+        "pointer-events-none flex items-center justify-center",
         className,
       )}
       aria-hidden="true"
     >
-      <div
-        className="rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] backdrop-blur-md"
-        style={{
-          color: activeTextTone.text,
-          borderColor: activeTheme.overlay,
-          background: activeTheme.tile,
-        }}
-      >
-        {currentIndex + 1} / {total}
-      </div>
-
-      <div className="relative flex flex-col items-center gap-2 py-1">
+      <div className="relative flex items-center gap-1.5 md:gap-2">
         {Array.from({ length: total }).map((_, index) => {
           const isPast = index < currentIndex;
           const isCurrent = index === currentIndex;
 
           return (
-            <div key={index} className="relative flex h-5 w-5 items-center justify-center">
+            <div key={index} className="relative flex h-6 w-6 items-center justify-center md:h-7 md:w-7">
               {index < total - 1 && (
                 <div
-                  className="absolute top-[calc(100%-2px)] h-4 w-px"
+                  className="absolute left-[calc(100%-1px)] h-px w-2 md:w-2.5"
                   style={{
                     background:
                       index < currentIndex
-                        ? "linear-gradient(180deg, rgba(58,227,255,0.75), rgba(58,227,255,0.18))"
-                        : "linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.04))",
+                        ? "linear-gradient(90deg, rgba(58,227,255,0.75), rgba(58,227,255,0.18))"
+                        : "linear-gradient(90deg, rgba(255,255,255,0.22), rgba(255,255,255,0.04))",
                   }}
                 />
               )}
 
               {isCurrent && (
-                <span className="absolute h-5 w-5 rounded-full bg-primary/25 animate-ping" />
+                <span className="absolute h-6 w-6 rounded-full bg-primary/20 animate-ping md:h-7 md:w-7" />
               )}
 
               <span
-                className="relative block rounded-full transition-all duration-300"
+                className="relative flex items-center justify-center rounded-full text-[10px] font-semibold transition-all duration-300 md:text-[11px]"
                 style={{
-                  width: isCurrent ? "10px" : isPast ? "8px" : "6px",
-                  height: isCurrent ? "10px" : isPast ? "8px" : "6px",
+                  width: isCurrent ? "24px" : "22px",
+                  height: isCurrent ? "24px" : "22px",
+                  color: isCurrent
+                    ? "#05131B"
+                    : isPast
+                      ? "#D7F8FF"
+                      : activeTextTone.muted,
                   background: isCurrent
                     ? "#3AE3FF"
                     : isPast
-                      ? "rgba(58,227,255,0.72)"
-                      : "rgba(255,255,255,0.34)",
+                      ? "rgba(58,227,255,0.22)"
+                      : activeTheme.tile,
                   boxShadow: isCurrent
                     ? "0 0 18px rgba(58,227,255,0.75)"
                     : isPast
                       ? "0 0 10px rgba(58,227,255,0.35)"
                       : "none",
-                  border: isCurrent || isPast ? "0" : `1px solid ${activeTheme.overlay}`,
+                  border:
+                    isCurrent || isPast
+                      ? "0"
+                      : `1px solid ${activeTheme.overlay}`,
                 }}
-              />
+              >
+                {index + 1}
+              </span>
             </div>
           );
         })}

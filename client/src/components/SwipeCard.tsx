@@ -5,13 +5,11 @@ import { cn } from "@/lib/utils";
 interface SwipeCardProps {
   content: string;
   index: number;
-  total: number;
   isActive: boolean;
   className?: string;
   textColor?: string;
   mutedTextColor?: string;
   fontClass?: string;
-  cardLabel?: string;
   panelStyle?: React.CSSProperties;
   backlightStyle?: React.CSSProperties;
   showSwipeHint?: boolean;
@@ -22,13 +20,11 @@ interface SwipeCardProps {
 export function SwipeCard({
   content,
   index,
-  total,
   isActive,
   className,
   textColor,
   mutedTextColor,
   fontClass,
-  cardLabel,
   panelStyle,
   backlightStyle,
   showSwipeHint = false,
@@ -70,16 +66,7 @@ export function SwipeCard({
               }
             }}
           >
-            <div className="mb-5 flex items-center justify-start gap-4 md:mb-7">
-              <div
-                className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.24em]"
-                style={{ color: mutedTextColor || textColor }}
-              >
-                {cardLabel || `Card ${index + 1} of ${total}`}
-              </div>
-            </div>
-
-            <div className="flex min-h-0 flex-1 items-center justify-center overflow-visible py-1 md:py-2">
+            <div className="flex min-h-0 flex-1 items-center justify-center overflow-visible py-2 md:py-3">
               <div className="w-full">
                 <p
                   className={cn(
@@ -135,14 +122,16 @@ export function SwipeCard({
               </div>
             </div>
 
-            <div className="mt-5 flex items-center justify-center md:mt-6">
-              <div
-                className="max-w-xl text-center text-sm leading-6"
-                style={{ color: mutedTextColor || textColor }}
-              >
-                {appCopy.card.helper}
+            {index === 0 && (
+              <div className="mt-5 flex items-center justify-center md:mt-6">
+                <div
+                  className="max-w-xl text-center text-sm leading-6"
+                  style={{ color: mutedTextColor || textColor }}
+                >
+                  {appCopy.card.helper}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
