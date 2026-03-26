@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { CourseModuleDots } from "@/components/CourseModuleDots";
 import { appCopy } from "@/content/copy";
 import { useAuth } from "@/hooks/use-auth";
+import { getCardTextSizeTier } from "@/lib/cardText";
 import { apiRequest } from "@/lib/queryClient";
 import type { CourseData, CourseProgressSummary } from "@/types/courses";
 
@@ -166,6 +167,7 @@ export default function CoursePlayerPage() {
   };
 
   const activeCard = module.cards[Math.min(cardIndex, module.cards.length - 1)];
+  const sizeTier = getCardTextSizeTier(activeCard.content);
 
   return (
     <div className={`min-h-screen ${accent.surface} px-5 py-6 text-white md:px-8`}>
@@ -258,7 +260,17 @@ export default function CoursePlayerPage() {
                     </span>
                   </div>
                   <div className="min-h-[240px] md:min-h-[300px]">
-                    <p className="text-2xl leading-[1.6] md:text-3xl md:leading-[1.7]">
+                    <p
+                      className={
+                        sizeTier === "short"
+                          ? "text-[1.95rem] leading-[1.58] md:text-[3rem] md:leading-[1.68]"
+                          : sizeTier === "medium"
+                            ? "text-[1.82rem] leading-[1.62] md:text-[2.65rem] md:leading-[1.7]"
+                            : sizeTier === "long"
+                              ? "text-[1.64rem] leading-[1.68] md:text-[2.25rem] md:leading-[1.74]"
+                              : "text-[1.48rem] leading-[1.74] md:text-[1.95rem] md:leading-[1.78]"
+                      }
+                    >
                       {activeCard.content}
                     </p>
                   </div>

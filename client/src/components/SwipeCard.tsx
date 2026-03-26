@@ -1,5 +1,6 @@
 import { Heart } from "lucide-react";
 import { appCopy } from "@/content/copy";
+import { getCardTextSizeTier } from "@/lib/cardText";
 import { cn } from "@/lib/utils";
 
 interface SwipeCardProps {
@@ -31,6 +32,8 @@ export function SwipeCard({
   isLiked = false,
   onLike,
 }: SwipeCardProps) {
+  const sizeTier = getCardTextSizeTier(content);
+
   return (
     <div
       className={cn(
@@ -70,7 +73,15 @@ export function SwipeCard({
               <div className="w-full">
                 <p
                   className={cn(
-                    "mx-auto max-w-[15ch] overflow-visible text-center text-[clamp(1.85rem,6.6vw,2.45rem)] font-medium leading-[1.32] tracking-[-0.02em] md:max-w-[18ch] md:text-[clamp(2.8rem,4vw,4.4rem)] md:leading-[1.24]",
+                    "mx-auto overflow-visible text-center font-medium tracking-[-0.02em]",
+                    sizeTier === "short" &&
+                      "max-w-[15ch] text-[clamp(1.85rem,6.6vw,2.45rem)] leading-[1.32] md:max-w-[18ch] md:text-[clamp(2.8rem,4vw,4.4rem)] md:leading-[1.24]",
+                    sizeTier === "medium" &&
+                      "max-w-[17ch] text-[clamp(1.72rem,5.9vw,2.24rem)] leading-[1.38] md:max-w-[19ch] md:text-[clamp(2.45rem,3.6vw,3.7rem)] md:leading-[1.28]",
+                    sizeTier === "long" &&
+                      "max-w-[19ch] text-[clamp(1.52rem,5vw,1.96rem)] leading-[1.44] md:max-w-[21ch] md:text-[clamp(2.05rem,3vw,3.05rem)] md:leading-[1.34]",
+                    sizeTier === "xlong" &&
+                      "max-w-[21ch] text-[clamp(1.36rem,4.2vw,1.76rem)] leading-[1.5] md:max-w-[23ch] md:text-[clamp(1.78rem,2.55vw,2.6rem)] md:leading-[1.4]",
                     fontClass || "",
                   )}
                   style={

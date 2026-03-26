@@ -4,7 +4,10 @@ import { z } from "zod";
 
 const courseCardSchema = z.object({
   id: z.string().min(1),
-  content: z.string().min(1),
+  content: z
+    .string()
+    .min(1)
+    .max(380, "Course card content must stay at or under 380 characters."),
 });
 
 const courseModuleSchema = z.object({
@@ -75,4 +78,3 @@ export async function getCourseById(courseId: string) {
   const courses = await listCourses();
   return courses.find((course) => course.id === courseId || course.slug === courseId);
 }
-
