@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
+  GraduationCap,
   LayoutDashboard,
   Paintbrush,
   Palette,
@@ -35,6 +36,7 @@ interface SwipeContainerProps {
   onOptionsChange: (options: TopicOption[]) => void;
   user?: AuthUser | null;
   onOpenAdmin?: () => void;
+  onOpenCourses?: () => void;
   onOpenDashboard?: () => void;
   onLogout?: () => Promise<void> | void;
   className?: string;
@@ -239,6 +241,7 @@ export function SwipeContainer({
   onOptionsChange,
   user,
   onOpenAdmin,
+  onOpenCourses,
   onOpenDashboard,
   onLogout,
   className,
@@ -591,6 +594,16 @@ export function SwipeContainer({
                       <span className="hidden lg:inline">{appCopy.home.adminButton}</span>
                     </Button>
                   )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onOpenCourses}
+                    className="h-10 rounded-full border-white/10 bg-white/[0.04] px-3 text-foreground"
+                    data-chrome-control="true"
+                  >
+                    <GraduationCap className="h-4 w-4" />
+                    <span className="hidden lg:inline">{appCopy.home.coursesButton}</span>
+                  </Button>
                   <Button
                     type="button"
                     variant="outline"

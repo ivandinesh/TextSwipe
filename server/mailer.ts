@@ -5,7 +5,7 @@ type MailPayload = {
   to: string;
   subject: string;
   text: string;
-  html: string;
+  html?: string;
 };
 
 type SmtpConfig = {
@@ -47,12 +47,35 @@ function encodeBase64(value: string) {
 }
 
 function renderMessage(config: SmtpConfig, payload: MailPayload) {
+  const messageId = `<${Date.now()}.${Math.random().toString(36).slice(2)}@focusfeed.me>`;
+  const dateHeader = new Date().toUTCString();
+
+  if (!payload.html) {
+    return [
+      `From: FocusFeed <${config.from}>`,
+      `To: ${payload.to}`,
+      `Subject: ${payload.subject}`,
+      `Date: ${dateHeader}`,
+      `Message-ID: ${messageId}`,
+      "Auto-Submitted: auto-generated",
+      "MIME-Version: 1.0",
+      'Content-Type: text/plain; charset="UTF-8"',
+      "Content-Transfer-Encoding: 8bit",
+      "",
+      payload.text,
+      "",
+    ].join("\r\n");
+  }
+
   const boundary = `focusfeed-${Date.now().toString(36)}`;
 
   return [
     `From: FocusFeed <${config.from}>`,
     `To: ${payload.to}`,
     `Subject: ${payload.subject}`,
+    `Date: ${dateHeader}`,
+    `Message-ID: ${messageId}`,
+    "Auto-Submitted: auto-generated",
     "MIME-Version: 1.0",
     `Content-Type: multipart/alternative; boundary="${boundary}"`,
     "",
@@ -266,3 +289,15 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string) {
   });
 }
 
+export async function sendPlainPasswordResetEmail(email: string, resetUrl: string) {
+  const subject =
+    process.env.PASSWORD_RESET_EMAIL_SUBJECT?.trim() ||
+    "Reset your FocusFeed password";
+
+  return sendTransactionalEmail({
+    to: email,
+    subject,
+    text:
+      `You asked to reset your FocusFeed password.\n\nUse this link to set a new one:\n${resetUrl}\n\nThis link expires soon. If you did not request this, you can ignore this email.\n\nFocusFeed`,
+  });
+}

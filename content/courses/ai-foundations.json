@@ -1,0 +1,307 @@
+{
+  "id": "ai-foundations",
+  "slug": "ai-foundations",
+  "title": "AI Foundations",
+  "tagline": "Get the big picture without the fog.",
+  "description": "A 60-card guided run through the core ideas that actually matter.",
+  "cover": {
+    "eyebrow": "Course",
+    "accent": "aurora",
+    "art": "signal-grid"
+  },
+  "metadata": {
+    "estimatedMinutes": 45,
+    "level": "Beginner",
+    "category": "Technology"
+  },
+  "modules": [
+    {
+      "id": "what-is-ai",
+      "title": "What AI Really Is",
+      "summary": "The core mental model behind the term.",
+      "order": 1,
+      "cards": [
+        {
+          "id": "what-is-ai-01",
+          "content": "AI is a broad label for systems that perform tasks we usually associate with human judgment, pattern matching, or decision-making."
+        },
+        {
+          "id": "what-is-ai-02",
+          "content": "Not all AI thinks. Most AI spots patterns in data, then predicts or ranks the next likely move."
+        },
+        {
+          "id": "what-is-ai-03",
+          "content": "A calculator follows fixed rules. An AI model learns patterns from examples, then applies them to new inputs."
+        },
+        {
+          "id": "what-is-ai-04",
+          "content": "Modern AI is strongest in narrow tasks. It can beat humans in one lane while failing badly outside it."
+        },
+        {
+          "id": "what-is-ai-05",
+          "content": "When people say AI, they often mean machine learning, which is the biggest engine behind today’s breakthroughs."
+        },
+        {
+          "id": "what-is-ai-06",
+          "content": "AI systems are built by humans who choose the data, the goal, the limits, and the way success gets measured."
+        },
+        {
+          "id": "what-is-ai-07",
+          "content": "A good AI answer is not magic. It is the output of data, model design, compute, and a scoring objective working together."
+        },
+        {
+          "id": "what-is-ai-08",
+          "content": "Many AI products feel intelligent because they are fast, fluent, and context-aware, not because they truly understand the world."
+        },
+        {
+          "id": "what-is-ai-09",
+          "content": "The smartest way to read AI is this: pattern engine first, human meaning layered on top."
+        },
+        {
+          "id": "what-is-ai-10",
+          "content": "If you remember one thing: AI is less a single technology and more a stack of methods for turning data into useful decisions."
+        }
+      ]
+    },
+    {
+      "id": "machine-learning",
+      "title": "Machine Learning Basics",
+      "summary": "How systems learn from examples.",
+      "order": 2,
+      "cards": [
+        {
+          "id": "machine-learning-01",
+          "content": "Machine learning trains a model on past examples so it can make better guesses on new ones."
+        },
+        {
+          "id": "machine-learning-02",
+          "content": "The model is not the data. It is a compressed pattern map shaped by the data it sees."
+        },
+        {
+          "id": "machine-learning-03",
+          "content": "Supervised learning uses labeled examples. The model learns to map input to the right output."
+        },
+        {
+          "id": "machine-learning-04",
+          "content": "Unsupervised learning looks for structure without labels, like clusters, groups, or hidden relationships."
+        },
+        {
+          "id": "machine-learning-05",
+          "content": "Reinforcement learning improves through trial, feedback, and reward rather than a direct answer key."
+        },
+        {
+          "id": "machine-learning-06",
+          "content": "Training is the fitting phase. Inference is the moment the trained model makes a live prediction."
+        },
+        {
+          "id": "machine-learning-07",
+          "content": "A model can memorize training examples and still fail in the real world. That is overfitting."
+        },
+        {
+          "id": "machine-learning-08",
+          "content": "A useful model balances fit and generalization. It should learn the signal, not cling to noise."
+        },
+        {
+          "id": "machine-learning-09",
+          "content": "Features matter. If the input is weak, noisy, or biased, the output usually inherits that weakness."
+        },
+        {
+          "id": "machine-learning-10",
+          "content": "Great machine learning is not just smart math. It is good data, a clear goal, and honest evaluation."
+        }
+      ]
+    },
+    {
+      "id": "neural-networks",
+      "title": "Neural Networks",
+      "summary": "Why deep learning changed the game.",
+      "order": 3,
+      "cards": [
+        {
+          "id": "neural-networks-01",
+          "content": "A neural network is a stack of layers that transform input into a prediction through learned weights."
+        },
+        {
+          "id": "neural-networks-02",
+          "content": "Each layer extracts patterns at a different level, from simple signals to more abstract structure."
+        },
+        {
+          "id": "neural-networks-03",
+          "content": "Deep learning means using many layers so the model can build richer internal representations."
+        },
+        {
+          "id": "neural-networks-04",
+          "content": "Backpropagation is the method that pushes error backward through the network so weights can improve."
+        },
+        {
+          "id": "neural-networks-05",
+          "content": "Gradient descent is the step-by-step optimization process that nudges the model toward lower error."
+        },
+        {
+          "id": "neural-networks-06",
+          "content": "Neural networks shine when the problem space is complex enough that hand-written rules break down."
+        },
+        {
+          "id": "neural-networks-07",
+          "content": "They became powerful when more data, more compute, and better architectures arrived together."
+        },
+        {
+          "id": "neural-networks-08",
+          "content": "Convolutional networks boosted vision. Transformers changed language and sequence-heavy tasks."
+        },
+        {
+          "id": "neural-networks-09",
+          "content": "The network does not store facts the way a database does. It stores tendencies in distributed weights."
+        },
+        {
+          "id": "neural-networks-10",
+          "content": "Deep learning feels impressive because it can absorb huge pattern spaces that would crush manual programming."
+        }
+      ]
+    },
+    {
+      "id": "language-models",
+      "title": "Language Models",
+      "summary": "How chat-style AI works.",
+      "order": 4,
+      "cards": [
+        {
+          "id": "language-models-01",
+          "content": "A language model predicts the next token based on the tokens that came before it."
+        },
+        {
+          "id": "language-models-02",
+          "content": "Tokens are chunks of text, not always full words. The model thinks in token probabilities."
+        },
+        {
+          "id": "language-models-03",
+          "content": "Fluent output comes from strong next-step prediction over massive text patterns."
+        },
+        {
+          "id": "language-models-04",
+          "content": "Transformers let language models pay attention to relationships across a sequence, not just nearby words."
+        },
+        {
+          "id": "language-models-05",
+          "content": "Pretraining gives the model broad language instincts. Fine-tuning or alignment shapes how it behaves."
+        },
+        {
+          "id": "language-models-06",
+          "content": "A chat model sounds conversational because it was trained and tuned on instruction-following patterns."
+        },
+        {
+          "id": "language-models-07",
+          "content": "Hallucinations happen when the model generates something statistically plausible but factually wrong."
+        },
+        {
+          "id": "language-models-08",
+          "content": "Prompting works because the model uses your context as a steering signal for what to predict next."
+        },
+        {
+          "id": "language-models-09",
+          "content": "The model does not browse reality by default. It continues the pattern space it was trained on."
+        },
+        {
+          "id": "language-models-10",
+          "content": "The strongest use of a language model is as a fast thinking partner, not an unquestioned source of truth."
+        }
+      ]
+    },
+    {
+      "id": "limits-and-risks",
+      "title": "Limits and Risks",
+      "summary": "Where the cracks show up.",
+      "order": 5,
+      "cards": [
+        {
+          "id": "limits-and-risks-01",
+          "content": "AI inherits the strengths and weaknesses of its training data, including blind spots and historical bias."
+        },
+        {
+          "id": "limits-and-risks-02",
+          "content": "A confident answer is not the same as a correct answer. Models are optimized for output, not certainty honesty."
+        },
+        {
+          "id": "limits-and-risks-03",
+          "content": "Bias can enter through data collection, labeling, objectives, evaluation, and deployment context."
+        },
+        {
+          "id": "limits-and-risks-04",
+          "content": "Even accurate models can cause harm if the surrounding product decisions are careless."
+        },
+        {
+          "id": "limits-and-risks-05",
+          "content": "Automation bias happens when humans trust the system too much and stop checking its weak spots."
+        },
+        {
+          "id": "limits-and-risks-06",
+          "content": "Privacy risk grows when models are trained on sensitive data or exposed to user input without guardrails."
+        },
+        {
+          "id": "limits-and-risks-07",
+          "content": "Robustness matters because models can fail hard on unusual inputs that look minor to a human."
+        },
+        {
+          "id": "limits-and-risks-08",
+          "content": "Interpretability is limited. Often we can observe the output without fully understanding why the model chose it."
+        },
+        {
+          "id": "limits-and-risks-09",
+          "content": "Good AI governance means watching behavior after launch, not just celebrating benchmark scores before it."
+        },
+        {
+          "id": "limits-and-risks-10",
+          "content": "The safest mental model is this: AI is useful leverage, but only when humans still own judgment."
+        }
+      ]
+    },
+    {
+      "id": "using-ai-well",
+      "title": "Using AI Well",
+      "summary": "How to turn the tools into leverage.",
+      "order": 6,
+      "cards": [
+        {
+          "id": "using-ai-well-01",
+          "content": "Use AI where speed, drafting, pattern synthesis, or brainstorming creates leverage without high irreversible risk."
+        },
+        {
+          "id": "using-ai-well-02",
+          "content": "Treat the first answer as a strong draft, not the finish line."
+        },
+        {
+          "id": "using-ai-well-03",
+          "content": "Clear prompts improve output because they reduce ambiguity about role, goal, context, and constraints."
+        },
+        {
+          "id": "using-ai-well-04",
+          "content": "Good prompting is less about clever wording and more about giving the model the right frame."
+        },
+        {
+          "id": "using-ai-well-05",
+          "content": "Verification matters most in factual, legal, medical, financial, or public-facing work."
+        },
+        {
+          "id": "using-ai-well-06",
+          "content": "The best workflows mix AI speed with human taste, judgment, and final accountability."
+        },
+        {
+          "id": "using-ai-well-07",
+          "content": "AI is strongest when it compresses effort on repetitive or structure-heavy steps."
+        },
+        {
+          "id": "using-ai-well-08",
+          "content": "It is weaker when the task depends on truth from changing real-world conditions unless external tools are attached."
+        },
+        {
+          "id": "using-ai-well-09",
+          "content": "People who get the most out of AI usually learn how to iterate, critique, and re-ask, not just submit once."
+        },
+        {
+          "id": "using-ai-well-10",
+          "content": "The real win is not replacing your thinking. It is giving your thinking better speed and range."
+        }
+      ]
+    }
+  ]
+}

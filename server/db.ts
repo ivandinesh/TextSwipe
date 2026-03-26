@@ -53,6 +53,18 @@ export const initializeDB = async () => {
           created_at text NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
       `);
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS course_module_progress (
+          id varchar PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id varchar NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          course_id text NOT NULL,
+          module_id text NOT NULL,
+          highest_card_index integer NOT NULL DEFAULT 0,
+          completed_at text,
+          last_viewed_at text NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          created_at text NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
       // Migrations disabled temporarily
       // await migrate(db, { migrationsFolder: './drizzle' });
       // console.log('✅ Database migrations applied');

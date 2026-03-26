@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { appCopy } from "@/content/copy";
 import { useAuth } from "@/hooks/use-auth";
+import type { CourseProgressSummary } from "@/types/courses";
 
 interface DashboardSummary {
   totalLearningMinutes: number;
@@ -23,6 +24,16 @@ interface RecommendedTopicsResponse {
   topics: string[];
 }
 
+interface DashboardCoursesResponse {
+  courses: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    tagline: string;
+    progress: CourseProgressSummary;
+  }>;
+}
+
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { user, logout } = useAuth();
@@ -39,10 +50,20 @@ export default function Dashboard() {
     queryKey: ["/api/dashboard/recommended-topics"],
     enabled: Boolean(user),
   });
+  const { data: courses } = useQuery<DashboardCoursesResponse>({
+    queryKey: ["/api/courses"],
+    enabled: Boolean(user),
+  });
 
   const maxWeeklyMinutes = useMemo(
     () => Math.max(...(summary?.weeklyMinutes.map((item) => item.minutes) ?? [1])),
     [summary],
+  );
+  const activeCourse = useMemo(
+    () =>
+      (courses?.courses ?? []).find((course) => !course.progress.isCompleted) ??
+      (courses?.courses ?? [])[0],
+    [courses],
   );
 
   if (!user) {
@@ -141,6 +162,41 @@ export default function Dashboard() {
           </div>
 
           <div className="space-y-4">
+            <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">{appCopy.dashboard.coursesTitle}</h2>
+                <Button variant="outline" onClick={() => setLocation("/courses")}>
+                  {appCopy.home.coursesButton}
+                </Button>
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {appCopy.dashboard.coursesDescription}
+              </p>
+              {activeCourse ? (
+                <div className="mt-4 rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="font-medium">{activeCourse.title}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {activeCourse.progress.completedModulesCount} / {activeCourse.progress.totalModules} modules cleared
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() =>
+                        setLocation(
+                          `/courses/${activeCourse.slug}?module=${activeCourse.progress.nextUnlockedIndex}&card=${activeCourse.progress.modules[activeCourse.progress.nextUnlockedIndex]?.highestCardIndex ?? 0}`,
+                        )
+                      }
+                    >
+                      {appCopy.dashboard.coursesContinue}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-muted-foreground">Courses will land here once you start one.</p>
+              )}
+            </div>
+
             <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
               <h2 className="text-xl font-semibold">{appCopy.dashboard.recommendedTitle}</h2>
               <div className="mt-4 flex flex-wrap gap-2.5">

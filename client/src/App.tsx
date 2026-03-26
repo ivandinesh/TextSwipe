@@ -7,6 +7,8 @@ import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import { appCopy } from "@/content/copy";
 import Home from "@/pages/Home";
 import AdminDashboard from "@/pages/AdminDashboard";
+import CoursePlayerPage from "@/pages/CoursePlayer";
+import CoursesPage from "@/pages/Courses";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/not-found";
 import ResetPassword from "@/pages/ResetPassword";
@@ -16,6 +18,8 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/courses" component={CoursesPage} />
+      <Route path="/courses/:courseId" component={CoursePlayerPage} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/reset-password" component={ResetPassword} />
       <Route component={NotFound} />

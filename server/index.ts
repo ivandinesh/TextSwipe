@@ -13,6 +13,7 @@ import chatRoutes from "./routes/chatsRuntime";
 import topicRoutes from "./routes/topicRoutesRuntime";
 import authRoutes from "./routes/authRoutes";
 import adminRoutes from "./routes/adminRoutes";
+import courseRoutes from "./routes/courseRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
 
 function isSecureCookieEnabled() {
@@ -130,6 +131,7 @@ app.use(
   const server = await registerRoutes(app);
   app.use(authRoutes);
   app.use(adminRoutes);
+  app.use(courseRoutes);
   app.use(dashboardRoutes);
   app.use(topicRoutes);
   app.use(chatRoutes);

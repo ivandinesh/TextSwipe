@@ -13,8 +13,14 @@ export interface AppCopy {
     footerEmpty: string;
     footerSaved: (count: number) => string;
     dashboardButton: string;
+    coursesButton: string;
     adminButton: string;
     signOutButton: string;
+    coursesTeaserEyebrow: string;
+    coursesTeaserTitle: string;
+    coursesTeaserDescription: string;
+    coursesTeaserCta: string;
+    coursesTeaserMeta: string;
   };
   topicInput: {
     eyebrow: string;
@@ -122,9 +128,36 @@ export interface AppCopy {
     weekTitle: string;
     likedSaved: (count: number) => string;
     recommendedTitle: string;
+    coursesTitle: string;
+    coursesDescription: string;
+    coursesContinue: string;
     recentTitle: string;
     likedTitle: string;
     likedEmpty: string;
+  };
+  courses: {
+    gateTitle: string;
+    gateDescription: string;
+    gateCta: string;
+    heroEyebrow: string;
+    heroTitle: string;
+    heroDescription: string;
+    resumeLabel: string;
+    startLabel: string;
+    completedLabel: string;
+    modulesLabel: (count: number) => string;
+    cardsLabel: string;
+    continueCta: string;
+    startCta: string;
+    replayCta: string;
+    playerBack: string;
+    moduleLabel: (current: number, total: number) => string;
+    completionTitle: string;
+    completionDescription: string;
+    nextModuleCta: string;
+    libraryCta: string;
+    finishedCourseTitle: string;
+    finishedCourseDescription: string;
   };
   admin: {
     signedOutTitle: string;
@@ -205,8 +238,15 @@ export const appCopy: AppCopy = {
     footerEmpty: "Pick a lane and start rolling.",
     footerSaved: (count) => `${count} saved hits waiting for a replay`,
     dashboardButton: "Your recap",
+    coursesButton: "Courses",
     adminButton: "Admin",
     signOutButton: "Sign out",
+    coursesTeaserEyebrow: "Locked guided runs",
+    coursesTeaserTitle: "60-card courses built to pull you in.",
+    coursesTeaserDescription:
+      "Six sharp modules. Ten quick hits each. Structured enough to finish. Smooth enough to binge.",
+    coursesTeaserCta: "Unlock courses",
+    coursesTeaserMeta: "6 topics / 60 cards / signup to unlock",
   },
   topicInput: {
     eyebrow: "Start here",
@@ -292,16 +332,17 @@ export const appCopy: AppCopy = {
     registerIdle: "Start your streak",
     forgotTrigger: "Forgot password?",
     forgotTitle: "Get back in fast",
-    forgotDescription: "Drop your email and we’ll send a clean way back to your next stack.",
+    forgotDescription: "Drop your email and we'll send a clean way back to your next stack.",
     forgotPending: "Sending your link...",
     forgotIdle: "Send reset link",
-    forgotSuccess: "If that email is in the app, a reset link is on the way.",
+    forgotSuccess:
+      "If that email is in the app, a reset link is on the way. Check spam too if it doesn't land fast.",
     backToLogin: "Back to sign in",
     resetPageTitle: "Reset your password",
     resetPageDescription: "Set a new password and pick up your run.",
     resetPending: "Saving your new password...",
     resetIdle: "Set new password",
-    resetSuccessTitle: "You’re back in range.",
+    resetSuccessTitle: "You're back in range.",
     resetSuccessDescription: "Your password is reset. Jump back in and keep the streak moving.",
     resetInvalid: "That reset link is expired or off. Grab a fresh one and try again.",
     resetRequestFresh: "Request a fresh link",
@@ -329,9 +370,36 @@ export const appCopy: AppCopy = {
     weekTitle: "This week",
     likedSaved: (count) => `${count} saved hits`,
     recommendedTitle: "Next lanes",
+    coursesTitle: "Guided runs",
+    coursesDescription: "Structured 60-card stacks built to finish, not just skim.",
+    coursesContinue: "Continue course",
     recentTitle: "Recent lanes",
     likedTitle: "Saved hits",
-    likedEmpty: "Save a few hits in the feed and they’ll land here.",
+    likedEmpty: "Save a few hits in the feed and they'll land here.",
+  },
+  courses: {
+    gateTitle: "Sign in to open courses.",
+    gateDescription: "Guided runs stay tied to your account so your place is always waiting.",
+    gateCta: "Back to the feed",
+    heroEyebrow: "Guided runs",
+    heroTitle: "Short courses. Cleaner momentum.",
+    heroDescription: "Pick a 60-card run, clear one module at a time, and keep your progress tight.",
+    resumeLabel: "Resume",
+    startLabel: "Start",
+    completedLabel: "Completed",
+    modulesLabel: (count: number) => `${count} modules`,
+    cardsLabel: "10 cards each",
+    continueCta: "Keep going",
+    startCta: "Start course",
+    replayCta: "Replay",
+    playerBack: "Back to courses",
+    moduleLabel: (current: number, total: number) => `Module ${current} / ${total}`,
+    completionTitle: "Module cleared.",
+    completionDescription: "Clean run. The next module is ready when you are.",
+    nextModuleCta: "Next module",
+    libraryCta: "Course library",
+    finishedCourseTitle: "Course complete.",
+    finishedCourseDescription: "You cleared the full run. Replay it or jump into another lane.",
   },
   admin: {
     signedOutTitle: "Sign in to open admin.",
@@ -381,7 +449,7 @@ export const appCopy: AppCopy = {
     onboarding: [
       {
         title: "Pick your lane",
-        description: "Drop into anything you’re curious about.",
+        description: "Drop into anything you're curious about.",
       },
       {
         title: "Swipe for quick hits",

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { LayoutDashboard, LogOut, Shield, Sparkles, Waves } from "lucide-react";
+import { GraduationCap, LayoutDashboard, LogOut, Shield, Sparkles, Waves } from "lucide-react";
 import { useLocation } from "wouter";
 import { appCopy } from "@/content/copy";
 import { useTopicService } from "@/services/topicService";
@@ -10,6 +10,7 @@ import { AuthDialog } from "./AuthDialog";
 import { LoadingScreen } from "./LoadingScreen";
 import { SwipeContainer } from "./SwipeContainer";
 import { TopicInput } from "./TopicInput";
+import { CoursesTeaser } from "@/pages/Courses";
 
 interface DemoContent {
   [key: string]: string[];
@@ -329,6 +330,14 @@ export function FocusFeed() {
                     <Button
                       variant="outline"
                       className="rounded-full border-white/10 bg-white/[0.04] text-foreground"
+                      onClick={() => setLocation("/courses")}
+                    >
+                      <GraduationCap className="h-4 w-4" />
+                      {appCopy.home.coursesButton}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="rounded-full border-white/10 bg-white/[0.04] text-foreground"
                       onClick={() => setLocation("/dashboard")}
                     >
                       <LayoutDashboard className="h-4 w-4" />
@@ -378,6 +387,26 @@ export function FocusFeed() {
               </div>
             </section>
 
+            {!user && (
+              <section className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+                <CoursesTeaser />
+                <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
+                  <p className="text-xs uppercase tracking-[0.26em] text-primary/80">
+                    {appCopy.home.coursesTeaserMeta}
+                  </p>
+                  <h2 className="mt-4 font-display text-3xl font-bold leading-tight text-foreground">
+                    Guided runs are the upgrade.
+                  </h2>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                    Drop into structured 60-card courses that feel like a premium scroll lane, then keep your place every time you come back.
+                  </p>
+                  <div className="mt-5">
+                    <AuthDialog triggerLabel={appCopy.home.coursesTeaserCta} />
+                  </div>
+                </div>
+              </section>
+            )}
+
             <footer className="flex flex-col gap-3 border-t border-white/8 pt-5 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
               <p>
                 {likedSnippets.length > 0
@@ -411,6 +440,7 @@ export function FocusFeed() {
           onOptionsChange={setCurrentOptions}
           user={user}
           onOpenAdmin={() => setLocation("/admin")}
+          onOpenCourses={() => setLocation("/courses")}
           onOpenDashboard={() => setLocation("/dashboard")}
           onLogout={async () => {
             await logout.mutateAsync();

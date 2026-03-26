@@ -19,7 +19,7 @@ import {
   verifyPassword,
 } from "../auth";
 import { getSessionUser } from "../authz";
-import { sendPasswordResetEmail, sendWelcomeEmail } from "../mailer";
+import { sendPlainPasswordResetEmail, sendWelcomeEmail } from "../mailer";
 
 const router = express.Router();
 
@@ -205,7 +205,7 @@ router.post("/api/auth/forgot-password", forgotPasswordLimiter, async (req, res)
       expiresAt: getPasswordResetExpiry(),
     });
 
-    await sendPasswordResetEmail(existingUser.email, buildResetUrl(token));
+    await sendPlainPasswordResetEmail(existingUser.email, buildResetUrl(token));
     return res.json(resetLinkResponse);
   } catch (error) {
     if (error instanceof z.ZodError) {

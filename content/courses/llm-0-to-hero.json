@@ -1,0 +1,307 @@
+{
+  "id": "llm-zero-to-hero",
+  "slug": "llm-zero-to-hero",
+  "title": "LLM 0 to Hero",
+  "tagline": "From zero knowledge to shipping LLM apps.",
+  "description": "A 60-card guided run through the exact skills that turn beginners into builders.",
+  "cover": {
+    "eyebrow": "Course",
+    "accent": "ember",
+    "art": "token-flame"
+  },
+  "metadata": {
+    "estimatedMinutes": 45,
+    "level": "Beginner",
+    "category": "Technology"
+  },
+  "modules": [
+    {
+      "id": "what-is-llm",
+      "title": "What LLMs Really Are",
+      "summary": "The big idea behind the buzz.",
+      "order": 1,
+      "cards": [
+        {
+          "id": "what-is-llm-01",
+          "content": "An LLM is a massive neural net trained to predict the next word in a sentence, nothing more, nothing less."
+        },
+        {
+          "id": "what-is-llm-02",
+          "content": "It doesn’t think. It patterns. Billions of examples taught it what usually comes next."
+        },
+        {
+          "id": "what-is-llm-03",
+          "content": "The magic happens at scale: more parameters, more data, more compute equals shockingly fluent output."
+        },
+        {
+          "id": "what-is-llm-04",
+          "content": "ChatGPT, Claude, Grok — they’re all just really good next-word predictors wrapped in a friendly interface."
+        },
+        {
+          "id": "what-is-llm-05",
+          "content": "LLMs are generalists. One model can write code, translate languages, or draft emails without being retrained."
+        },
+        {
+          "id": "what-is-llm-06",
+          "content": "They run on tokens — tiny chunks of text that the model treats like puzzle pieces."
+        },
+        {
+          "id": "what-is-llm-07",
+          "content": "Size matters. A 7B model fits on your laptop. A 405B model needs a data center."
+        },
+        {
+          "id": "what-is-llm-08",
+          "content": "Open-source models like Llama 3 let anyone run them locally without paying API bills."
+        },
+        {
+          "id": "what-is-llm-09",
+          "content": "The hero path starts here: stop treating them like magic and start seeing them as powerful autocomplete on steroids."
+        },
+        {
+          "id": "what-is-llm-10",
+          "content": "If you remember one thing: LLMs are prediction machines that feel intelligent because language is the ultimate pattern."
+        }
+      ]
+    },
+    {
+      "id": "llm-mechanics",
+      "title": "LLM Mechanics",
+      "summary": "How the prediction engine actually ticks.",
+      "order": 2,
+      "cards": [
+        {
+          "id": "llm-mechanics-01",
+          "content": "Every LLM starts with a transformer architecture that lets it look at the entire conversation at once."
+        },
+        {
+          "id": "llm-mechanics-02",
+          "content": "Attention is the secret sauce: the model decides which earlier words matter most for predicting the next one."
+        },
+        {
+          "id": "llm-mechanics-03",
+          "content": "Layers stack on layers. Early ones catch basic grammar, later ones grasp meaning and intent."
+        },
+        {
+          "id": "llm-mechanics-04",
+          "content": "Parameters are the adjustable knobs — 70 billion of them in a decent model, each tuned during training."
+        },
+        {
+          "id": "llm-mechanics-05",
+          "content": "Inference is when the model runs live: you type, it predicts, token by token, until it stops."
+        },
+        {
+          "id": "llm-mechanics-06",
+          "content": "Temperature controls creativity. Low for precise answers, high for wild ideas."
+        },
+        {
+          "id": "llm-mechanics-07",
+          "content": "Context window is the memory limit. New models remember 128k tokens — roughly an entire book."
+        },
+        {
+          "id": "llm-mechanics-08",
+          "content": "Embeddings turn your words into numbers so the math-loving model can work with them."
+        },
+        {
+          "id": "llm-mechanics-09",
+          "content": "Sampling picks the next token. Greedy grabs the most likely; top-p keeps it diverse."
+        },
+        {
+          "id": "llm-mechanics-10",
+          "content": "The whole thing is just statistics at planetary scale, yet it feels like talking to a genius."
+        }
+      ]
+    },
+    {
+      "id": "training-basics",
+      "title": "Training Basics",
+      "summary": "How raw models become super useful.",
+      "order": 3,
+      "cards": [
+        {
+          "id": "training-basics-01",
+          "content": "Pre-training is the first phase: the model reads the entire internet to learn language patterns."
+        },
+        {
+          "id": "training-basics-02",
+          "content": "Next-token prediction is the only teacher. No labels needed — just massive text and a simple goal."
+        },
+        {
+          "id": "training-basics-03",
+          "content": "Fine-tuning comes after: smaller datasets teach the model to follow instructions or stay on-topic."
+        },
+        {
+          "id": "training-basics-04",
+          "content": "RLHF adds human feedback so the model prefers helpful, honest, and harmless answers."
+        },
+        {
+          "id": "training-basics-05",
+          "content": "LoRA is the cheat code: tweak just a tiny fraction of parameters instead of retraining everything."
+        },
+        {
+          "id": "training-basics-06",
+          "content": "Quantization shrinks models so a 70B beast runs on consumer hardware without losing much smarts."
+        },
+        {
+          "id": "training-basics-07",
+          "content": "Data quality beats quantity. Clean, diverse, high-signal text makes far better models."
+        },
+        {
+          "id": "training-basics-08",
+          "content": "Training costs millions in GPUs, but inference is cheap — that’s why APIs exploded."
+        },
+        {
+          "id": "training-basics-09",
+          "content": "Open models let you fine-tune on your own data and keep everything private."
+        },
+        {
+          "id": "training-basics-10",
+          "content": "The hero move: you don’t need to train from scratch. Start with a strong base and customize fast."
+        }
+      ]
+    },
+    {
+      "id": "advanced-techniques",
+      "title": "Advanced Techniques",
+      "summary": "Level-up tricks that separate pros from beginners.",
+      "order": 4,
+      "cards": [
+        {
+          "id": "advanced-techniques-01",
+          "content": "Chain-of-thought prompting makes the model think step-by-step and dramatically boosts accuracy."
+        },
+        {
+          "id": "advanced-techniques-02",
+          "content": "Few-shot examples inside the prompt teach the model your style without any fine-tuning."
+        },
+        {
+          "id": "advanced-techniques-03",
+          "content": "RAG pulls fresh data from your docs or database so the model never hallucinates outdated facts."
+        },
+        {
+          "id": "advanced-techniques-04",
+          "content": "Function calling turns the LLM into an agent that can run code, hit APIs, or book your calendar."
+        },
+        {
+          "id": "advanced-techniques-05",
+          "content": "Multi-agent setups let different LLMs debate or divide tasks like a tiny startup team."
+        },
+        {
+          "id": "advanced-techniques-06",
+          "content": "Evaluation frameworks catch when the model is confidently wrong before you ship."
+        },
+        {
+          "id": "advanced-techniques-07",
+          "content": "Guardrails block toxic output or force the model to say “I don’t know” instead of guessing."
+        },
+        {
+          "id": "advanced-techniques-08",
+          "content": "Structured output tools force JSON every time so your app can actually use the response."
+        },
+        {
+          "id": "advanced-techniques-09",
+          "content": "Memory layers remember past conversations across sessions without blowing the context window."
+        },
+        {
+          "id": "advanced-techniques-10",
+          "content": "These techniques are what turn a simple chatbot into production-grade AI that feels alive."
+        }
+      ]
+    },
+    {
+      "id": "building-llm-apps",
+      "title": "Building LLM Apps",
+      "summary": "From idea to working product in hours.",
+      "order": 5,
+      "cards": [
+        {
+          "id": "building-llm-apps-01",
+          "content": "Start with LangChain or LlamaIndex — they handle the messy plumbing so you focus on the fun stuff."
+        },
+        {
+          "id": "building-llm-apps-02",
+          "content": "Build a simple RAG chatbot in under 50 lines of code that answers questions about your own docs."
+        },
+        {
+          "id": "building-llm-apps-03",
+          "content": "Add tools so your app can search the web, send emails, or update a spreadsheet automatically."
+        },
+        {
+          "id": "building-llm-apps-04",
+          "content": "Host on Vercel or Railway and give your friends a shareable link in minutes."
+        },
+        {
+          "id": "building-llm-apps-05",
+          "content": "Use OpenAI, Anthropic, or Grok APIs first — then swap to local models when you want zero cost."
+        },
+        {
+          "id": "building-llm-apps-06",
+          "content": "Stream responses so users see text appear live instead of staring at a loading spinner."
+        },
+        {
+          "id": "building-llm-apps-07",
+          "content": "Track costs per user so you don’t wake up to a surprise $800 OpenAI bill."
+        },
+        {
+          "id": "building-llm-apps-08",
+          "content": "A/B test prompts like you would any product feature — small changes can double quality."
+        },
+        {
+          "id": "building-llm-apps-09",
+          "content": "Ship fast, then iterate. The first version will feel magical even if it’s rough around the edges."
+        },
+        {
+          "id": "building-llm-apps-10",
+          "content": "Your first LLM app will change how you think about software forever."
+        }
+      ]
+    },
+    {
+      "id": "hero-level",
+      "title": "Hero Level",
+      "summary": "The mindset and moves that separate builders from dreamers.",
+      "order": 6,
+      "cards": [
+        {
+          "id": "hero-level-01",
+          "content": "Treat the model as a junior teammate: great at drafting, terrible at final decisions."
+        },
+        {
+          "id": "hero-level-02",
+          "content": "Always add human review for anything that touches customers or money."
+        },
+        {
+          "id": "hero-level-03",
+          "content": "Monitor what users actually do with your app — that feedback beats any benchmark."
+        },
+        {
+          "id": "hero-level-04",
+          "content": "Combine multiple models: cheap one for simple tasks, smart one for the hard stuff."
+        },
+        {
+          "id": "hero-level-05",
+          "content": "Keep your prompts in version control like real code so you can roll back disasters."
+        },
+        {
+          "id": "hero-level-06",
+          "content": "Build for your own pain first. Solve one annoying problem and the rest flows."
+        },
+        {
+          "id": "hero-level-07",
+          "content": "The best LLM apps feel invisible — users just get better results without noticing the AI."
+        },
+        {
+          "id": "hero-level-08",
+          "content": "Stay curious. New models drop every month and the hero path is constant experimentation."
+        },
+        {
+          "id": "hero-level-09",
+          "content": "Share what you ship. The community moves faster when everyone shows their work."
+        },
+        {
+          "id": "hero-level-10",
+          "content": "You’re not replacing yourself. You’re giving every idea superpowers — now go build something only you could imagine."
+        }
+      ]
+    }
+  ]
+}

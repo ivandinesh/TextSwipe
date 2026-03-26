@@ -136,6 +136,27 @@ export const passwordResetTokens = pgTable("password_reset_tokens", {
 
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 
+export const courseModuleProgress = pgTable("course_module_progress", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  courseId: text("course_id").notNull(),
+  moduleId: text("module_id").notNull(),
+  highestCardIndex: integer("highest_card_index").notNull().default(0),
+  completedAt: text("completed_at"),
+  lastViewedAt: text("last_viewed_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export type CourseModuleProgress = typeof courseModuleProgress.$inferSelect;
+
 export const adminAuditLogs = pgTable("admin_audit_logs", {
   id: varchar("id")
     .primaryKey()
