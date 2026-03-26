@@ -1,4 +1,4 @@
-import { randomBytes, scryptSync, timingSafeEqual } from "crypto";
+import { createHash, randomBytes, scryptSync, timingSafeEqual } from "crypto";
 
 const SCRYPT_KEYLEN = 64;
 
@@ -22,4 +22,12 @@ export function verifyPassword(password: string, storedHash: string) {
   }
 
   return timingSafeEqual(derivedKey, storedKey);
+}
+
+export function generateSecureToken(bytes = 32) {
+  return randomBytes(bytes).toString("hex");
+}
+
+export function hashResetToken(token: string) {
+  return createHash("sha256").update(token).digest("hex");
 }

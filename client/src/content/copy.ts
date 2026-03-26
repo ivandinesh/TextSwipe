@@ -83,8 +83,25 @@ export interface AppCopy {
     loginIdle: string;
     registerPending: string;
     registerIdle: string;
+    forgotTrigger: string;
+    forgotTitle: string;
+    forgotDescription: string;
+    forgotPending: string;
+    forgotIdle: string;
+    forgotSuccess: string;
+    backToLogin: string;
+    resetPageTitle: string;
+    resetPageDescription: string;
+    resetPending: string;
+    resetIdle: string;
+    resetSuccessTitle: string;
+    resetSuccessDescription: string;
+    resetInvalid: string;
+    resetRequestFresh: string;
     loginFallbackError: string;
     registerFallbackError: string;
+    forgotFallbackError: string;
+    resetFallbackError: string;
   };
   dashboard: {
     signedOutTitle: string;
@@ -273,8 +290,25 @@ export const appCopy: AppCopy = {
     loginIdle: "Jump back in",
     registerPending: "Setting you up...",
     registerIdle: "Start your streak",
+    forgotTrigger: "Forgot password?",
+    forgotTitle: "Get back in fast",
+    forgotDescription: "Drop your email and we’ll send a clean way back to your next stack.",
+    forgotPending: "Sending your link...",
+    forgotIdle: "Send reset link",
+    forgotSuccess: "If that email is in the app, a reset link is on the way.",
+    backToLogin: "Back to sign in",
+    resetPageTitle: "Reset your password",
+    resetPageDescription: "Set a new password and pick up your run.",
+    resetPending: "Saving your new password...",
+    resetIdle: "Set new password",
+    resetSuccessTitle: "You’re back in range.",
+    resetSuccessDescription: "Your password is reset. Jump back in and keep the streak moving.",
+    resetInvalid: "That reset link is expired or off. Grab a fresh one and try again.",
+    resetRequestFresh: "Request a fresh link",
     loginFallbackError: "Couldn't sign you in.",
     registerFallbackError: "Couldn't create your account.",
+    forgotFallbackError: "Couldn't send that link right now.",
+    resetFallbackError: "Couldn't reset your password.",
   },
   dashboard: {
     signedOutTitle: "Sign in to see your recap.",

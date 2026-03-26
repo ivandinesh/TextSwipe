@@ -4,16 +4,18 @@ import {
   chatCards,
   chats,
   learningSessions,
+  passwordResetTokens,
   userLikedCards,
   userTopicInteractions,
   users,
   type AdminAuditLog,
   type LearningSession,
+  type PasswordResetToken,
   type User,
   type UserLikedCard,
   type UserTopicInteraction,
 } from "../shared/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { db } from "./db";
 
 interface CreateUserInput {
@@ -50,6 +52,7 @@ const memoryTopicInteractions = new Map<string, UserTopicInteraction[]>();
 const memoryLikedCards = new Map<string, UserLikedCard[]>();
 const memoryLearningSessions = new Map<string, LearningSession[]>();
 const memoryAdminAuditLogs: AdminAuditLog[] = [];
+const memoryPasswordResetTokens: PasswordResetToken[] = [];
 
 const DEFAULT_RECOMMENDATION_TOPICS = [
   "Quantum Computing",
@@ -257,6 +260,26 @@ export async function createAccount(input: CreateUserInput): Promise<User> {
   };
   memoryUsers.set(user.id, user);
   return user;
+}
+
+export async function updateUserPassword(userId: string, password: string) {
+  if (db) {
+    const updated = await db
+      .update(users)
+      .set({ password })
+      .where(eq(users.id, userId))
+      .returning();
+    return updated[0];
+  }
+
+  const current = memoryUsers.get(userId);
+  if (!current) {
+    return undefined;
+  }
+
+  const next = { ...current, password };
+  memoryUsers.set(userId, next);
+  return next;
 }
 
 export async function recordLearningSession(input: RecordSessionInput) {
@@ -492,6 +515,99 @@ export async function getRecommendedTopics(userId: string) {
   const interactions = await getUserInteractions(userId);
   const likedCards = await getUserLikedCards(userId);
   return buildRecommendationCandidates(interactions, likedCards).slice(0, 6);
+}
+
+async function getAllPasswordResetTokens() {
+  if (db) {
+    return db.select().from(passwordResetTokens);
+  }
+
+  return memoryPasswordResetTokens;
+}
+
+export async function createPasswordResetToken(input: {
+  userId: string;
+  tokenHash: string;
+  expiresAt: string;
+}) {
+  if (db) {
+    const inserted = await db
+      .insert(passwordResetTokens)
+      .values(input)
+      .returning();
+    return inserted[0];
+  }
+
+  const token: PasswordResetToken = {
+    id: randomUUID(),
+    createdAt: new Date().toISOString(),
+    usedAt: null,
+    ...input,
+  };
+  memoryPasswordResetTokens.unshift(token);
+  return token;
+}
+
+export async function getActivePasswordResetTokenByHash(tokenHash: string) {
+  const tokens = await getAllPasswordResetTokens();
+  const now = new Date().toISOString();
+
+  return tokens
+    .filter((token) => token.tokenHash === tokenHash)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .find((token) => !token.usedAt && token.expiresAt > now);
+}
+
+export async function markPasswordResetTokenUsed(tokenId: string) {
+  const usedAt = new Date().toISOString();
+
+  if (db) {
+    const updated = await db
+      .update(passwordResetTokens)
+      .set({ usedAt })
+      .where(eq(passwordResetTokens.id, tokenId))
+      .returning();
+    return updated[0];
+  }
+
+  const index = memoryPasswordResetTokens.findIndex((token) => token.id === tokenId);
+  if (index < 0) {
+    return undefined;
+  }
+
+  memoryPasswordResetTokens[index] = {
+    ...memoryPasswordResetTokens[index],
+    usedAt,
+  };
+
+  return memoryPasswordResetTokens[index];
+}
+
+export async function invalidatePasswordResetTokensForUser(userId: string) {
+  const usedAt = new Date().toISOString();
+
+  if (db) {
+    await db
+      .update(passwordResetTokens)
+      .set({ usedAt })
+      .where(
+        and(
+          eq(passwordResetTokens.userId, userId),
+          isNull(passwordResetTokens.usedAt),
+        ),
+      );
+    return;
+  }
+
+  for (let index = 0; index < memoryPasswordResetTokens.length; index += 1) {
+    const token = memoryPasswordResetTokens[index];
+    if (token.userId === userId && !token.usedAt) {
+      memoryPasswordResetTokens[index] = {
+        ...token,
+        usedAt,
+      };
+    }
+  }
 }
 
 async function getAllUsers() {

@@ -43,6 +43,16 @@ export const initializeDB = async () => {
           created_at text NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
       `);
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS password_reset_tokens (
+          id varchar PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id varchar NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          token_hash text NOT NULL,
+          expires_at text NOT NULL,
+          used_at text,
+          created_at text NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
       // Migrations disabled temporarily
       // await migrate(db, { migrationsFolder: './drizzle' });
       // console.log('✅ Database migrations applied');

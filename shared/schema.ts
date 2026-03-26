@@ -119,6 +119,23 @@ export type UserTopicInteraction = typeof userTopicInteractions.$inferSelect;
 export type UserLikedCard = typeof userLikedCards.$inferSelect;
 export type LearningSession = typeof learningSessions.$inferSelect;
 
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull(),
+  expiresAt: text("expires_at").notNull(),
+  usedAt: text("used_at"),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+
 export const adminAuditLogs = pgTable("admin_audit_logs", {
   id: varchar("id")
     .primaryKey()

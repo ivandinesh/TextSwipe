@@ -72,11 +72,19 @@ export function useAuth() {
     },
   });
 
+  const forgotPasswordMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const response = await apiRequest("POST", "/api/auth/forgot-password", { email });
+      return response.json();
+    },
+  });
+
   return {
     user: authQuery.data?.user ?? null,
     isLoading: authQuery.isLoading,
     register: registerMutation,
     login: loginMutation,
+    forgotPassword: forgotPasswordMutation,
     logout: logoutMutation,
   };
 }

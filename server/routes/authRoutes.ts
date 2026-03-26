@@ -1,12 +1,25 @@
 import express from "express";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import { z } from "zod";
 import {
   createAccount,
   findUserByEmail,
+  findUserById,
+  createPasswordResetToken,
+  getActivePasswordResetTokenByHash,
+  invalidatePasswordResetTokensForUser,
+  markPasswordResetTokenUsed,
   syncBootstrapAdminStatus,
+  updateUserPassword,
 } from "../accountStore";
-import { hashPassword, verifyPassword } from "../auth";
+import {
+  generateSecureToken,
+  hashPassword,
+  hashResetToken,
+  verifyPassword,
+} from "../auth";
 import { getSessionUser } from "../authz";
+import { sendPasswordResetEmail, sendWelcomeEmail } from "../mailer";
 
 const router = express.Router();
 
@@ -14,6 +27,52 @@ const authSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(128),
 });
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string().min(32),
+  password: z.string().min(8).max(128),
+});
+
+const resetLinkResponse = {
+  success: true,
+  message: "If that account exists, a reset link is on the way.",
+};
+
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => ipKeyGenerator(req.ip ?? ""),
+  message: resetLinkResponse,
+});
+
+const resetPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => ipKeyGenerator(req.ip ?? ""),
+  message: { error: "Too many reset attempts. Give it a second." },
+});
+
+function buildResetUrl(token: string) {
+  const baseUrl = (process.env.APP_BASE_URL || "http://localhost:5000").trim();
+  return `${baseUrl.replace(/\/$/, "")}/reset-password?token=${encodeURIComponent(token)}`;
+}
+
+function getPasswordResetExpiry() {
+  const ttlMinutes = Number.parseInt(
+    process.env.PASSWORD_RESET_TOKEN_TTL_MINUTES || "60",
+    10,
+  );
+
+  return new Date(Date.now() + Math.max(ttlMinutes, 5) * 60 * 1000).toISOString();
+}
 
 router.get("/api/auth/me", async (req, res) => {
   const user = await getSessionUser(req);
@@ -53,6 +112,10 @@ router.post("/api/auth/register", async (req, res) => {
         console.error("Registration session save failed:", sessionError);
         return res.status(500).json({ error: "Account created, but sign-in could not be completed." });
       }
+
+      void sendWelcomeEmail(user.email).catch((mailError) => {
+        console.error("Welcome email failed:", mailError);
+      });
 
       return res.status(201).json({
         user: {
@@ -123,6 +186,79 @@ router.post("/api/auth/logout", (req, res) => {
     res.clearCookie("focusfeed.sid");
     return res.json({ success: true });
   });
+});
+
+router.post("/api/auth/forgot-password", forgotPasswordLimiter, async (req, res) => {
+  try {
+    const { email } = forgotPasswordSchema.parse(req.body);
+    const existingUser = await findUserByEmail(email);
+
+    if (!existingUser) {
+      return res.json(resetLinkResponse);
+    }
+
+    const token = generateSecureToken();
+    const tokenHash = hashResetToken(token);
+    await createPasswordResetToken({
+      userId: existingUser.id,
+      tokenHash,
+      expiresAt: getPasswordResetExpiry(),
+    });
+
+    await sendPasswordResetEmail(existingUser.email, buildResetUrl(token));
+    return res.json(resetLinkResponse);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.json(resetLinkResponse);
+    }
+
+    console.error("Forgot-password flow failed:", error);
+    return res.json(resetLinkResponse);
+  }
+});
+
+router.get("/api/auth/reset-password/validate", async (req, res) => {
+  const token = typeof req.query.token === "string" ? req.query.token : "";
+  if (!token) {
+    return res.status(400).json({ valid: false, error: "Missing reset token." });
+  }
+
+  const record = await getActivePasswordResetTokenByHash(hashResetToken(token));
+  if (!record) {
+    return res.status(400).json({ valid: false, error: "That reset link is expired or invalid." });
+  }
+
+  return res.json({ valid: true });
+});
+
+router.post("/api/auth/reset-password", resetPasswordLimiter, async (req, res) => {
+  try {
+    const { token, password } = resetPasswordSchema.parse(req.body);
+    const record = await getActivePasswordResetTokenByHash(hashResetToken(token));
+
+    if (!record) {
+      return res.status(400).json({ error: "That reset link is expired or invalid." });
+    }
+
+    const user = await findUserById(record.userId);
+    if (!user) {
+      return res.status(400).json({ error: "That reset link is expired or invalid." });
+    }
+
+    await updateUserPassword(user.id, hashPassword(password));
+    await invalidatePasswordResetTokensForUser(user.id);
+    await markPasswordResetTokenUsed(record.id);
+
+    req.session.destroy(() => undefined);
+    return res.json({ success: true });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: "Use a valid reset link and a password with at least 8 characters." });
+    }
+
+    console.error("Reset-password flow failed:", error);
+    return res.status(500).json({ error: "Couldn't reset your password." });
+  }
 });
 
 export default router;
