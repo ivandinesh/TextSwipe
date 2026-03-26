@@ -75,6 +75,11 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="flex gap-3">
+            {user.isAdmin && (
+              <Button variant="outline" onClick={() => setLocation("/admin")}>
+                {appCopy.dashboard.adminCta}
+              </Button>
+            )}
             <Button variant="outline" onClick={() => setLocation("/")}>
               {appCopy.dashboard.primaryCta}
             </Button>

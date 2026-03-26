@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Paintbrush,
   Palette,
+  Shield,
   Type,
   LogOut,
 } from "lucide-react";
@@ -33,6 +34,7 @@ interface SwipeContainerProps {
   onIndexChange: (index: number) => void;
   onOptionsChange: (options: TopicOption[]) => void;
   user?: AuthUser | null;
+  onOpenAdmin?: () => void;
   onOpenDashboard?: () => void;
   onLogout?: () => Promise<void> | void;
   className?: string;
@@ -236,6 +238,7 @@ export function SwipeContainer({
   onIndexChange,
   onOptionsChange,
   user,
+  onOpenAdmin,
   onOpenDashboard,
   onLogout,
   className,
@@ -576,6 +579,18 @@ export function SwipeContainer({
             <div className="hidden items-center gap-2 sm:flex">
               {user ? (
                 <>
+                  {user.isAdmin && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={onOpenAdmin}
+                      className="h-10 rounded-full border-white/10 bg-white/[0.04] px-3 text-foreground"
+                      data-chrome-control="true"
+                    >
+                      <Shield className="h-4 w-4" />
+                      <span className="hidden lg:inline">{appCopy.home.adminButton}</span>
+                    </Button>
+                  )}
                   <Button
                     type="button"
                     variant="outline"

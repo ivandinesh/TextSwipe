@@ -13,6 +13,7 @@ export interface AppCopy {
     footerEmpty: string;
     footerSaved: (count: number) => string;
     dashboardButton: string;
+    adminButton: string;
     signOutButton: string;
   };
   topicInput: {
@@ -93,6 +94,7 @@ export interface AppCopy {
     title: (email: string) => string;
     description: string;
     primaryCta: string;
+    adminCta: string;
     signOutCta: string;
     metrics: {
       totalMinutes: string;
@@ -106,6 +108,40 @@ export interface AppCopy {
     recentTitle: string;
     likedTitle: string;
     likedEmpty: string;
+  };
+  admin: {
+    signedOutTitle: string;
+    signedOutDescription: string;
+    signedOutCta: string;
+    forbiddenTitle: string;
+    forbiddenDescription: string;
+    backCta: string;
+    eyebrow: string;
+    title: string;
+    description: string;
+    sections: {
+      overview: string;
+      content: string;
+      users: string;
+    };
+    metrics: {
+      totalUsers: string;
+      adminUsers: string;
+      runsToday: string;
+      savedHits: string;
+      contentRuns: string;
+      generatedCards: string;
+    };
+    topTopics: string;
+    recentAudit: string;
+    recentSessions: string;
+    hotTopics: string;
+    recentCards: string;
+    usersTitle: string;
+    makeAdmin: string;
+    removeAdmin: string;
+    noAudit: string;
+    noCards: string;
   };
   errors: {
     appCrashTitle: string;
@@ -152,6 +188,7 @@ export const appCopy: AppCopy = {
     footerEmpty: "Pick a lane and start rolling.",
     footerSaved: (count) => `${count} saved hits waiting for a replay`,
     dashboardButton: "Your recap",
+    adminButton: "Admin",
     signOutButton: "Sign out",
   },
   topicInput: {
@@ -247,6 +284,7 @@ export const appCopy: AppCopy = {
     title: (email) => `You're back, ${email}`,
     description: "A quick run today keeps the streak alive.",
     primaryCta: "Back to the feed",
+    adminCta: "Open admin",
     signOutCta: "Sign out",
     metrics: {
       totalMinutes: "Time stacked",
@@ -260,6 +298,40 @@ export const appCopy: AppCopy = {
     recentTitle: "Recent lanes",
     likedTitle: "Saved hits",
     likedEmpty: "Save a few hits in the feed and they’ll land here.",
+  },
+  admin: {
+    signedOutTitle: "Sign in to open admin.",
+    signedOutDescription: "Admin tools only show up once your account is signed in and approved.",
+    signedOutCta: "Back to the feed",
+    forbiddenTitle: "This lane is admin-only.",
+    forbiddenDescription: "Your account is live, but it doesn't have admin access on the server.",
+    backCta: "Back to the feed",
+    eyebrow: "Admin",
+    title: "Control room",
+    description: "Track the feed, inspect users, and keep an eye on what is moving.",
+    sections: {
+      overview: "Overview",
+      content: "Content",
+      users: "Users",
+    },
+    metrics: {
+      totalUsers: "Users",
+      adminUsers: "Admins",
+      runsToday: "Active today",
+      savedHits: "Saved hits",
+      contentRuns: "Total runs",
+      generatedCards: "Generated cards",
+    },
+    topTopics: "Top topics",
+    recentAudit: "Recent admin moves",
+    recentSessions: "Latest runs",
+    hotTopics: "Hot topics",
+    recentCards: "Recent generated cards",
+    usersTitle: "User access",
+    makeAdmin: "Make admin",
+    removeAdmin: "Remove admin",
+    noAudit: "No admin activity yet.",
+    noCards: "No generated cards have been stored yet.",
   },
   errors: {
     appCrashTitle: "The feed hit a snag",

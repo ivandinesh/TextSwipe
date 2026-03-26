@@ -1,13 +1,12 @@
 import express from "express";
 import { z } from "zod";
-import { createAccount, findUserByEmail, findUserById } from "../accountStore";
+import {
+  createAccount,
+  findUserByEmail,
+  syncBootstrapAdminStatus,
+} from "../accountStore";
 import { hashPassword, verifyPassword } from "../auth";
-
-declare module "express-session" {
-  interface SessionData {
-    userId?: string;
-  }
-}
+import { getSessionUser } from "../authz";
 
 const router = express.Router();
 
@@ -17,13 +16,8 @@ const authSchema = z.object({
 });
 
 router.get("/api/auth/me", async (req, res) => {
-  if (!req.session.userId) {
-    return res.status(401).json({ user: null });
-  }
-
-  const user = await findUserById(req.session.userId);
+  const user = await getSessionUser(req);
   if (!user) {
-    req.session.destroy(() => undefined);
     return res.status(401).json({ user: null });
   }
 
@@ -32,6 +26,7 @@ router.get("/api/auth/me", async (req, res) => {
       id: user.id,
       email: user.email,
       username: user.username,
+      isAdmin: user.isAdmin,
       createdAt: user.createdAt,
     },
   });
@@ -45,11 +40,12 @@ router.post("/api/auth/register", async (req, res) => {
       return res.status(409).json({ error: "An account with this email already exists." });
     }
 
-    const user = await createAccount({
+    const createdUser = await createAccount({
       email,
       username: email.toLowerCase(),
       password: hashPassword(password),
     });
+    const user = await syncBootstrapAdminStatus(createdUser);
 
     req.session.userId = user.id;
     return req.session.save((sessionError) => {
@@ -63,6 +59,7 @@ router.post("/api/auth/register", async (req, res) => {
           id: user.id,
           email: user.email,
           username: user.username,
+          isAdmin: user.isAdmin,
           createdAt: user.createdAt,
         },
       });
@@ -80,7 +77,10 @@ router.post("/api/auth/register", async (req, res) => {
 router.post("/api/auth/login", async (req, res) => {
   try {
     const { email, password } = authSchema.parse(req.body);
-    const user = await findUserByEmail(email);
+    const existingUser = await findUserByEmail(email);
+    const user = existingUser
+      ? await syncBootstrapAdminStatus(existingUser)
+      : undefined;
 
     if (!user || !verifyPassword(password, user.password)) {
       return res.status(401).json({ error: "Invalid email or password." });
@@ -98,6 +98,7 @@ router.post("/api/auth/login", async (req, res) => {
           id: user.id,
           email: user.email,
           username: user.username,
+          isAdmin: user.isAdmin,
           createdAt: user.createdAt,
         },
       });

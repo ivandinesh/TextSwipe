@@ -8,26 +8,9 @@ import {
   toggleLikedCard,
   trackTopicInteraction,
 } from "../accountStore";
-
-declare module "express-session" {
-  interface SessionData {
-    userId?: string;
-  }
-}
+import { requireAuth } from "../authz";
 
 const router = express.Router();
-
-function requireAuth(
-  req: express.Request,
-  res: express.Response,
-): string | null {
-  if (!req.session.userId) {
-    res.status(401).json({ error: "Unauthorized" });
-    return null;
-  }
-
-  return req.session.userId;
-}
 
 const learningSessionSchema = z.object({
   topic: z.string().min(1).max(255),
@@ -50,37 +33,37 @@ const topicInteractionSchema = z.object({
 });
 
 router.get("/api/dashboard/summary", async (req, res) => {
-  const userId = requireAuth(req, res);
-  if (!userId) return;
+  const user = await requireAuth(req, res);
+  if (!user) return;
 
-  const summary = await getDashboardSummary(userId);
+  const summary = await getDashboardSummary(user.id);
   res.json(summary);
 });
 
 router.get("/api/dashboard/liked-cards", async (req, res) => {
-  const userId = requireAuth(req, res);
-  if (!userId) return;
+  const user = await requireAuth(req, res);
+  if (!user) return;
 
-  const likedCards = await getUserLikedCards(userId);
+  const likedCards = await getUserLikedCards(user.id);
   res.json({ likedCards });
 });
 
 router.get("/api/dashboard/recommended-topics", async (req, res) => {
-  const userId = requireAuth(req, res);
-  if (!userId) return;
+  const user = await requireAuth(req, res);
+  if (!user) return;
 
-  const topics = await getRecommendedTopics(userId);
+  const topics = await getRecommendedTopics(user.id);
   res.json({ topics });
 });
 
 router.post("/api/dashboard/learning-sessions", async (req, res) => {
-  const userId = requireAuth(req, res);
-  if (!userId) return;
+  const user = await requireAuth(req, res);
+  if (!user) return;
 
   const payload = learningSessionSchema.parse(req.body);
-  await recordLearningSession({ userId, ...payload });
+  await recordLearningSession({ userId: user.id, ...payload });
   await trackTopicInteraction({
-    userId,
+    userId: user.id,
     topic: payload.topic,
     increment: Math.max(payload.cardsCompleted, 1),
   });
@@ -88,20 +71,20 @@ router.post("/api/dashboard/learning-sessions", async (req, res) => {
 });
 
 router.post("/api/dashboard/liked-cards", async (req, res) => {
-  const userId = requireAuth(req, res);
-  if (!userId) return;
+  const user = await requireAuth(req, res);
+  if (!user) return;
 
   const payload = likedCardSchema.parse(req.body);
-  await toggleLikedCard({ userId, ...payload });
+  await toggleLikedCard({ userId: user.id, ...payload });
   res.status(201).json({ success: true });
 });
 
 router.post("/api/dashboard/topic-interactions", async (req, res) => {
-  const userId = requireAuth(req, res);
-  if (!userId) return;
+  const user = await requireAuth(req, res);
+  if (!user) return;
 
   const payload = topicInteractionSchema.parse(req.body);
-  await trackTopicInteraction({ userId, ...payload });
+  await trackTopicInteraction({ userId: user.id, ...payload });
   res.status(201).json({ success: true });
 });
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { LayoutDashboard, LogOut, Sparkles, Waves } from "lucide-react";
+import { LayoutDashboard, LogOut, Shield, Sparkles, Waves } from "lucide-react";
 import { useLocation } from "wouter";
 import { appCopy } from "@/content/copy";
 import { useTopicService } from "@/services/topicService";
@@ -316,6 +316,16 @@ export function FocusFeed() {
                 </div>
                 {user ? (
                   <>
+                    {user.isAdmin && (
+                      <Button
+                        variant="outline"
+                        className="rounded-full border-white/10 bg-white/[0.04] text-foreground"
+                        onClick={() => setLocation("/admin")}
+                      >
+                        <Shield className="h-4 w-4" />
+                        {appCopy.home.adminButton}
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       className="rounded-full border-white/10 bg-white/[0.04] text-foreground"
@@ -400,6 +410,7 @@ export function FocusFeed() {
           }}
           onOptionsChange={setCurrentOptions}
           user={user}
+          onOpenAdmin={() => setLocation("/admin")}
           onOpenDashboard={() => setLocation("/dashboard")}
           onLogout={async () => {
             await logout.mutateAsync();

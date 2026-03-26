@@ -4,7 +4,6 @@
  */
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
 const { Pool } = pg;
 import * as schema from "../shared/schema";
 import { IStorage } from "./storage";
@@ -30,6 +29,20 @@ export const initializeDB = async () => {
       console.log("✅ PostgreSQL connected successfully");
       // Initialize Drizzle
       db = drizzle(pool, { schema });
+      await pool.query(
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin boolean NOT NULL DEFAULT false",
+      );
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS admin_audit_logs (
+          id varchar PRIMARY KEY DEFAULT gen_random_uuid(),
+          actor_user_id varchar NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          action text NOT NULL,
+          target_type text NOT NULL,
+          target_id text,
+          details text,
+          created_at text NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
       // Migrations disabled temporarily
       // await migrate(db, { migrationsFolder: './drizzle' });
       // console.log('✅ Database migrations applied');

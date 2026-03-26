@@ -12,6 +12,7 @@ import { initializeDB } from "./db";
 import chatRoutes from "./routes/chatsRuntime";
 import topicRoutes from "./routes/topicRoutesRuntime";
 import authRoutes from "./routes/authRoutes";
+import adminRoutes from "./routes/adminRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
 
 function isSecureCookieEnabled() {
@@ -128,6 +129,7 @@ app.use(
   await initializeDB();
   const server = await registerRoutes(app);
   app.use(authRoutes);
+  app.use(adminRoutes);
   app.use(dashboardRoutes);
   app.use(topicRoutes);
   app.use(chatRoutes);

@@ -10,6 +10,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  isAdmin: boolean("is_admin").notNull().default(false),
   createdAt: text("created_at")
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
@@ -117,3 +118,21 @@ export const learningSessions = pgTable("learning_sessions", {
 export type UserTopicInteraction = typeof userTopicInteractions.$inferSelect;
 export type UserLikedCard = typeof userLikedCards.$inferSelect;
 export type LearningSession = typeof learningSessions.$inferSelect;
+
+export const adminAuditLogs = pgTable("admin_audit_logs", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  actorUserId: varchar("actor_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  action: text("action").notNull(),
+  targetType: text("target_type").notNull(),
+  targetId: text("target_id"),
+  details: text("details"),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export type AdminAuditLog = typeof adminAuditLogs.$inferSelect;

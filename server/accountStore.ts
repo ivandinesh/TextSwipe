@@ -1,9 +1,13 @@
 import { randomUUID } from "crypto";
 import {
+  adminAuditLogs,
+  chatCards,
+  chats,
   learningSessions,
   userLikedCards,
   userTopicInteractions,
   users,
+  type AdminAuditLog,
   type LearningSession,
   type User,
   type UserLikedCard,
@@ -45,6 +49,7 @@ const memoryUsers = new Map<string, User>();
 const memoryTopicInteractions = new Map<string, UserTopicInteraction[]>();
 const memoryLikedCards = new Map<string, UserLikedCard[]>();
 const memoryLearningSessions = new Map<string, LearningSession[]>();
+const memoryAdminAuditLogs: AdminAuditLog[] = [];
 
 const DEFAULT_RECOMMENDATION_TOPICS = [
   "Quantum Computing",
@@ -60,6 +65,19 @@ const DEFAULT_RECOMMENDATION_TOPICS = [
   "Economics",
   "Design Thinking",
 ];
+
+function getAdminAllowlist() {
+  return new Set(
+    (process.env.ADMIN_EMAIL_ALLOWLIST || "")
+      .split(",")
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean),
+  );
+}
+
+function isAllowlistedAdmin(email: string) {
+  return getAdminAllowlist().has(email.trim().toLowerCase());
+}
 
 function normalizeTopic(topic: string) {
   return topic.trim().toLowerCase();
@@ -192,9 +210,40 @@ export async function findUserById(id: string): Promise<User | undefined> {
   return memoryUsers.get(id);
 }
 
+export async function updateUserAdminStatus(userId: string, isAdmin: boolean) {
+  if (db) {
+    const updated = await db
+      .update(users)
+      .set({ isAdmin })
+      .where(eq(users.id, userId))
+      .returning();
+    return updated[0];
+  }
+
+  const current = memoryUsers.get(userId);
+  if (!current) {
+    return undefined;
+  }
+
+  const next = { ...current, isAdmin };
+  memoryUsers.set(userId, next);
+  return next;
+}
+
+export async function syncBootstrapAdminStatus(user: User): Promise<User> {
+  if (user.isAdmin || !isAllowlistedAdmin(user.email)) {
+    return user;
+  }
+
+  return (await updateUserAdminStatus(user.id, true)) ?? user;
+}
+
 export async function createAccount(input: CreateUserInput): Promise<User> {
   if (db) {
-    const inserted = await db.insert(users).values(input).returning();
+    const inserted = await db
+      .insert(users)
+      .values({ ...input, isAdmin: isAllowlistedAdmin(input.email) })
+      .returning();
     return inserted[0];
   }
 
@@ -203,6 +252,7 @@ export async function createAccount(input: CreateUserInput): Promise<User> {
     email: input.email,
     username: input.username,
     password: input.password,
+    isAdmin: isAllowlistedAdmin(input.email),
     createdAt: new Date().toISOString(),
   };
   memoryUsers.set(user.id, user);
@@ -442,4 +492,232 @@ export async function getRecommendedTopics(userId: string) {
   const interactions = await getUserInteractions(userId);
   const likedCards = await getUserLikedCards(userId);
   return buildRecommendationCandidates(interactions, likedCards).slice(0, 6);
+}
+
+async function getAllUsers() {
+  if (db) {
+    return db.select().from(users);
+  }
+
+  return Array.from(memoryUsers.values());
+}
+
+async function getAllSessions() {
+  if (db) {
+    return db.select().from(learningSessions);
+  }
+
+  return Array.from(memoryLearningSessions.values()).flat();
+}
+
+async function getAllInteractions() {
+  if (db) {
+    return db.select().from(userTopicInteractions);
+  }
+
+  return Array.from(memoryTopicInteractions.values()).flat();
+}
+
+async function getAllLikedCards() {
+  if (db) {
+    return db.select().from(userLikedCards);
+  }
+
+  return Array.from(memoryLikedCards.values()).flat();
+}
+
+async function getAllChats() {
+  if (db) {
+    return db.select().from(chats);
+  }
+
+  return [];
+}
+
+async function getAllChatCards() {
+  if (db) {
+    return db.select().from(chatCards);
+  }
+
+  return [];
+}
+
+export async function recordAdminAuditEvent(input: {
+  actorUserId: string;
+  action: string;
+  targetType: string;
+  targetId?: string | null;
+  details?: string | null;
+}) {
+  const entry = {
+    actorUserId: input.actorUserId,
+    action: input.action,
+    targetType: input.targetType,
+    targetId: input.targetId ?? null,
+    details: input.details ?? null,
+  };
+
+  if (db) {
+    const inserted = await db.insert(adminAuditLogs).values(entry).returning();
+    return inserted[0];
+  }
+
+  const memoryEntry: AdminAuditLog = {
+    id: randomUUID(),
+    createdAt: new Date().toISOString(),
+    ...entry,
+  };
+  memoryAdminAuditLogs.unshift(memoryEntry);
+  return memoryEntry;
+}
+
+export async function getRecentAdminAuditLogs(limit = 20) {
+  if (db) {
+    const logs = await db.select().from(adminAuditLogs);
+    return logs
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .slice(0, limit);
+  }
+
+  return memoryAdminAuditLogs.slice(0, limit);
+}
+
+export async function getAdminOverview() {
+  const [allUsers, sessions, interactions, likedCards, auditLogs] = await Promise.all([
+    getAllUsers(),
+    getAllSessions(),
+    getAllInteractions(),
+    getAllLikedCards(),
+    getRecentAdminAuditLogs(8),
+  ]);
+
+  const activeToday = new Set(
+    sessions
+      .filter((session) => formatDayKey(new Date(session.endedAt)) === formatDayKey(new Date()))
+      .map((session) => session.userId),
+  ).size;
+
+  const topTopics = Array.from(
+    interactions.reduce((map, interaction) => {
+      const current = map.get(interaction.topic) ?? 0;
+      map.set(
+        interaction.topic,
+        current + interaction.interactionCount + interaction.likeCount * 2,
+      );
+      return map;
+    }, new Map<string, number>()),
+  )
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([topic, score]) => ({ topic, score }));
+
+  return {
+    totals: {
+      users: allUsers.length,
+      admins: allUsers.filter((user) => user.isAdmin).length,
+      sessions: sessions.length,
+      savedHits: likedCards.length,
+      activeToday,
+    },
+    topTopics,
+    recentAudit: auditLogs,
+  };
+}
+
+export async function getAdminUsersSnapshot() {
+  const [allUsers, sessions, likedCards, interactions] = await Promise.all([
+    getAllUsers(),
+    getAllSessions(),
+    getAllLikedCards(),
+    getAllInteractions(),
+  ]);
+
+  return allUsers
+    .map((user) => {
+      const userSessions = sessions.filter((session) => session.userId === user.id);
+      const userLikes = likedCards.filter((card) => card.userId === user.id);
+      const userInteractions = interactions.filter(
+        (interaction) => interaction.userId === user.id,
+      );
+
+      return {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        isAdmin: user.isAdmin,
+        createdAt: user.createdAt,
+        sessionCount: userSessions.length,
+        savedHits: userLikes.length,
+        cardsCompleted: userSessions.reduce(
+          (total, session) => total + session.cardsCompleted,
+          0,
+        ),
+        currentStreak: calculateCurrentStreak(userSessions),
+        lastSeenAt:
+          userSessions
+            .map((session) => session.endedAt)
+            .sort((a, b) => b.localeCompare(a))[0] ??
+          userInteractions
+            .map((interaction) => interaction.lastInteraction)
+            .sort((a, b) => b.localeCompare(a))[0] ??
+          user.createdAt,
+      };
+    })
+    .sort((a, b) => b.lastSeenAt.localeCompare(a.lastSeenAt));
+}
+
+export async function getAdminContentSnapshot() {
+  const [sessions, interactions, likedCards, allChats, allChatCards] = await Promise.all([
+    getAllSessions(),
+    getAllInteractions(),
+    getAllLikedCards(),
+    getAllChats(),
+    getAllChatCards(),
+  ]);
+
+  const recentSessions = [...sessions]
+    .sort((a, b) => b.endedAt.localeCompare(a.endedAt))
+    .slice(0, 10);
+
+  const hotTopics = Array.from(
+    interactions.reduce((map, interaction) => {
+      map.set(
+        interaction.topic,
+        (map.get(interaction.topic) ?? 0) +
+          interaction.interactionCount +
+          interaction.likeCount * 2,
+      );
+      return map;
+    }, new Map<string, number>()),
+  )
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([topic, score]) => ({ topic, score }));
+
+  const recentGeneratedCards = [...allChatCards]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, 12)
+    .map((card) => {
+      const chat = allChats.find((entry) => entry.id === card.chatId);
+      return {
+        id: card.id,
+        chatId: card.chatId,
+        topic: chat?.topic ?? "Unknown topic",
+        createdAt: card.createdAt,
+        content: card.content,
+      };
+    });
+
+  return {
+    totals: {
+      sessions: sessions.length,
+      topicSignals: interactions.length,
+      savedHits: likedCards.length,
+      chats: allChats.length,
+      generatedCards: allChatCards.length,
+    },
+    recentSessions,
+    hotTopics,
+    recentGeneratedCards,
+  };
 }
