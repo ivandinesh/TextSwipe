@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
   GraduationCap,
   LayoutDashboard,
   Paintbrush,
@@ -45,6 +47,12 @@ interface SwipeContainerProps {
 interface GenerateResponse {
   cards?: { content: string }[];
   options?: TopicOption[];
+}
+
+interface CardItem {
+  id: string;
+  content: string;
+  position: number;
 }
 
 type ThemeName = "midnight" | "aurora" | "ember" | "petal" | "sage";
@@ -228,6 +236,27 @@ const TEXT_TONE_CHOICES: TextToneChoice[] = [
   { id: "high-contrast" },
 ];
 const swipeThreshold = 42;
+const axisLockThreshold = 12;
+
+function isInteractiveTarget(target: EventTarget | null) {
+  return (
+    target instanceof Element &&
+    Boolean(target.closest("[data-chrome-control='true'], [data-theme-panel='true'], button, a, input, textarea, select"))
+  );
+}
+
+function shouldIgnoreKeyboardEvent(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  if (target.isContentEditable) {
+    return true;
+  }
+
+  const tagName = target.tagName.toLowerCase();
+  return ["input", "textarea", "select", "button"].includes(tagName);
+}
 
 export function SwipeContainer({
   snippets,
@@ -255,13 +284,44 @@ export function SwipeContainer({
   const [controlsOpen, setControlsOpen] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [swipeDirection, setSwipeDirection] = useState<1 | -1>(1);
-  const [touchStart, setTouchStart] = useState({ x: 0, y: 0 });
-  const lastTapRef = useRef(0);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [liveMessage, setLiveMessage] = useState("");
   const themePanelRef = useRef<HTMLDivElement | null>(null);
+  const pointerTrackerRef = useRef<{
+    pointerId: number | null;
+    startX: number;
+    startY: number;
+    currentX: number;
+    currentY: number;
+    startTime: number;
+    axis: "x" | "y" | null;
+    engaged: boolean;
+  }>({
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    currentX: 0,
+    currentY: 0,
+    startTime: 0,
+    axis: null,
+    engaged: false,
+  });
+  const deckIdRef = useRef(0);
 
   const activeTheme = THEMES[themeName];
   const activeTextTone = activeTheme.textTones[textToneName];
   const fontClass = FONT_CLASSES[fontName];
+  const cards = useMemo<CardItem[]>(
+    () =>
+      allSnippets.map((content, index) => ({
+        id: `${topic}-${deckIdRef.current}-${index}`,
+        content,
+        position: index,
+      })),
+    [allSnippets, topic],
+  );
+  const currentCard = cards[currentIndex];
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("focusfeed-theme") as ThemeName | null;
@@ -283,12 +343,21 @@ export function SwipeContainer({
   }, []);
 
   useEffect(() => {
+    deckIdRef.current += 1;
     setAllSnippets(snippets);
     setShowOptions(false);
     setControlsOpen(false);
     setShowSwipeHint(true);
     setSwipeDirection(1);
+    setDragOffset({ x: 0, y: 0 });
+    setIsDragging(false);
   }, [snippets, topic]);
+
+  useEffect(() => {
+    if (!showOptions && currentCard) {
+      setLiveMessage(appCopy.card.cardLabel(currentIndex + 1, cards.length));
+    }
+  }, [cards.length, currentCard, currentIndex, showOptions]);
 
   const selectTheme = useCallback((nextTheme: ThemeName) => {
     setThemeName(nextTheme);
@@ -348,6 +417,7 @@ export function SwipeContainer({
         const nextOptions = data.options ?? [];
         onOptionsChange(nextOptions);
 
+        deckIdRef.current += 1;
         setAllSnippets(nextSnippets);
         onIndexChange(0);
         setShowOptions(false);
@@ -406,12 +476,18 @@ export function SwipeContainer({
   const toggleLikeCurrent = useCallback(() => {
     const currentSnippet = allSnippets[currentIndex];
     if (currentSnippet) {
+      const isAlreadyLiked = _likedSnippets.includes(currentSnippet);
       onLike?.(currentSnippet);
+      setLiveMessage(isAlreadyLiked ? "Removed from saved hits." : "Saved to your hits.");
     }
-  }, [allSnippets, currentIndex, onLike]);
+  }, [_likedSnippets, allSnippets, currentIndex, onLike]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (shouldIgnoreKeyboardEvent(e.target)) {
+        return;
+      }
+
       if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " ") {
         e.preventDefault();
         nextCard();
@@ -462,6 +538,112 @@ export function SwipeContainer({
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [controlsOpen, showOptions]);
 
+  useEffect(() => {
+    if (controlsOpen && !showOptions) {
+      themePanelRef.current?.focus();
+    }
+  }, [controlsOpen, showOptions]);
+
+  const resetGesture = useCallback(() => {
+    pointerTrackerRef.current = {
+      pointerId: null,
+      startX: 0,
+      startY: 0,
+      currentX: 0,
+      currentY: 0,
+      startTime: 0,
+      axis: null,
+      engaged: false,
+    };
+    setDragOffset({ x: 0, y: 0 });
+    setIsDragging(false);
+  }, []);
+
+  const handlePointerDown = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    if (showOptions || isInteractiveTarget(event.target)) {
+      return;
+    }
+
+    const target = event.target;
+    if (!(target instanceof Element) || !target.closest("[data-card-surface='true']")) {
+      return;
+    }
+
+    pointerTrackerRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      currentX: event.clientX,
+      currentY: event.clientY,
+      startTime: performance.now(),
+      axis: null,
+      engaged: true,
+    };
+
+    setIsDragging(true);
+    setDragOffset({ x: 0, y: 0 });
+  }, [showOptions]);
+
+  const handlePointerMove = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    const pointer = pointerTrackerRef.current;
+    if (!pointer.engaged || pointer.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - pointer.startX;
+    const deltaY = event.clientY - pointer.startY;
+    pointer.currentX = event.clientX;
+    pointer.currentY = event.clientY;
+
+    if (!pointer.axis) {
+      if (Math.abs(deltaX) < axisLockThreshold && Math.abs(deltaY) < axisLockThreshold) {
+        return;
+      }
+
+      pointer.axis = Math.abs(deltaX) >= Math.abs(deltaY) ? "x" : "y";
+    }
+
+    if (pointer.axis === "x") {
+      setDragOffset({ x: deltaX, y: 0 });
+    } else {
+      setDragOffset({ x: 0, y: deltaY });
+    }
+  }, []);
+
+  const handlePointerUp = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    const pointer = pointerTrackerRef.current;
+    if (!pointer.engaged || pointer.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - pointer.startX;
+    const deltaY = event.clientY - pointer.startY;
+    const elapsed = Math.max(performance.now() - pointer.startTime, 1);
+    const velocityX = deltaX / elapsed;
+    const velocityY = deltaY / elapsed;
+
+    if (pointer.axis === "x") {
+      if (Math.abs(deltaX) > swipeThreshold || Math.abs(velocityX) > 0.45) {
+        setControlsOpen(false);
+        if (deltaX < 0) {
+          nextCard();
+        } else {
+          previousCard();
+        }
+      }
+    } else if (pointer.axis === "y") {
+      if (Math.abs(deltaY) > 34 || Math.abs(velocityY) > 0.4) {
+        if (deltaY < 0) {
+          setControlsOpen(true);
+        } else if (controlsOpen) {
+          setControlsOpen(false);
+        }
+      }
+    }
+
+    resetGesture();
+  }, [controlsOpen, nextCard, previousCard, resetGesture]);
+
   if (!allSnippets.length) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -480,60 +662,15 @@ export function SwipeContainer({
         className,
       )}
       style={{ transition: "background-color 0.3s ease, color 0.3s ease" }}
-      onTouchStart={(e) => {
-        if (showOptions) {
-          return;
-        }
-
-        setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
-      }}
-      onTouchEnd={(e) => {
-        if (showOptions) {
-          return;
-        }
-
-        const endX = e.changedTouches[0].clientX;
-        const endY = e.changedTouches[0].clientY;
-        const deltaX = touchStart.x - endX;
-        const deltaY = touchStart.y - endY;
-
-        if (Math.abs(deltaX) > swipeThreshold && Math.abs(deltaX) > Math.abs(deltaY)) {
-          setControlsOpen(false);
-          if (deltaX > 0) {
-            previousCard();
-          } else {
-            nextCard();
-          }
-          return;
-        }
-
-        if (Math.abs(deltaY) > 34 && Math.abs(deltaY) > Math.abs(deltaX)) {
-          if (deltaY > 0) {
-            setControlsOpen(true);
-          } else if (controlsOpen) {
-            setControlsOpen(false);
-          }
-          return;
-        }
-
-        if (Math.abs(deltaY) < 12 && Math.abs(deltaX) < 12) {
-          const target = e.target;
-          if (!(target instanceof Element) || !target.closest("[data-card-surface='true']")) {
-            return;
-          }
-
-          const now = Date.now();
-          if (now - lastTapRef.current < 280) {
-            lastTapRef.current = 0;
-            toggleLikeCurrent();
-            return;
-          }
-
-          lastTapRef.current = now;
-        }
-      }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={resetGesture}
       data-testid="swipe-container"
     >
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {liveMessage}
+      </div>
       <div
         className={cn(
           "pointer-events-none absolute inset-x-0 top-0 z-10 px-4 pt-4 transition-all duration-300 md:px-6",
@@ -661,6 +798,10 @@ export function SwipeContainer({
                   borderColor: activeTheme.overlay,
                 }}
                 data-theme-panel="true"
+                role="dialog"
+                aria-modal="false"
+                aria-label={appCopy.card.controlsTitle}
+                tabIndex={-1}
               >
                 <div className="mb-4 flex items-start justify-between gap-4">
                   <div>
@@ -842,7 +983,18 @@ export function SwipeContainer({
             }}
           />
         ) : (
-        <div className="relative h-full">
+          <div className="relative h-full">
+            <div
+              className="pointer-events-none absolute inset-0 z-0 opacity-100 transition-opacity duration-300"
+              style={{
+                background:
+                  `radial-gradient(circle at center, rgba(8,12,24,0) 0%, ${activeTheme.shell.replace("0.84", "0.18").replace("0.86", "0.18")} 38%, rgba(4,6,18,0.58) 100%)`,
+              }}
+            />
+            <div
+              className="pointer-events-none absolute inset-x-6 inset-y-6 z-0 rounded-[2.4rem] opacity-80 blur-3xl md:inset-x-16 md:inset-y-10"
+              style={{ background: activeTheme.backlight }}
+            />
             <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center px-6">
               <div
                 className="rounded-full border px-3 py-2 backdrop-blur-md"
@@ -863,32 +1015,34 @@ export function SwipeContainer({
               </div>
             </div>
             <div
-              className="pointer-events-none absolute inset-x-4 inset-y-3 rounded-[2.1rem] border opacity-45 md:inset-x-8 md:inset-y-5"
+              className="pointer-events-none absolute inset-x-4 inset-y-3 z-[1] rounded-[2.1rem] border opacity-40 md:inset-x-8 md:inset-y-5"
               style={{
                 background: activeTheme.panel,
                 borderColor: activeTheme.panelBorder,
-                boxShadow: activeTheme.panelGlow,
+                boxShadow: `0 30px 90px rgba(0,0,0,0.45), ${activeTheme.panelGlow}`,
                 transform: "translate3d(0, 12px, 0) scale(0.975)",
+                filter: "brightness(0.82) saturate(0.88)",
               }}
             />
             <div
-              className="pointer-events-none absolute inset-x-4 inset-y-3 rounded-[2.1rem] border opacity-22 md:inset-x-8 md:inset-y-5"
+              className="pointer-events-none absolute inset-x-4 inset-y-3 z-[1] rounded-[2.1rem] border opacity-24 md:inset-x-8 md:inset-y-5"
               style={{
                 background: activeTheme.panel,
                 borderColor: activeTheme.panelBorder,
                 transform: "translate3d(0, 22px, 0) scale(0.95)",
+                filter: "brightness(0.72) saturate(0.82)",
               }}
             />
             <AnimatePresence initial={false} custom={swipeDirection} mode="popLayout">
               <motion.div
-                key={`${topic}-${currentIndex}-${allSnippets[currentIndex]?.slice(0, 24) ?? "card"}`}
+                key={currentCard?.id ?? `${topic}-${currentIndex}-card`}
                 custom={swipeDirection}
                 variants={{
                   enter: (direction: 1 | -1) => ({
-                    x: direction > 0 ? -88 : 88,
+                    x: direction > 0 ? 88 : -88,
                     opacity: 0,
                     scale: 0.97,
-                    rotateZ: direction > 0 ? -1.5 : 1.5,
+                    rotateZ: direction > 0 ? 1.5 : -1.5,
                   }),
                   center: {
                     x: 0,
@@ -903,10 +1057,10 @@ export function SwipeContainer({
                     },
                   },
                   exit: (direction: 1 | -1) => ({
-                    x: direction > 0 ? 132 : -132,
+                    x: direction > 0 ? -132 : 132,
                     opacity: 0,
                     scale: 0.985,
-                    rotateZ: direction > 0 ? 1.8 : -1.8,
+                    rotateZ: direction > 0 ? -1.8 : 1.8,
                     transition: {
                       x: { type: "spring", stiffness: 260, damping: 30, mass: 0.95 },
                       opacity: { duration: 0.16 },
@@ -915,14 +1069,25 @@ export function SwipeContainer({
                   }),
                 }}
                 initial="enter"
-                animate="center"
+                animate={
+                  isDragging
+                    ? {
+                        x: dragOffset.x,
+                        y: dragOffset.y * 0.35,
+                        rotateZ: dragOffset.x * 0.02,
+                        scale: 1.01,
+                        transition: { type: "spring", stiffness: 320, damping: 28, mass: 0.8 },
+                      }
+                    : "center"
+                }
                 exit="exit"
-                className="absolute inset-0"
+                className="absolute inset-0 z-[2]"
               >
                 <SwipeCard
-                  key={`${topic}-${currentIndex}`}
-                  content={allSnippets[currentIndex]}
-                  index={currentIndex}
+                  key={currentCard?.id ?? `${topic}-${currentIndex}`}
+                  content={currentCard?.content ?? allSnippets[currentIndex]}
+                  index={currentCard?.position ?? currentIndex}
+                  total={cards.length}
                   isActive
                   textColor={activeTextTone.text}
                   mutedTextColor={activeTextTone.muted}
@@ -935,14 +1100,40 @@ export function SwipeContainer({
                   onLike={toggleLikeCurrent}
                   panelStyle={{
                     background: activeTheme.panel,
-                    borderColor: activeTheme.panelBorder,
-                    boxShadow: activeTheme.panelGlow,
+                    borderColor: "rgba(255,255,255,0.18)",
+                    boxShadow: `0 36px 120px rgba(0,0,0,0.52), ${activeTheme.panelGlow}`,
                   }}
-                  backlightStyle={{ background: activeTheme.backlight }}
+                  backlightStyle={{
+                    background: activeTheme.backlight,
+                    opacity: 1,
+                  }}
                   className="absolute inset-0"
                 />
               </motion.div>
             </AnimatePresence>
+            <div className="pointer-events-none absolute inset-x-4 bottom-5 z-[3] flex justify-between md:inset-x-8 md:bottom-8">
+              <button
+                type="button"
+                onClick={previousCard}
+                disabled={currentIndex <= 0}
+                className="pointer-events-auto inline-flex h-11 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-4 text-sm text-white/80 backdrop-blur-md transition hover:bg-white/10 disabled:opacity-40"
+                data-chrome-control="true"
+                aria-label="Go to previous card"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={nextCard}
+                className="pointer-events-auto inline-flex h-11 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-4 text-sm text-white/80 backdrop-blur-md transition hover:bg-white/10"
+                data-chrome-control="true"
+                aria-label={currentIndex >= cards.length - 1 ? "Open next options" : "Go to next card"}
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         )}
       </div>

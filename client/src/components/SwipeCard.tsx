@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 interface SwipeCardProps {
   content: string;
   index: number;
+  total?: number;
   isActive: boolean;
   className?: string;
   textColor?: string;
@@ -21,6 +22,7 @@ interface SwipeCardProps {
 export function SwipeCard({
   content,
   index,
+  total = index + 1,
   isActive,
   className,
   textColor,
@@ -48,12 +50,15 @@ export function SwipeCard({
           <div
             className={cn(
               "pointer-events-none absolute inset-x-[8%] top-[14%] h-[58%] rounded-full blur-3xl transition-all duration-300 md:inset-x-[16%]",
-              "opacity-90 scale-100",
+              isActive ? "opacity-100 scale-100" : "opacity-70 scale-95",
             )}
             style={backlightStyle}
           />
           <div
-            className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border px-5 py-5 backdrop-blur-2xl transition-all duration-300 md:px-12 md:py-8"
+            className={cn(
+              "relative flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border px-5 py-5 backdrop-blur-2xl transition-all duration-300 md:px-12 md:py-8",
+              isActive && "scale-[1.005]",
+            )}
             style={panelStyle}
             data-card-surface="true"
             onDoubleClick={(event) => {
@@ -62,6 +67,8 @@ export function SwipeCard({
             }}
             role="button"
             tabIndex={0}
+            aria-roledescription="learning card"
+            aria-label={appCopy.card.cardLabel(index + 1, total)}
             onKeyDown={(event) => {
               if (event.key.toLowerCase() === "f") {
                 event.preventDefault();
@@ -109,8 +116,8 @@ export function SwipeCard({
                 className={cn(
                   "flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-md transition-all duration-200",
                   isLiked
-                    ? "border-primary/50 bg-primary/20 text-primary"
-                    : "border-white/10 bg-black/20 text-white/75 hover:bg-white/10",
+                    ? "border-primary/50 bg-primary/20 text-primary shadow-[0_0_24px_rgba(58,227,255,0.2)]"
+                    : "border-white/10 bg-black/30 text-white/75 hover:bg-white/10",
                 )}
                 aria-label={isLiked ? appCopy.card.unsaveLabel : appCopy.card.saveLabel}
                 data-chrome-control="true"
