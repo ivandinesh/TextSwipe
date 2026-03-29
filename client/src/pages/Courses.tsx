@@ -1,4 +1,4 @@
-import { Lock, Play, Sparkles } from "lucide-react";
+import { ArrowLeft, Lock, Play, Sparkles } from "lucide-react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -84,6 +84,17 @@ export default function CoursesPage() {
     <div className="editorial-shell neon-grid min-h-screen bg-background px-5 py-8 text-foreground md:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <section className="rounded-[2.4rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl md:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Button
+              variant="outline"
+              className="border-white/10 bg-white/[0.03]"
+              onClick={() => setLocation("/")}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to feed
+            </Button>
+          </div>
+
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary/80">
