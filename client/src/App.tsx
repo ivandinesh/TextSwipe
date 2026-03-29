@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -6,24 +7,40 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import { appCopy } from "@/content/copy";
 import Home from "@/pages/Home";
-import AdminDashboard from "@/pages/AdminDashboard";
-import CoursePlayerPage from "@/pages/CoursePlayer";
-import CoursesPage from "@/pages/Courses";
-import Dashboard from "@/pages/Dashboard";
-import NotFound from "@/pages/not-found";
-import ResetPassword from "@/pages/ResetPassword";
+
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const CoursesPage = lazy(() => import("@/pages/Courses"));
+const CoursePlayerPage = lazy(() => import("@/pages/CoursePlayer"));
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
+const NotFound = lazy(() => import("@/pages/not-found"));
+
+function RouteFallback() {
+  return (
+    <div className="editorial-shell neon-grid flex min-h-screen items-center justify-center bg-background px-5 text-foreground">
+      <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] px-6 py-4 text-center backdrop-blur-xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">
+          {appCopy.home.badge}
+        </p>
+        <p className="mt-3 text-sm text-muted-foreground">Loading your next screen...</p>
+      </div>
+    </div>
+  );
+}
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/courses" component={CoursesPage} />
-      <Route path="/courses/:courseId" component={CoursePlayerPage} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/reset-password" component={ResetPassword} />
-      <Route component={NotFound} />
-    </Switch>
+    <Suspense fallback={<RouteFallback />}>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/courses" component={CoursesPage} />
+        <Route path="/courses/:courseId" component={CoursePlayerPage} />
+        <Route path="/admin" component={AdminDashboard} />
+        <Route path="/reset-password" component={ResetPassword} />
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 
