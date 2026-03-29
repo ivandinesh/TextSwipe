@@ -1,0 +1,307 @@
+{
+  "id": "why-smart-people-stay-broke",
+  "slug": "why-smart-people-stay-broke",
+  "title": "Why Smart People Stay Broke",
+  "tagline": "High IQ. Low net worth. The fix that actually works.",
+  "description": "A 60-card guided run through the mindset traps and simple shifts that turn intelligence into real wealth.",
+  "cover": {
+    "eyebrow": "Course",
+    "accent": "ember",
+    "art": "wealth-grid"
+  },
+  "metadata": {
+    "estimatedMinutes": 50,
+    "level": "Intermediate",
+    "category": "Finance"
+  },
+  "modules": [
+    {
+      "id": "smart-broke-paradox",
+      "title": "The Smart-Broke Paradox",
+      "summary": "Why brains and bank accounts often clash.",
+      "order": 1,
+      "cards": [
+        {
+          "id": "smart-broke-paradox-01",
+          "content": "Smart people stay broke not because they lack brains, but because they treat money like a complex equation that needs perfect solving instead of simple systems that just work."
+        },
+        {
+          "id": "smart-broke-paradox-02",
+          "content": "Overthinking every dollar turns decisions into analysis paralysis while less analytical people simply save and invest without drama."
+        },
+        {
+          "id": "smart-broke-paradox-03",
+          "content": "High intelligence often pairs with perfectionism that delays action until the market or opportunity has already moved on."
+        },
+        {
+          "id": "smart-broke-paradox-04",
+          "content": "The paradox hits hardest when smart folks chase intellectual stimulation instead of boring, consistent wealth habits that actually compound."
+        },
+        {
+          "id": "smart-broke-paradox-05",
+          "content": "Your brain is wired for puzzles, not patience. That wiring quietly keeps paychecks disappearing before they build anything lasting."
+        },
+        {
+          "id": "smart-broke-paradox-06",
+          "content": "Most broke smart people have impressive resumes and empty savings accounts because knowledge never automatically equals behavior."
+        },
+        {
+          "id": "smart-broke-paradox-07",
+          "content": "Intelligence without financial discipline is like a Ferrari with no gas. It looks impressive but goes nowhere."
+        },
+        {
+          "id": "smart-broke-paradox-08",
+          "content": "The fix starts when you stop admiring your own cleverness and start copying what actually works for regular people who get rich."
+        },
+        {
+          "id": "smart-broke-paradox-09",
+          "content": "This paradox explains why so many PhDs live paycheck to paycheck while high-school dropouts build empires through relentless execution."
+        },
+        {
+          "id": "smart-broke-paradox-10",
+          "content": "Understanding the trap is the first step. The next six modules give you the exact shifts that break it for good."
+        }
+      ]
+    },
+    {
+      "id": "toxic-money-beliefs",
+      "title": "Toxic Money Beliefs",
+      "summary": "The invisible mindsets draining your wealth.",
+      "order": 2,
+      "cards": [
+        {
+          "id": "toxic-money-beliefs-01",
+          "content": "Believing money is evil keeps smart people from pursuing it aggressively enough to ever get ahead."
+        },
+        {
+          "id": "toxic-money-beliefs-02",
+          "content": "The idea that you must love your job to earn well traps talented people in underpaid passion projects."
+        },
+        {
+          "id": "toxic-money-beliefs-03",
+          "content": "Thinking rich people are greedy stops you from studying their habits and copying what actually creates wealth."
+        },
+        {
+          "id": "toxic-money-beliefs-04",
+          "content": "The belief that more education always equals more money keeps smart people in endless degrees instead of income-producing assets."
+        },
+        {
+          "id": "toxic-money-beliefs-05",
+          "content": "Waiting for the perfect time or perfect amount to invest is a toxic belief that leaves your money sitting idle for decades."
+        },
+        {
+          "id": "toxic-money-beliefs-06",
+          "content": "Equating self-worth to salary makes smart people chase status symbols instead of building real net worth."
+        },
+        {
+          "id": "toxic-money-beliefs-07",
+          "content": "The myth that you need to be brilliant to get rich ignores that consistency beats brilliance every single time."
+        },
+        {
+          "id": "toxic-money-beliefs-08",
+          "content": "Believing luck or connections matter more than systems keeps smart people waiting instead of building."
+        },
+        {
+          "id": "toxic-money-beliefs-09",
+          "content": "These beliefs feel smart and noble but quietly sabotage your ability to create financial freedom."
+        },
+        {
+          "id": "toxic-money-beliefs-10",
+          "content": "Replace them with one truth: money is neutral. It rewards the people who treat it like a tool, not a moral test."
+        }
+      ]
+    },
+    {
+      "id": "lifestyle-status-traps",
+      "title": "Lifestyle and Status Traps",
+      "summary": "How success quietly empties your wallet.",
+      "order": 3,
+      "cards": [
+        {
+          "id": "lifestyle-status-traps-01",
+          "content": "Lifestyle inflation is the silent killer. Every raise disappears into nicer cars, bigger apartments, and fancier dinners."
+        },
+        {
+          "id": "lifestyle-status-traps-02",
+          "content": "Smart people spot status opportunities faster than they spot savings opportunities, so the money leaks out the side door."
+        },
+        {
+          "id": "lifestyle-status-traps-03",
+          "content": "Keeping up with successful friends creates a quiet arms race that keeps everyone broke together."
+        },
+        {
+          "id": "lifestyle-status-traps-04",
+          "content": "The bigger your paycheck, the more invisible the creep becomes until your lifestyle owns you instead of the other way around."
+        },
+        {
+          "id": "lifestyle-status-traps-05",
+          "content": "Vacation upgrades, premium subscriptions, and little daily luxuries add up faster than any investment return can fight."
+        },
+        {
+          "id": "lifestyle-status-traps-06",
+          "content": "Status spending feels earned after hard work, but it guarantees you stay exactly where you started financially."
+        },
+        {
+          "id": "lifestyle-status-traps-07",
+          "content": "Smart people justify every purchase with logic while their future self watches the compound interest vanish."
+        },
+        {
+          "id": "lifestyle-status-traps-08",
+          "content": "The trap is so common because society rewards visible success, not invisible net worth."
+        },
+        {
+          "id": "lifestyle-status-traps-09",
+          "content": "Breaking it means deciding your future freedom is sexier than today's upgraded lifestyle."
+        },
+        {
+          "id": "lifestyle-status-traps-10",
+          "content": "Once you see the pattern, you can cap lifestyle at last year's level and let every raise flow straight into assets."
+        }
+      ]
+    },
+    {
+      "id": "money-behavior-traps",
+      "title": "Money Behavior Traps",
+      "summary": "Smart thinking patterns that destroy wealth.",
+      "order": 4,
+      "cards": [
+        {
+          "id": "money-behavior-traps-01",
+          "content": "Over-researching every investment until the opportunity disappears is a classic smart-person trap."
+        },
+        {
+          "id": "money-behavior-traps-02",
+          "content": "Treating budgeting like a spreadsheet puzzle instead of a simple rule makes it feel overwhelming and easy to quit."
+        },
+        {
+          "id": "money-behavior-traps-03",
+          "content": "Chasing the next hot stock or crypto because it feels intellectually exciting drains accounts faster than boring index funds grow them."
+        },
+        {
+          "id": "money-behavior-traps-04",
+          "content": "Negotiating everything except your own salary keeps smart people underpaid while they proudly save pennies elsewhere."
+        },
+        {
+          "id": "money-behavior-traps-05",
+          "content": "Waiting for the perfect financial plan before starting guarantees you never build momentum or real wealth."
+        },
+        {
+          "id": "money-behavior-traps-06",
+          "content": "Using credit cards for points and rewards feels clever until the interest quietly eats your progress."
+        },
+        {
+          "id": "money-behavior-traps-07",
+          "content": "Focusing on income hacks instead of asset-building systems keeps you trading time for money forever."
+        },
+        {
+          "id": "money-behavior-traps-08",
+          "content": "Perfectionism around taxes and optimization leads to analysis paralysis while simple consistent investing wins."
+        },
+        {
+          "id": "money-behavior-traps-09",
+          "content": "These traps feel productive because they involve thinking, but thinking never paid a mortgage."
+        },
+        {
+          "id": "money-behavior-traps-10",
+          "content": "Behavior beats brilliance. The fix is replacing clever tactics with boring systems you can actually stick to."
+        }
+      ]
+    },
+    {
+      "id": "real-wealth-systems",
+      "title": "Real Wealth Systems",
+      "summary": "What actually compounds money over time.",
+      "order": 5,
+      "cards": [
+        {
+          "id": "real-wealth-systems-01",
+          "content": "Wealth is built by owning assets that put money in your pocket while you sleep, not by earning a bigger salary."
+        },
+        {
+          "id": "real-wealth-systems-02",
+          "content": "The simplest system is pay yourself first: automate transfers to investments before you even see the paycheck."
+        },
+        {
+          "id": "real-wealth-systems-03",
+          "content": "Index funds beat 90% of smart stock pickers over time because they remove emotion and fees from the equation."
+        },
+        {
+          "id": "real-wealth-systems-04",
+          "content": "Real estate or dividend stocks create cash flow that grows independently of your daily effort."
+        },
+        {
+          "id": "real-wealth-systems-05",
+          "content": "The 4% rule works because consistent saving and compounding turn small monthly amounts into life-changing numbers."
+        },
+        {
+          "id": "real-wealth-systems-06",
+          "content": "Multiple income streams protect you when one job or market shifts unexpectedly."
+        },
+        {
+          "id": "real-wealth-systems-07",
+          "content": "Tax-advantaged accounts are free leverage most smart people ignore until they run the numbers."
+        },
+        {
+          "id": "real-wealth-systems-08",
+          "content": "Systems win because they make good decisions automatic instead of willpower-dependent."
+        },
+        {
+          "id": "real-wealth-systems-09",
+          "content": "The boring path of steady saving plus time beats every get-rich-quick scheme ever invented."
+        },
+        {
+          "id": "real-wealth-systems-10",
+          "content": "Once these systems run in the background, your intelligence can focus on enjoying life instead of stressing about money."
+        }
+      ]
+    },
+    {
+      "id": "the-fix-that-works",
+      "title": "The Fix That Works",
+      "summary": "Your practical system to get ahead for good.",
+      "order": 6,
+      "cards": [
+        {
+          "id": "the-fix-that-works-01",
+          "content": "Start by tracking every dollar for thirty days so you finally see exactly where your intelligence is leaking."
+        },
+        {
+          "id": "the-fix-that-works-02",
+          "content": "Set one non-negotiable rule: 20% of every paycheck moves automatically to investments before anything else."
+        },
+        {
+          "id": "the-fix-that-works-03",
+          "content": "Kill one status expense this month and redirect every saved dollar straight into your wealth account."
+        },
+        {
+          "id": "the-fix-that-works-04",
+          "content": "Build a simple three-fund portfolio and stop checking it more than twice a year."
+        },
+        {
+          "id": "the-fix-that-works-05",
+          "content": "Create a money date with yourself every Sunday to review progress and adjust the system."
+        },
+        {
+          "id": "the-fix-that-works-06",
+          "content": "Replace overthinking with one decision rule: if it compounds and fits your risk level, do it consistently."
+        },
+        {
+          "id": "the-fix-that-works-07",
+          "content": "Surround yourself with people who already live the systems you want instead of those who admire the problem."
+        },
+        {
+          "id": "the-fix-that-works-08",
+          "content": "After ninety days of these rules, your brain will start defaulting to wealth-building mode without effort."
+        },
+        {
+          "id": "the-fix-that-works-09",
+          "content": "The real fix isn't more knowledge. It's installing systems that run whether you feel motivated or not."
+        },
+        {
+          "id": "the-fix-that-works-10",
+          "content": "Smart people who finally apply this fix wake up one day with options, freedom, and a bank account that matches their IQ."
+        }
+      ]
+    }
+  ]
+}

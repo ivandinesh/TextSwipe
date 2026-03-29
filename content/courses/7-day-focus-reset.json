@@ -1,0 +1,307 @@
+{
+  "id": "7-day-focus-reset",
+  "slug": "7-day-focus-reset",
+  "title": "7-Day Focus Reset",
+  "tagline": "Rewire your brain for unbreakable focus.",
+  "description": "A 60-card guided run through the daily practices that rebuild your attention from the ground up.",
+  "cover": {
+    "eyebrow": "Course",
+    "accent": "sage",
+    "art": "focus-grid"
+  },
+  "metadata": {
+    "estimatedMinutes": 48,
+    "level": "Beginner",
+    "category": "Productivity"
+  },
+  "modules": [
+    {
+      "id": "focus-crisis",
+      "title": "The Focus Crisis",
+      "summary": "Why your attention is under siege.",
+      "order": 1,
+      "cards": [
+        {
+          "id": "focus-crisis-01",
+          "content": "Modern life bombards your brain with notifications, emails, and infinite scrolls designed to capture every spare moment of attention."
+        },
+        {
+          "id": "focus-crisis-02",
+          "content": "Constant task switching creates attention residue that leaves you mentally drained even when you're trying to focus."
+        },
+        {
+          "id": "focus-crisis-03",
+          "content": "Your brain's reward system gets hijacked by quick dopamine hits from likes, pings, and new content."
+        },
+        {
+          "id": "focus-crisis-04",
+          "content": "Poor focus isn't laziness. It's the predictable result of environments engineered to fragment your attention."
+        },
+        {
+          "id": "focus-crisis-05",
+          "content": "The hidden cost is lost deep work, higher stress, and that constant feeling you're not getting to what matters most."
+        },
+        {
+          "id": "focus-crisis-06",
+          "content": "Most people accept scattered attention as normal, but it doesn't have to stay that way."
+        },
+        {
+          "id": "focus-crisis-07",
+          "content": "The first step in resetting is seeing exactly how your current habits are working against your goals."
+        },
+        {
+          "id": "focus-crisis-08",
+          "content": "Attention is your most valuable resource. Every distraction you allow is a deliberate giveaway."
+        },
+        {
+          "id": "focus-crisis-09",
+          "content": "This 7-day reset uses your brain's natural wiring to rebuild stronger focus patterns fast."
+        },
+        {
+          "id": "focus-crisis-10",
+          "content": "Focus is a trainable skill. This week you'll start treating it like one."
+        }
+      ]
+    },
+    {
+      "id": "brain-on-focus",
+      "title": "Your Brain on Focus",
+      "summary": "The science behind attention and rewiring.",
+      "order": 2,
+      "cards": [
+        {
+          "id": "brain-on-focus-01",
+          "content": "Your prefrontal cortex is the CEO of focus, but it gets easily overwhelmed by distractions and fatigue."
+        },
+        {
+          "id": "brain-on-focus-02",
+          "content": "Neuroplasticity means your brain can literally rewire itself when you repeat better focus habits."
+        },
+        {
+          "id": "brain-on-focus-03",
+          "content": "Dopamine drives motivation, but chasing quick hits trains your brain to avoid deep, effortful work."
+        },
+        {
+          "id": "brain-on-focus-04",
+          "content": "The default mode network kicks in during mind-wandering, which can be creative or a total focus killer."
+        },
+        {
+          "id": "brain-on-focus-05",
+          "content": "Attention works like a muscle. The more you train it deliberately, the stronger it gets over time."
+        },
+        {
+          "id": "brain-on-focus-06",
+          "content": "Stress and poor sleep shrink your ability to sustain focus by flooding your system with cortisol."
+        },
+        {
+          "id": "brain-on-focus-07",
+          "content": "Flow states happen when challenge meets skill and distractions disappear completely."
+        },
+        {
+          "id": "brain-on-focus-08",
+          "content": "Small consistent changes compound into new neural pathways that make focus feel more natural."
+        },
+        {
+          "id": "brain-on-focus-09",
+          "content": "Your brain conserves energy by defaulting to easy distractions unless you intentionally direct it."
+        },
+        {
+          "id": "brain-on-focus-10",
+          "content": "Understanding the science removes the mystery and gives you the levers to actually change your focus."
+        }
+      ]
+    },
+    {
+      "id": "eliminate-noise",
+      "title": "Eliminate the Noise",
+      "summary": "Clear external and internal distractions.",
+      "order": 3,
+      "cards": [
+        {
+          "id": "eliminate-noise-01",
+          "content": "Your phone is the biggest focus thief. Start by creating physical and digital distance from it during work blocks."
+        },
+        {
+          "id": "eliminate-noise-02",
+          "content": "Notifications are engineered interruptions. Turn them all off except for true emergencies."
+        },
+        {
+          "id": "eliminate-noise-03",
+          "content": "Cluttered spaces create cluttered minds. A clean environment signals your brain it's time to focus."
+        },
+        {
+          "id": "eliminate-noise-04",
+          "content": "Social media is designed for endless consumption. Set strict time limits or remove apps temporarily."
+        },
+        {
+          "id": "eliminate-noise-05",
+          "content": "Internal noise like worry and overthinking steals focus just as much as external pings."
+        },
+        {
+          "id": "eliminate-noise-06",
+          "content": "Batch checking email and messages instead of living in constant reaction mode."
+        },
+        {
+          "id": "eliminate-noise-07",
+          "content": "Saying no to low-value commitments protects the space your deep work needs."
+        },
+        {
+          "id": "eliminate-noise-08",
+          "content": "Multitasking is a myth. Single-tasking is how you actually get meaningful things done."
+        },
+        {
+          "id": "eliminate-noise-09",
+          "content": "Create focus triggers like a specific playlist or workspace that tells your brain it's go time."
+        },
+        {
+          "id": "eliminate-noise-10",
+          "content": "The goal isn't zero distraction forever. It's creating protected windows where focus can actually happen."
+        }
+      ]
+    },
+    {
+      "id": "build-focus-muscle",
+      "title": "Build Your Focus Muscle",
+      "summary": "Daily training techniques to strengthen attention.",
+      "order": 4,
+      "cards": [
+        {
+          "id": "build-focus-muscle-01",
+          "content": "Start small with 25-minute focused sprints followed by short breaks to build tolerance."
+        },
+        {
+          "id": "build-focus-muscle-02",
+          "content": "Mindful breathing for just five minutes trains your brain to return to the present moment faster."
+        },
+        {
+          "id": "build-focus-muscle-03",
+          "content": "Single-task everything. When you eat, just eat. When you walk, just walk."
+        },
+        {
+          "id": "build-focus-muscle-04",
+          "content": "Use the Pomodoro technique but adjust the length as your concentration span improves."
+        },
+        {
+          "id": "build-focus-muscle-05",
+          "content": "Boredom is the gateway to deep focus. Resist the urge to escape it with your phone."
+        },
+        {
+          "id": "build-focus-muscle-06",
+          "content": "Practice deliberate attention by noticing when your mind wanders and gently bringing it back."
+        },
+        {
+          "id": "build-focus-muscle-07",
+          "content": "Morning focus rituals set the tone for the entire day and build momentum."
+        },
+        {
+          "id": "build-focus-muscle-08",
+          "content": "Progressive overload works for focus too. Gradually increase the length and difficulty of your sessions."
+        },
+        {
+          "id": "build-focus-muscle-09",
+          "content": "Journaling at the end of each day about what helped or hurt your focus accelerates learning."
+        },
+        {
+          "id": "build-focus-muscle-10",
+          "content": "Consistency beats intensity. Short daily practice compounds faster than occasional long hauls."
+        }
+      ]
+    },
+    {
+      "id": "optimize-energy",
+      "title": "Optimize Your Brain Energy",
+      "summary": "Sleep, movement, and habits that power focus.",
+      "order": 5,
+      "cards": [
+        {
+          "id": "optimize-energy-01",
+          "content": "Sleep is the ultimate focus reset button. Protect your bedtime like your most important meeting."
+        },
+        {
+          "id": "optimize-energy-02",
+          "content": "Movement increases blood flow to the brain and clears mental fog better than caffeine."
+        },
+        {
+          "id": "optimize-energy-03",
+          "content": "Stable blood sugar from protein-rich meals prevents the afternoon energy crashes that kill focus."
+        },
+        {
+          "id": "optimize-energy-04",
+          "content": "Hydration matters. Even mild dehydration reduces cognitive performance noticeably."
+        },
+        {
+          "id": "optimize-energy-05",
+          "content": "Natural light in the morning sets your circadian rhythm for better daytime alertness."
+        },
+        {
+          "id": "optimize-energy-06",
+          "content": "Short walks between deep work blocks refresh your brain without breaking your flow."
+        },
+        {
+          "id": "optimize-energy-07",
+          "content": "Caffeine can help, but timing it right and avoiding afternoon doses protects your sleep."
+        },
+        {
+          "id": "optimize-energy-08",
+          "content": "Stress management through breathing or meditation lowers cortisol and frees up mental bandwidth."
+        },
+        {
+          "id": "optimize-energy-09",
+          "content": "Your brain uses 20% of your energy. Treat it like the high-performance machine it is."
+        },
+        {
+          "id": "optimize-energy-10",
+          "content": "Energy management is focus management. You can't focus well when your body is running on empty."
+        }
+      ]
+    },
+    {
+      "id": "7-day-protocol",
+      "title": "The 7-Day Protocol",
+      "summary": "Your exact day-by-day plan to rewire focus for good.",
+      "order": 6,
+      "cards": [
+        {
+          "id": "7-day-protocol-01",
+          "content": "Day 1 is all about awareness. Track every distraction and note how it makes you feel."
+        },
+        {
+          "id": "7-day-protocol-02",
+          "content": "Day 2 focuses on environment. Remove every unnecessary app and notification from your devices."
+        },
+        {
+          "id": "7-day-protocol-03",
+          "content": "Day 3 introduces short focus sprints to start rebuilding your attention span."
+        },
+        {
+          "id": "7-day-protocol-04",
+          "content": "Day 4 layers in energy habits like consistent sleep and movement to support your brain."
+        },
+        {
+          "id": "7-day-protocol-05",
+          "content": "Day 5 practices single-tasking across everything from meals to conversations."
+        },
+        {
+          "id": "7-day-protocol-06",
+          "content": "Day 6 reviews your progress and doubles down on what worked best for you personally."
+        },
+        {
+          "id": "7-day-protocol-07",
+          "content": "Day 7 solidifies the new habits and creates your personal long-term focus system."
+        },
+        {
+          "id": "7-day-protocol-08",
+          "content": "The reset works because it combines environment design, brain training, and energy optimization together."
+        },
+        {
+          "id": "7-day-protocol-09",
+          "content": "After seven days, you'll have new defaults that make focused work feel more automatic."
+        },
+        {
+          "id": "7-day-protocol-10",
+          "content": "The real win is using this week as the foundation for a permanently sharper, calmer mind."
+        }
+      ]
+    }
+  ]
+}

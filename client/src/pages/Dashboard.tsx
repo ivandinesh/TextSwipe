@@ -104,16 +104,19 @@ export default function Dashboard() {
             <Button variant="outline" onClick={() => setLocation("/")}>
               {appCopy.dashboard.primaryCta}
             </Button>
-            <Button
-              variant="outline"
-              onClick={async () => {
-                await logout.mutateAsync();
-                setLocation("/");
-              }}
-            >
-              {appCopy.dashboard.signOutCta}
-            </Button>
           </div>
+        </div>
+
+        <div className="flex flex-wrap justify-end gap-3">
+          <Button
+            variant="outline"
+            onClick={async () => {
+              await logout.mutateAsync();
+              setLocation("/");
+            }}
+          >
+            {appCopy.dashboard.signOutCta}
+          </Button>
         </div>
 
         <div className="grid gap-4 md:grid-cols-4">

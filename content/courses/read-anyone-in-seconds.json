@@ -1,0 +1,307 @@
+{
+  "id": "read-anyone-in-seconds",
+  "slug": "read-anyone-in-seconds",
+  "title": "Read Anyone in Seconds",
+  "tagline": "Instant tells. Zero guesswork.",
+  "description": "A 60-card guided run through the body language, microexpressions, and psychology tricks that let you read anyone instantly.",
+  "cover": {
+    "eyebrow": "Course",
+    "accent": "midnight",
+    "art": "scan-grid"
+  },
+  "metadata": {
+    "estimatedMinutes": 47,
+    "level": "Intermediate",
+    "category": "Social Skills"
+  },
+  "modules": [
+    {
+      "id": "hidden-signals",
+      "title": "The Hidden Signals",
+      "summary": "Why everyone leaks the truth.",
+      "order": 1,
+      "cards": [
+        {
+          "id": "hidden-signals-01",
+          "content": "People think they hide their thoughts, but their face, body, and voice leak the truth faster than words can form."
+        },
+        {
+          "id": "hidden-signals-02",
+          "content": "Your brain already reads these signals subconsciously. This course just turns that instinct into a deliberate skill."
+        },
+        {
+          "id": "hidden-signals-03",
+          "content": "Microexpressions flash for a split second before someone can fake a smile or calm expression."
+        },
+        {
+          "id": "hidden-signals-04",
+          "content": "Body language is 55% of communication. Most people ignore it and wonder why they get surprised later."
+        },
+        {
+          "id": "hidden-signals-05",
+          "content": "Verbal cues like filler words or pitch changes reveal stress or deception in real time."
+        },
+        {
+          "id": "hidden-signals-06",
+          "content": "Context always matters. One signal alone can mislead you, but clusters tell the full story."
+        },
+        {
+          "id": "hidden-signals-07",
+          "content": "Reading people isn’t manipulation. It’s the fastest way to understand motives and protect yourself."
+        },
+        {
+          "id": "hidden-signals-08",
+          "content": "In conversations, the real message often hides between the lines and behind the smile."
+        },
+        {
+          "id": "hidden-signals-09",
+          "content": "These skills give you an unfair advantage in interviews, dates, negotiations, and everyday life."
+        },
+        {
+          "id": "hidden-signals-10",
+          "content": "Master this and you’ll never walk into a room wondering what someone is really thinking again."
+        }
+      ]
+    },
+    {
+      "id": "microexpressions",
+      "title": "Microexpressions",
+      "summary": "The seven faces that betray everyone.",
+      "order": 2,
+      "cards": [
+        {
+          "id": "microexpressions-01",
+          "content": "A genuine smile crinkles the eyes. A fake one stops at the mouth. Spot the difference in a heartbeat."
+        },
+        {
+          "id": "microexpressions-02",
+          "content": "Flash of contempt: one side of the lip curls up for a fraction of a second. It reveals hidden judgment."
+        },
+        {
+          "id": "microexpressions-03",
+          "content": "Surprise eyebrows shoot up and stay there. If they drop too fast, the emotion is being hidden."
+        },
+        {
+          "id": "microexpressions-04",
+          "content": "Fear shows in raised eyebrows and tensed lower eyelids. Watch for it when someone denies something."
+        },
+        {
+          "id": "microexpressions-05",
+          "content": "Disgust wrinkles the nose and pulls the upper lip. It leaks even when someone says they’re fine."
+        },
+        {
+          "id": "microexpressions-06",
+          "content": "Anger tightens the lips and lowers the brows. A micro-flash often appears right before someone lies."
+        },
+        {
+          "id": "microexpressions-07",
+          "content": "Sadness pulls the inner corners of the eyebrows up. It’s the hardest to fake convincingly."
+        },
+        {
+          "id": "microexpressions-08",
+          "content": "These seven universal expressions cross cultures and appear before the person can control them."
+        },
+        {
+          "id": "microexpressions-09",
+          "content": "Train your eye by slowing down videos. You’ll start catching them in live conversations within days."
+        },
+        {
+          "id": "microexpressions-10",
+          "content": "Once you see microexpressions, conversations become a live lie detector you carry in your head."
+        }
+      ]
+    },
+    {
+      "id": "body-language",
+      "title": "Body Language",
+      "summary": "What their posture screams.",
+      "order": 3,
+      "cards": [
+        {
+          "id": "body-language-01",
+          "content": "Crossed arms don’t always mean closed off. Context decides if it’s cold, defensive, or just comfortable."
+        },
+        {
+          "id": "body-language-02",
+          "content": "Leaning forward signals interest. Leaning back signals doubt or a desire to escape the topic."
+        },
+        {
+          "id": "body-language-03",
+          "content": "Feet pointing toward you show genuine engagement. Feet pointing away mean they’re mentally leaving."
+        },
+        {
+          "id": "body-language-04",
+          "content": "Touching the neck or face often betrays anxiety or an attempt to soothe discomfort."
+        },
+        {
+          "id": "body-language-05",
+          "content": "Open palms build trust. Hidden hands or clenched fists signal withheld information or tension."
+        },
+        {
+          "id": "body-language-06",
+          "content": "Mirroring your movements is a subconscious sign they feel connected and safe."
+        },
+        {
+          "id": "body-language-07",
+          "content": "Sudden stillness after fidgeting can mean someone just decided to lie or hold something back."
+        },
+        {
+          "id": "body-language-08",
+          "content": "Legs crossed toward you indicate comfort. Crossed away creates a barrier."
+        },
+        {
+          "id": "body-language-09",
+          "content": "Shoulders rising toward the ears signal fear or uncertainty even if the face stays neutral."
+        },
+        {
+          "id": "body-language-10",
+          "content": "The body rarely lies when you know what to watch. Words can be chosen. Posture cannot."
+        }
+      ]
+    },
+    {
+      "id": "verbal-tells",
+      "title": "Verbal Tells",
+      "summary": "Words that expose the truth.",
+      "order": 4,
+      "cards": [
+        {
+          "id": "verbal-tells-01",
+          "content": "Too many filler words like “um” and “like” often mean the speaker is buying time to fabricate."
+        },
+        {
+          "id": "verbal-tells-02",
+          "content": "Qualifiers such as “honestly” or “to be frank” frequently signal the opposite of honesty."
+        },
+        {
+          "id": "verbal-tells-03",
+          "content": "Repeating your question before answering is a classic stall tactic while they craft the story."
+        },
+        {
+          "id": "verbal-tells-04",
+          "content": "Sudden drop in vocal pitch or volume can reveal nervousness or an attempt to sound more convincing."
+        },
+        {
+          "id": "verbal-tells-05",
+          "content": "Over-explaining a simple answer usually means the person is trying to sell the lie harder."
+        },
+        {
+          "id": "verbal-tells-06",
+          "content": "Defensive phrases like “why would I do that?” often appear right before a guilty person deflects."
+        },
+        {
+          "id": "verbal-tells-07",
+          "content": "Speaking faster than normal can signal excitement or anxiety depending on the rest of the cluster."
+        },
+        {
+          "id": "verbal-tells-08",
+          "content": "Avoiding specific details and sticking to vague generalities is a red flag for deception."
+        },
+        {
+          "id": "verbal-tells-09",
+          "content": "A sudden change in speech pattern mid-conversation often marks the moment the truth shifts."
+        },
+        {
+          "id": "verbal-tells-10",
+          "content": "Words are chosen. The delivery, speed, and qualifiers are what the brain can’t rehearse."
+        }
+      ]
+    },
+    {
+      "id": "cluster-reading",
+      "title": "Cluster Reading",
+      "summary": "When signals line up and reveal everything.",
+      "order": 5,
+      "cards": [
+        {
+          "id": "cluster-reading-01",
+          "content": "A single microexpression means little. Three signals together create a reliable read."
+        },
+        {
+          "id": "cluster-reading-02",
+          "content": "Smile plus forward lean plus open palms? Genuine interest. Smile plus crossed arms? Forced politeness."
+        },
+        {
+          "id": "cluster-reading-03",
+          "content": "Neck touch, foot pointing away, and vocal pitch drop together almost always mean discomfort or lying."
+        },
+        {
+          "id": "cluster-reading-04",
+          "content": "Baseline behavior is your reference point. Any sudden cluster of changes is the real signal."
+        },
+        {
+          "id": "cluster-reading-05",
+          "content": "Cultural differences matter. What looks like deception in one place is normal politeness in another."
+        },
+        {
+          "id": "cluster-reading-06",
+          "content": "Timing is everything. Signals that appear right after a specific question are the most telling."
+        },
+        {
+          "id": "cluster-reading-07",
+          "content": "When body, face, and voice all contradict the words, trust the body and face first."
+        },
+        {
+          "id": "cluster-reading-08",
+          "content": "Practice spotting clusters in low-stakes settings like coffee chats before high-stakes meetings."
+        },
+        {
+          "id": "cluster-reading-09",
+          "content": "The more clusters you catch, the less you’ll need to ask follow-up questions to know the truth."
+        },
+        {
+          "id": "cluster-reading-10",
+          "content": "Mastering clusters turns reading people from guesswork into a repeatable, accurate skill."
+        }
+      ]
+    },
+    {
+      "id": "real-world-mastery",
+      "title": "Real-World Mastery",
+      "summary": "Use it daily without getting caught.",
+      "order": 6,
+      "cards": [
+        {
+          "id": "real-world-mastery-01",
+          "content": "Start every conversation by noting their baseline for thirty seconds before diving in."
+        },
+        {
+          "id": "real-world-mastery-02",
+          "content": "Ask open questions first. People reveal more when they feel safe and talk freely."
+        },
+        {
+          "id": "real-world-mastery-03",
+          "content": "Stay neutral with your own body language so you don’t influence or alert them."
+        },
+        {
+          "id": "real-world-mastery-04",
+          "content": "In negotiations, watch for clusters right after you name your price or terms."
+        },
+        {
+          "id": "real-world-mastery-05",
+          "content": "On dates, microexpressions around future plans show real excitement or hidden hesitation."
+        },
+        {
+          "id": "real-world-mastery-06",
+          "content": "Use these skills to read the room in meetings and know exactly who is on board."
+        },
+        {
+          "id": "real-world-mastery-07",
+          "content": "Never call someone out on a read. Just adjust your approach and keep the information private."
+        },
+        {
+          "id": "real-world-mastery-08",
+          "content": "Daily practice on strangers in public will sharpen your eye faster than any book."
+        },
+        {
+          "id": "real-world-mastery-09",
+          "content": "The ethical rule is simple: use it to understand, never to manipulate or harm."
+        },
+        {
+          "id": "real-world-mastery-10",
+          "content": "Once you master this, every conversation becomes clearer, faster, and more powerful than before."
+        }
+      ]
+    }
+  ]
+}

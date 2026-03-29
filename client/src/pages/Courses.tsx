@@ -35,6 +35,10 @@ const accentStyles = {
     gradient: "linear-gradient(135deg, rgba(214,246,225,0.28), rgba(12,23,22,0.96))",
     chip: "rgba(214,246,225,0.24)",
   },
+  electric: {
+    gradient: "linear-gradient(135deg, rgba(86,162,255,0.3), rgba(15,18,59,0.98))",
+    chip: "rgba(86,162,255,0.24)",
+  },
 } as const;
 
 function getCourseHref(course: CourseOverviewItem) {
@@ -54,7 +58,7 @@ export default function CoursesPage() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
 
-  const { data } = useQuery<CoursesResponse>({
+  const { data, error, isLoading } = useQuery<CoursesResponse>({
     queryKey: ["/api/courses"],
     enabled: Boolean(user),
   });
@@ -119,6 +123,21 @@ export default function CoursesPage() {
         </section>
 
         <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {isLoading && (
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 text-sm text-muted-foreground backdrop-blur-xl">
+              Loading courses...
+            </div>
+          )}
+          {error instanceof Error && (
+            <div className="rounded-[2rem] border border-red-400/20 bg-red-500/10 p-6 text-sm text-red-100 backdrop-blur-xl md:col-span-2 xl:col-span-3">
+              Courses could not load right now: {error.message}
+            </div>
+          )}
+          {!isLoading && !error && courses.length === 0 && (
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 text-sm text-muted-foreground backdrop-blur-xl md:col-span-2 xl:col-span-3">
+              No courses are available right now.
+            </div>
+          )}
           {courses.map((course) => {
             const accent = accentStyles[course.cover.accent];
             const isStarted = course.progress.completedModulesCount > 0;
@@ -255,4 +274,3 @@ export function CoursesTeaser() {
     </div>
   );
 }
-

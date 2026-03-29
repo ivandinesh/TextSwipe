@@ -19,7 +19,7 @@ export interface CourseData {
   description: string;
   cover: {
     eyebrow: string;
-    accent: "midnight" | "aurora" | "ember" | "petal" | "sage";
+    accent: "midnight" | "aurora" | "ember" | "petal" | "sage" | "electric";
     art?: string;
   };
   metadata: {
@@ -48,4 +48,3 @@ export interface CourseProgressSummary {
     isUnlocked: boolean;
   }>;
 }
-

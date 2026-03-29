@@ -305,12 +305,12 @@ export function FocusFeed() {
       {currentView === "input" && (
         <div className="relative min-h-screen overflow-hidden px-5 py-8 md:px-8 md:py-10">
           <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl flex-col justify-between gap-10">
-            <header className="flex items-center justify-between">
+            <header className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs uppercase tracking-[0.28em] text-primary/80">
                 <Sparkles className="h-3.5 w-3.5" />
                 {appCopy.home.badge}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex max-w-full flex-wrap items-center justify-end gap-2">
                 <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-muted-foreground md:flex">
                   <Waves className="h-3.5 w-3.5 text-primary" />
                   {appCopy.home.utilityBadge}

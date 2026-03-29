@@ -79,7 +79,7 @@ function extractCardPreview(content: string) {
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [section, setSection] = useState<AdminSection>("overview");
 
   const overviewQuery = useQuery<AdminOverviewResponse>({
@@ -179,6 +179,18 @@ export default function AdminDashboard() {
               {appCopy.admin.backCta}
             </Button>
           </div>
+        </div>
+
+        <div className="flex flex-wrap justify-end gap-3">
+          <Button
+            variant="outline"
+            onClick={async () => {
+              await logout.mutateAsync();
+              setLocation("/");
+            }}
+          >
+            {appCopy.dashboard.signOutCta}
+          </Button>
         </div>
 
         <div className="flex flex-wrap gap-2">

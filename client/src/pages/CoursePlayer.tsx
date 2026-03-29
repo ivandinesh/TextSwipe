@@ -71,6 +71,17 @@ const accentStyles = {
     text: "#F8FFFB",
     muted: "#C5DED5",
   },
+  electric: {
+    surface:
+      "bg-[radial-gradient(circle_at_top_left,rgba(86,162,255,0.24),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(89,247,255,0.16),transparent_26%),linear-gradient(180deg,rgba(10,16,48,0.98),rgba(8,12,32,1))]",
+    shell: "rgba(12, 18, 52, 0.88)",
+    panel: "linear-gradient(180deg, rgba(24, 39, 94, 0.92), rgba(11, 18, 48, 0.88))",
+    accent: "#56A2FF",
+    glow: "rgba(86,162,255,0.72)",
+    border: "rgba(120, 188, 255, 0.28)",
+    text: "#F7FBFF",
+    muted: "#BDD6F5",
+  },
 } as const;
 
 export default function CoursePlayerPage() {
@@ -82,7 +93,7 @@ export default function CoursePlayerPage() {
   const [cardIndex, setCardIndex] = useState(0);
   const [hydrated, setHydrated] = useState(false);
 
-  const { data } = useQuery<CourseResponse>({
+  const { data, error, isLoading } = useQuery<CourseResponse>({
     queryKey: [`/api/courses/${params?.courseId ?? ""}`],
     enabled: Boolean(user && params?.courseId),
   });
@@ -143,10 +154,26 @@ export default function CoursePlayerPage() {
     );
   }
 
-  if (!data) {
+  if (isLoading) {
     return (
       <div className="editorial-shell neon-grid flex min-h-screen items-center justify-center bg-background text-foreground">
         Loading course...
+      </div>
+    );
+  }
+
+  if (error instanceof Error || !data) {
+    return (
+      <div className="editorial-shell neon-grid min-h-screen bg-background px-5 py-8 text-foreground md:px-8">
+        <div className="mx-auto max-w-3xl rounded-[2rem] border border-white/10 bg-white/[0.04] p-8 text-center backdrop-blur-xl">
+          <h1 className="text-3xl font-semibold">Course unavailable.</h1>
+          <p className="mt-3 text-muted-foreground">
+            {error instanceof Error ? error.message : "This course could not be loaded right now."}
+          </p>
+          <Button className="mt-6" onClick={() => setLocation("/courses")}>
+            {appCopy.courses.libraryCta}
+          </Button>
+        </div>
       </div>
     );
   }

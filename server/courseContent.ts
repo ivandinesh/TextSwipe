@@ -18,7 +18,14 @@ const courseModuleSchema = z.object({
   cards: z.array(courseCardSchema).length(10),
 });
 
-const accentSchema = z.enum(["midnight", "aurora", "ember", "petal", "sage"]);
+const accentSchema = z.enum([
+  "midnight",
+  "aurora",
+  "ember",
+  "petal",
+  "sage",
+  "electric",
+]);
 
 const courseSchema = z.object({
   id: z.string().min(1),
@@ -67,9 +74,17 @@ export async function listCourses() {
   const dir = getCoursesDir();
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const files = entries.filter((entry) => entry.isFile() && entry.name.endsWith(".json"));
-  const courses = await Promise.all(
+  const settledCourses = await Promise.allSettled(
     files.map((file) => readCourseFile(path.join(dir, file.name))),
   );
+  const courses = settledCourses.flatMap((result, index) => {
+    if (result.status === "fulfilled") {
+      return [result.value];
+    }
+
+    console.error(`Failed to load course file ${files[index].name}:`, result.reason);
+    return [];
+  });
 
   return courses.sort((a, b) => a.title.localeCompare(b.title));
 }
