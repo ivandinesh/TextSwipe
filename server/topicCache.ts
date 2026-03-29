@@ -58,6 +58,20 @@ function getCacheRootDir() {
   return path.resolve(process.cwd(), process.env.TOPIC_CACHE_DIR || "cache");
 }
 
+export async function getTopicCacheHealth() {
+  if (!isCacheEnabled()) {
+    return { status: "disabled" as const };
+  }
+
+  try {
+    await fs.promises.mkdir(getCacheRootDir(), { recursive: true });
+    return { status: "up" as const, rootDir: getCacheRootDir() };
+  } catch (error) {
+    console.error("Topic cache health check failed:", error);
+    return { status: "down" as const, rootDir: getCacheRootDir() };
+  }
+}
+
 function getTopicsDir() {
   return path.join(getCacheRootDir(), "topics");
 }

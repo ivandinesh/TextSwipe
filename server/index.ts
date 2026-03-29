@@ -1,4 +1,5 @@
 import express, { type NextFunction, type Request, type Response } from "express";
+import { randomUUID } from "crypto";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
@@ -29,13 +30,11 @@ function isSecureCookieEnabled() {
   return process.env.NODE_ENV === "production";
 }
 
-// Load environment variables from .env file
 const dotenvResult = dotenv.config();
 if (dotenvResult.error) {
-  console.error("⚠️ Failed to load environment variables:", dotenvResult.error.message);
+  console.error("Failed to load environment variables:", dotenvResult.error.message);
 }
 
-// Validate required environment variables
 const requiredEnvVars = ["NODE_ENV"];
 if (process.env.NODE_ENV === "production") {
   requiredEnvVars.push("OPENROUTER_API_KEY", "SESSION_SECRET");
@@ -43,11 +42,12 @@ if (process.env.NODE_ENV === "production") {
 
 const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
 if (missingVars.length > 0) {
-  console.error("❌ Missing required environment variables:", missingVars.join(", "));
+  console.error("Missing required environment variables:", missingVars.join(", "));
   if (process.env.NODE_ENV === "production") {
     process.exit(1);
   }
 }
+
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -59,7 +59,6 @@ const allowedOrigins = (process.env.APP_ALLOWED_ORIGINS || "")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-// Security middleware
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -74,10 +73,9 @@ app.use(
         objectSrc: ["'none'"],
       },
     },
-  })
+  }),
 );
 
-// CORS configuration - restrict to your domain in production
 app.use(
   cors({
     origin:
@@ -86,29 +84,40 @@ app.use(
           ? allowedOrigins
           : false
         : true,
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(
-  (req: Request, res: Response, next: NextFunction) => {
-    const start = Date.now();
-    const requestPath = req.path;
-    res.on("finish", () => {
-      const duration = Date.now() - start;
-      if (requestPath.startsWith("/api")) {
-        let logLine = `${req.method} ${requestPath} ${res.statusCode} in ${duration}ms`;
-        if (logLine.length > 80) {
-          logLine = logLine.slice(0, 79) + "…";
-        }
-        log(logLine);
-      }
-    });
-    next();
-  },
-);
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const requestId = randomUUID();
+  const start = Date.now();
+  const requestPath = req.path;
+
+  res.setHeader("X-Request-Id", requestId);
+
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (requestPath.startsWith("/api")) {
+      log(
+        JSON.stringify({
+          requestId,
+          method: req.method,
+          path: requestPath,
+          statusCode: res.statusCode,
+          durationMs: duration,
+          ip: req.ip,
+        }),
+        "api",
+      );
+    }
+  });
+
+  next();
+});
+
 (async () => {
   await initializeDB();
   const pool = getPool();
@@ -143,40 +152,31 @@ app.use(
   app.use(dashboardRoutes);
   app.use(topicRoutes);
   app.use(chatRoutes);
+
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
-    res.status(status).json({ message });
-    // Removed throw err; not needed in error handler
-  });
-  // Error handling middleware
-  app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.error("❌ Server error:", err.message);
-    res.status(500).json({
+
+    console.error("Server error:", err);
+    res.status(status).json({
       success: false,
-      error: "Internal server error",
-      // Don't expose stack traces in production
-      ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+      error: status >= 500 ? "Internal server error" : message,
+      ...(process.env.NODE_ENV === "development" && err?.stack
+        ? { stack: err.stack }
+        : {}),
     });
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // does not interfere with the other routes
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
-    // Add SPA fallback for prod
     const publicPath = path.join(__dirname, "../dist/public");
-    app.get("*", (req, res) => {
+    app.get("*", (_req, res) => {
       res.sendFile(path.resolve(publicPath, "index.html"));
     });
   }
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
+
   const port = parseInt(process.env.PORT || "5000", 10);
   server.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port}`);

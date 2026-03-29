@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { courseModuleProgress, type CourseModuleProgress } from "../shared/schema";
 import { db } from "./db";
 import type { Course } from "./courseContent";
@@ -8,8 +8,15 @@ const memoryCourseProgress: CourseModuleProgress[] = [];
 
 export async function getUserCourseModuleProgress(userId: string, courseId: string) {
   if (db) {
-    const rows = await db.select().from(courseModuleProgress);
-    return rows.filter((row) => row.userId === userId && row.courseId === courseId);
+    return db
+      .select()
+      .from(courseModuleProgress)
+      .where(
+        and(
+          eq(courseModuleProgress.userId, userId),
+          eq(courseModuleProgress.courseId, courseId),
+        ),
+      );
   }
 
   return memoryCourseProgress.filter(
@@ -27,23 +34,27 @@ export async function upsertCourseModuleProgress(input: {
   const lastViewedAt = new Date().toISOString();
 
   if (db) {
-    const rows = await db.select().from(courseModuleProgress);
-    const existing = rows.find(
-      (row) =>
-        row.userId === input.userId &&
-        row.courseId === input.courseId &&
-        row.moduleId === input.moduleId,
-    );
+    const existing = await db
+      .select()
+      .from(courseModuleProgress)
+      .where(
+        and(
+          eq(courseModuleProgress.userId, input.userId),
+          eq(courseModuleProgress.courseId, input.courseId),
+          eq(courseModuleProgress.moduleId, input.moduleId),
+        ),
+      )
+      .limit(1);
 
-    if (existing) {
+    if (existing[0]) {
       const updated = await db
         .update(courseModuleProgress)
         .set({
-          highestCardIndex: Math.max(existing.highestCardIndex, input.highestCardIndex),
-          completedAt: input.completedAt ?? existing.completedAt,
+          highestCardIndex: Math.max(existing[0].highestCardIndex, input.highestCardIndex),
+          completedAt: input.completedAt ?? existing[0].completedAt,
           lastViewedAt,
         })
-        .where(eq(courseModuleProgress.id, existing.id))
+        .where(eq(courseModuleProgress.id, existing[0].id))
         .returning();
       return updated[0];
     }
@@ -143,7 +154,10 @@ export function buildCourseProgressSummary(course: Course, progressRows: CourseM
 
 export async function getUserCoursesOverview(userId: string, courses: Course[]) {
   const allProgressRows = db
-    ? await db.select().from(courseModuleProgress)
+    ? await db
+        .select()
+        .from(courseModuleProgress)
+        .where(eq(courseModuleProgress.userId, userId))
     : memoryCourseProgress;
 
   return courses.map((course) => {

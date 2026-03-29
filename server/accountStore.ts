@@ -15,7 +15,7 @@ import {
   type UserLikedCard,
   type UserTopicInteraction,
 } from "../shared/schema";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { db } from "./db";
 
 interface CreateUserInput {
@@ -195,8 +195,13 @@ function buildRecommendationCandidates(
 
 export async function findUserByEmail(email: string): Promise<User | undefined> {
   if (db) {
-    const result = await db.select().from(users);
-    return result.find((user) => user.email.toLowerCase() === email.toLowerCase());
+    const normalizedEmail = email.trim().toLowerCase();
+    const result = await db
+      .select()
+      .from(users)
+      .where(sql`lower(${users.email}) = ${normalizedEmail}`)
+      .limit(1);
+    return result[0];
   }
 
   return Array.from(memoryUsers.values()).find(
@@ -206,8 +211,8 @@ export async function findUserByEmail(email: string): Promise<User | undefined> 
 
 export async function findUserById(id: string): Promise<User | undefined> {
   if (db) {
-    const result = await db.select().from(users);
-    return result.find((user) => user.id === id);
+    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
   }
 
   return memoryUsers.get(id);
@@ -304,15 +309,19 @@ export async function recordLearningSession(input: RecordSessionInput) {
 
 export async function toggleLikedCard(input: ToggleLikeInput) {
   if (db) {
-    const current = await db.select().from(userLikedCards);
-    const existing = current.find(
-      (card) =>
-        card.userId === input.userId &&
-        card.topic === input.topic &&
-        card.content === input.content,
-    );
+    const existing = await db
+      .select()
+      .from(userLikedCards)
+      .where(
+        and(
+          eq(userLikedCards.userId, input.userId),
+          eq(userLikedCards.topic, input.topic),
+          eq(userLikedCards.content, input.content),
+        ),
+      )
+      .limit(1);
 
-    if (input.liked && !existing) {
+    if (input.liked && !existing[0]) {
       await db.insert(userLikedCards).values({
         userId: input.userId,
         topic: input.topic,
@@ -320,7 +329,7 @@ export async function toggleLikedCard(input: ToggleLikeInput) {
       });
     }
 
-    if (!input.liked && existing) {
+    if (!input.liked && existing[0]) {
       await db
         .delete(userLikedCards)
         .where(
@@ -363,22 +372,27 @@ export async function toggleLikedCard(input: ToggleLikeInput) {
 
 export async function trackTopicInteraction(input: TrackTopicInput) {
   if (db) {
-    const current = await db.select().from(userTopicInteractions);
-    const existing = current.find(
-      (interaction) =>
-        interaction.userId === input.userId && interaction.topic === input.topic,
-    );
+    const existing = await db
+      .select()
+      .from(userTopicInteractions)
+      .where(
+        and(
+          eq(userTopicInteractions.userId, input.userId),
+          eq(userTopicInteractions.topic, input.topic),
+        ),
+      )
+      .limit(1);
 
-    if (existing) {
+    if (existing[0]) {
       await db
         .update(userTopicInteractions)
         .set({
-          interactionCount: existing.interactionCount + (input.increment ?? 1),
-          likeCount: existing.likeCount + (input.isLiked ? 1 : 0),
-          isLiked: input.isLiked ?? existing.isLiked,
+          interactionCount: existing[0].interactionCount + (input.increment ?? 1),
+          likeCount: existing[0].likeCount + (input.isLiked ? 1 : 0),
+          isLiked: input.isLiked ?? existing[0].isLiked,
           lastInteraction: new Date().toISOString(),
         })
-        .where(eq(userTopicInteractions.id, existing.id));
+        .where(eq(userTopicInteractions.id, existing[0].id));
       return;
     }
 
@@ -425,8 +439,10 @@ export async function trackTopicInteraction(input: TrackTopicInput) {
 
 async function getUserSessions(userId: string) {
   if (db) {
-    const result = await db.select().from(learningSessions);
-    return result.filter((session) => session.userId === userId);
+    return db
+      .select()
+      .from(learningSessions)
+      .where(eq(learningSessions.userId, userId));
   }
 
   return memoryLearningSessions.get(userId) ?? [];
@@ -434,8 +450,10 @@ async function getUserSessions(userId: string) {
 
 async function getUserInteractions(userId: string) {
   if (db) {
-    const result = await db.select().from(userTopicInteractions);
-    return result.filter((interaction) => interaction.userId === userId);
+    return db
+      .select()
+      .from(userTopicInteractions)
+      .where(eq(userTopicInteractions.userId, userId));
   }
 
   return memoryTopicInteractions.get(userId) ?? [];
@@ -443,10 +461,11 @@ async function getUserInteractions(userId: string) {
 
 export async function getUserLikedCards(userId: string) {
   if (db) {
-    const result = await db.select().from(userLikedCards);
-    return result
-      .filter((card) => card.userId === userId)
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return db
+      .select()
+      .from(userLikedCards)
+      .where(eq(userLikedCards.userId, userId))
+      .orderBy(desc(userLikedCards.createdAt));
   }
 
   return (memoryLikedCards.get(userId) ?? []).sort((a, b) =>
@@ -689,10 +708,11 @@ export async function recordAdminAuditEvent(input: {
 
 export async function getRecentAdminAuditLogs(limit = 20) {
   if (db) {
-    const logs = await db.select().from(adminAuditLogs);
-    return logs
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-      .slice(0, limit);
+    return db
+      .select()
+      .from(adminAuditLogs)
+      .orderBy(desc(adminAuditLogs.createdAt))
+      .limit(limit);
   }
 
   return memoryAdminAuditLogs.slice(0, limit);

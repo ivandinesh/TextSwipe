@@ -2,6 +2,9 @@ import { type Express, type Request, type Response } from "express";
 import { createServer, type Server } from "http";
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import { generateLearningSnippets } from "./openai";
+import { getPool } from "./db";
+import { isSmtpConfigured } from "./mailer";
+import { getTopicCacheHealth } from "./topicCache";
 
 const DEFAULT_GENERATION_WINDOW_MS = 15 * 60 * 1000;
 const DEFAULT_GENERATION_MAX_REQUESTS = 10;
@@ -86,8 +89,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/health", (_req: Request, res: Response) => {
-    res.json({ status: "healthy", timestamp: new Date().toISOString() });
+  app.get("/api/health", async (_req: Request, res: Response) => {
+    const pool = getPool();
+    let database = "disabled";
+
+    if (pool) {
+      try {
+        await pool.query("SELECT 1");
+        database = "up";
+      } catch {
+        database = "down";
+      }
+    }
+
+    const topicCache = await getTopicCacheHealth();
+    const services = {
+      database,
+      sessionStore:
+        process.env.NODE_ENV === "production"
+          ? pool
+            ? "postgres"
+            : "misconfigured"
+          : "memory",
+      smtp: isSmtpConfigured() ? "configured" : "not_configured",
+      openrouter: process.env.OPENROUTER_API_KEY ? "configured" : "not_configured",
+      topicCache: topicCache.status,
+    };
+    const isHealthy =
+      (process.env.NODE_ENV !== "production" || database !== "down") &&
+      topicCache.status !== "down";
+
+    res.status(isHealthy ? 200 : 503).json({
+      status: isHealthy ? "healthy" : "degraded",
+      timestamp: new Date().toISOString(),
+      services,
+    });
   });
 
   return createServer(app);

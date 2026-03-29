@@ -42,6 +42,10 @@ function getSmtpConfig(): SmtpConfig | null {
   };
 }
 
+export function isSmtpConfigured() {
+  return getSmtpConfig() !== null;
+}
+
 function encodeBase64(value: string) {
   return Buffer.from(value, "utf8").toString("base64");
 }
@@ -241,12 +245,12 @@ function wrapEmailHtml(content: string) {
 export async function sendWelcomeEmail(email: string) {
   return sendTransactionalEmail({
     to: email,
-    subject: "You’re in. Your next stack is waiting.",
+    subject: "You're in. Your next stack is waiting.",
     text:
-      "You’re in.\n\nFocusFeed is ready whenever you want a smarter scroll. Pick a lane, stack a few quick hits, and keep the good ones moving.\n\nOne more swipe. One more win.\n\nFocusFeed",
+      "You're in.\n\nFocusFeed is ready whenever you want a smarter scroll. Pick a lane, stack a few quick hits, and keep the good ones moving.\n\nOne more swipe. One more win.\n\nFocusFeed",
     html: wrapEmailHtml(`
       <p style="margin:0 0 8px;font-size:12px;letter-spacing:0.28em;text-transform:uppercase;color:#6fd8ff;">FocusFeed</p>
-      <h1 style="margin:0 0 16px;font-size:32px;line-height:1.05;">You’re in. Your next stack is waiting.</h1>
+      <h1 style="margin:0 0 16px;font-size:32px;line-height:1.05;">You're in. Your next stack is waiting.</h1>
       <p style="margin:0 0 12px;font-size:16px;line-height:1.7;color:#c7d7ee;">
         FocusFeed is ready whenever you want a smarter scroll.
       </p>
@@ -269,7 +273,7 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string) {
     to: email,
     subject,
     text:
-      `Need a clean way back in?\n\nReset your FocusFeed password here:\n${resetUrl}\n\nThis link expires soon. If you didn’t ask for it, you can ignore this email.\n\nFocusFeed`,
+      `Need a clean way back in?\n\nReset your FocusFeed password here:\n${resetUrl}\n\nThis link expires soon. If you didn't ask for it, you can ignore this email.\n\nFocusFeed`,
     html: wrapEmailHtml(`
       <p style="margin:0 0 8px;font-size:12px;letter-spacing:0.28em;text-transform:uppercase;color:#6fd8ff;">FocusFeed</p>
       <h1 style="margin:0 0 16px;font-size:32px;line-height:1.05;">Get back in and pick up your run.</h1>
@@ -280,7 +284,7 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string) {
         Reset password
       </a>
       <p style="margin:20px 0 0;font-size:14px;line-height:1.7;color:#c7d7ee;">
-        This link expires soon. If you didn’t ask for it, you can ignore this email.
+        This link expires soon. If you didn't ask for it, you can ignore this email.
       </p>
       <p style="margin:16px 0 0;font-size:12px;line-height:1.6;color:#9ab0cb;">
         ${resetUrl}
