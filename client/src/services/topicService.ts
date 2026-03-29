@@ -27,16 +27,6 @@ const LOCAL_STORAGE_KEYS = {
   USER_ID: 'focusfeed-user-id'
 };
 
-// Generate a simple user ID for local identification
-const getOrCreateUserId = (): string => {
-  let userId = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID);
-  if (!userId) {
-    userId = `user-${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem(LOCAL_STORAGE_KEYS.USER_ID, userId);
-  }
-  return userId;
-};
-
 // Default popular topics (fallback)
 const DEFAULT_POPULAR_TOPICS = [
   "Quantum Computing", "Neuroplasticity", "Dark Matter", "Biohacking",
@@ -49,8 +39,6 @@ const DEFAULT_POPULAR_TOPICS = [
 
 // Topic Service Implementation
 export const createTopicService = (): TopicService => {
-  const userId = getOrCreateUserId();
-
   // Initialize topic interactions from localStorage
   const initialize = () => {
     const storedInteractions = localStorage.getItem(LOCAL_STORAGE_KEYS.TOPIC_INTERACTIONS);
@@ -185,8 +173,8 @@ export const createTopicService = (): TopicService => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
-          userId,
           interactions,
           timestamp: Date.now()
         }),
@@ -207,7 +195,9 @@ export const createTopicService = (): TopicService => {
   // Fetch popular topics from server (if available)
   const fetchServerPopularTopics = async (): Promise<string[] | null> => {
     try {
-      const response = await fetch(`/api/popular-topics?userId=${userId}`);
+      const response = await fetch(`/api/popular-topics`, {
+        credentials: 'include'
+      });
       if (response.ok) {
         const data = await response.json();
         return data.topics || null;

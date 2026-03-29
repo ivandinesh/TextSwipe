@@ -20,6 +20,11 @@ import {
 } from "../auth";
 import { getSessionUser } from "../authz";
 import { sendPlainPasswordResetEmail, sendWelcomeEmail } from "../mailer";
+import {
+  getAuthRateLimitWindowMs,
+  getLoginRateLimitMaxRequests,
+  getRegisterRateLimitMaxRequests,
+} from "../authRateLimit";
 
 const router = express.Router();
 
@@ -41,6 +46,26 @@ const resetLinkResponse = {
   success: true,
   message: "If that account exists, a reset link is on the way.",
 };
+
+const authRateLimitWindowMs = getAuthRateLimitWindowMs();
+
+const registerLimiter = rateLimit({
+  windowMs: authRateLimitWindowMs,
+  max: getRegisterRateLimitMaxRequests(),
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => ipKeyGenerator(req.ip ?? ""),
+  message: { error: "Too many registration attempts. Please try again later." },
+});
+
+const loginLimiter = rateLimit({
+  windowMs: authRateLimitWindowMs,
+  max: getLoginRateLimitMaxRequests(),
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => ipKeyGenerator(req.ip ?? ""),
+  message: { error: "Too many login attempts. Please try again later." },
+});
 
 const forgotPasswordLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -91,7 +116,7 @@ router.get("/api/auth/me", async (req, res) => {
   });
 });
 
-router.post("/api/auth/register", async (req, res) => {
+router.post("/api/auth/register", registerLimiter, async (req, res) => {
   try {
     const { email, password } = authSchema.parse(req.body);
     const existingUser = await findUserByEmail(email);
@@ -137,7 +162,7 @@ router.post("/api/auth/register", async (req, res) => {
   }
 });
 
-router.post("/api/auth/login", async (req, res) => {
+router.post("/api/auth/login", loginLimiter, async (req, res) => {
   try {
     const { email, password } = authSchema.parse(req.body);
     const existingUser = await findUserByEmail(email);

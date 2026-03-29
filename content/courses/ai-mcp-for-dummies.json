@@ -1,16 +1,16 @@
 {
-  "id": "ai-mcp",
-  "slug": "ai-mcp",
-  "title": "MCP for Dummies",
-  "tagline": "AI that actually does things, not just talks.",
-  "description": "A 60-card guided run through the protocol that connects AI to real tools and data.",
+  "id": "ai-mcp-for-dummies",
+  "slug": "ai-mcp-for-dummies",
+  "title": "AI - MCP for Dummies",
+  "tagline": "The universal connector for AI, no custom hacks needed.",
+  "description": "A 60-card guided run through the core ideas that actually matter.",
   "cover": {
     "eyebrow": "Course",
-    "accent": "sage",
-    "art": "connector-port"
+    "accent": "electric",
+    "art": "plug-port"
   },
   "metadata": {
-    "estimatedMinutes": 45,
+    "estimatedMinutes": 55,
     "level": "Beginner",
     "category": "Technology"
   },
@@ -18,288 +18,288 @@
     {
       "id": "what-is-mcp",
       "title": "What MCP Really Is",
-      "summary": "The core idea behind the universal AI adapter.",
+      "summary": "The core mental model behind the Model Context Protocol.",
       "order": 1,
       "cards": [
         {
           "id": "what-is-mcp-01",
-          "content": "MCP stands for Model Context Protocol. It’s the open standard that lets any AI model plug straight into your data, tools, and systems."
+          "content": "MCP stands for Model Context Protocol: an open-source standard that lets AI apps connect securely to external data, tools, and systems."
         },
         {
           "id": "what-is-mcp-02",
-          "content": "Think of it as USB-C for AI. One clean connector instead of a drawer full of mismatched cables."
+          "content": "Think of MCP as USB-C for AI. One universal plug that works with any data source or tool instead of building custom adapters every time."
         },
         {
           "id": "what-is-mcp-03",
-          "content": "Anthropic open-sourced MCP in late 2024 to end the chaos of custom integrations between AI and everything else."
+          "content": "Anthropic introduced MCP in November 2024 to replace fragmented integrations with a single, standardized protocol."
         },
         {
           "id": "what-is-mcp-04",
-          "content": "It turns chatty models into real agents that can fetch live files, call APIs, or update records safely."
+          "content": "MCP enables LLMs like Claude or ChatGPT to fetch live data, run tools, and perform actions without leaving their training cutoff behind."
         },
         {
           "id": "what-is-mcp-05",
-          "content": "No more training-data-only limits. MCP gives AI fresh context from the real world on demand."
+          "content": "It is built on JSON-RPC 2.0, making it simple, lightweight, and easy for developers to implement."
         },
         {
           "id": "what-is-mcp-06",
-          "content": "Developers write one MCP server. Every compatible AI can use it instantly."
+          "content": "MCP is two-way: AI can request context from servers and servers can push updates or ask for human approval."
         },
         {
           "id": "what-is-mcp-07",
-          "content": "The protocol runs on simple JSON-RPC calls, so it’s fast, reliable, and easy to secure."
+          "content": "The protocol turns static AI models into dynamic agents that can read files, query databases, or trigger workflows."
         },
         {
           "id": "what-is-mcp-08",
-          "content": "MCP isn’t another AI model. It’s the plumbing that makes every model more useful."
+          "content": "Adoption is already widespread: OpenAI, Google, Microsoft, Cursor, VS Code, and many IDEs support MCP out of the box."
         },
         {
           "id": "what-is-mcp-09",
-          "content": "It standardizes how AI asks for context, uses tools, and gets results back without drama."
+          "content": "MCP is open source and vendor-neutral. Anyone can build servers or clients without permission."
         },
         {
           "id": "what-is-mcp-10",
-          "content": "If you remember one thing: MCP is the missing piece that finally makes AI act like a true teammate."
+          "content": "If you remember one thing: MCP is less a new AI model and more a universal socket that plugs any AI into the real world."
         }
       ]
     },
     {
-      "id": "the-integration-headache",
-      "title": "The Integration Headache",
-      "summary": "Why AI was stuck before MCP arrived.",
+      "id": "why-mcp-matters",
+      "title": "Why MCP Matters",
+      "summary": "The problem it solves and the gap it fills.",
       "order": 2,
       "cards": [
         {
-          "id": "the-integration-headache-01",
-          "content": "Every AI vendor used its own weird way to reach your data. Developers rebuilt the same bridge over and over."
+          "id": "why-mcp-matters-01",
+          "content": "Before MCP, every AI tool needed custom code to talk to each database, API, or file system. That was slow and error-prone."
         },
         {
-          "id": "the-integration-headache-02",
-          "content": "Change one database schema and every AI integration broke at once."
+          "id": "why-mcp-matters-02",
+          "content": "LLMs are stuck with outdated training data. MCP gives them live, real-time context on demand."
         },
         {
-          "id": "the-integration-headache-03",
-          "content": "Security teams hated it. Custom code meant custom attack surfaces everywhere."
+          "id": "why-mcp-matters-03",
+          "content": "Custom integrations break easily when systems change. MCP provides one stable interface that everyone can rely on."
         },
         {
-          "id": "the-integration-headache-04",
-          "content": "Models hallucinated because they had zero access to your latest numbers or files."
+          "id": "why-mcp-matters-04",
+          "content": "Agentic AI needs to act, not just chat. MCP supplies the standardized way for models to call tools and get results."
         },
         {
-          "id": "the-integration-headache-05",
-          "content": "Agents dreamed of booking flights or creating tickets, but the plumbing was never there."
+          "id": "why-mcp-matters-05",
+          "content": "Developers waste weeks building one-off connectors. MCP lets them build once and reuse everywhere."
         },
         {
-          "id": "the-integration-headache-06",
-          "content": "Companies wasted months wiring each new tool instead of shipping real features."
+          "id": "why-mcp-matters-06",
+          "content": "Security and permissions are built in from day one. MCP servers control exactly what the AI can see or do."
         },
         {
-          "id": "the-integration-headache-07",
-          "content": "Tool calling felt like a hack. It worked until it didn’t."
+          "id": "why-mcp-matters-07",
+          "content": "Human-in-the-loop is native: servers can pause and ask a person for approval before sensitive actions."
         },
         {
-          "id": "the-integration-headache-08",
-          "content": "Different models spoke different languages to the same APIs. Pure friction."
+          "id": "why-mcp-matters-08",
+          "content": "MCP reduces hallucinations by grounding AI answers in fresh, verified external data."
         },
         {
-          "id": "the-integration-headache-09",
-          "content": "The dream of agentic AI stayed just a dream without a shared standard."
+          "id": "why-mcp-matters-09",
+          "content": "It accelerates the shift from chatbots to autonomous agents that can actually get work done."
         },
         {
-          "id": "the-integration-headache-10",
-          "content": "MCP killed that headache in one stroke by giving everyone the same plug."
+          "id": "why-mcp-matters-10",
+          "content": "The big idea: MCP is the missing standard that finally makes AI as plug-and-play as the rest of the internet."
         }
       ]
     },
     {
-      "id": "mcp-mechanics",
-      "title": "How MCP Works",
-      "summary": "The protocol that makes connections click.",
+      "id": "mcp-architecture",
+      "title": "MCP Architecture",
+      "summary": "The client-server model that powers everything.",
       "order": 3,
       "cards": [
         {
-          "id": "mcp-mechanics-01",
-          "content": "MCP uses a simple client-server model. Your app runs an MCP server that exposes tools and data."
+          "id": "mcp-architecture-01",
+          "content": "MCP uses a simple client-server architecture. The AI host runs an MCP client; external systems run MCP servers."
         },
         {
-          "id": "mcp-mechanics-02",
-          "content": "The AI client discovers what the server offers and asks for exactly what it needs."
+          "id": "mcp-architecture-02",
+          "content": "Clients are inside the AI app (Claude, ChatGPT, Cursor, etc.). They discover and talk to any available MCP server."
         },
         {
-          "id": "mcp-mechanics-03",
-          "content": "Everything travels as structured JSON-RPC messages, so there’s no guesswork."
+          "id": "mcp-architecture-03",
+          "content": "Servers expose three things: resources (files/data), tools (functions the AI can call), and prompts (pre-written workflows)."
         },
         {
-          "id": "mcp-mechanics-04",
-          "content": "The AI decides which tool to call, sends a clean request, and gets a clean response."
+          "id": "mcp-architecture-04",
+          "content": "Communication happens over HTTP, SSE, or WebSockets. Everything is JSON-RPC messages."
         },
         {
-          "id": "mcp-mechanics-05",
-          "content": "Human-in-the-loop is baked in. You can approve big actions before they fire."
+          "id": "mcp-architecture-05",
+          "content": "Servers declare their capabilities upfront so the AI knows exactly what it can ask for."
         },
         {
-          "id": "mcp-mechanics-06",
-          "content": "Servers can stream results in real time, so the AI isn’t waiting around."
+          "id": "mcp-architecture-06",
+          "content": "Sessions are stateful when needed, letting the AI maintain context across multiple tool calls."
         },
         {
-          "id": "mcp-mechanics-07",
-          "content": "Context is scoped. The AI only sees what you explicitly allow."
+          "id": "mcp-architecture-07",
+          "content": "Discovery is automatic. Clients scan for local or remote MCP servers without manual configuration."
         },
         {
-          "id": "mcp-mechanics-08",
-          "content": "It works locally or in the cloud. Your laptop files or your enterprise database, same protocol."
+          "id": "mcp-architecture-08",
+          "content": "Permissions are granular: each server decides what the AI can read, write, or execute."
         },
         {
-          "id": "mcp-mechanics-09",
-          "content": "The AI keeps a conversation state across multiple tool calls, chaining actions naturally."
+          "id": "mcp-architecture-09",
+          "content": "The design is intentionally lightweight so even small tools or personal scripts can become MCP servers."
         },
         {
-          "id": "mcp-mechanics-10",
-          "content": "One protocol, endless possibilities. That’s the mechanical beauty of MCP."
+          "id": "mcp-architecture-10",
+          "content": "This clean separation means AI models stay focused on reasoning while the heavy lifting happens outside."
         }
       ]
     },
     {
-      "id": "mcp-components",
-      "title": "Clients, Servers & Tools",
-      "summary": "The pieces that make MCP tick.",
+      "id": "building-mcp-servers",
+      "title": "Building MCP Servers",
+      "summary": "How to expose your data and tools to AI.",
       "order": 4,
       "cards": [
         {
-          "id": "mcp-components-01",
-          "content": "MCP server: the lightweight app you build to expose your tools, files, or APIs."
+          "id": "building-mcp-servers-01",
+          "content": "Anyone can write an MCP server in any language. Official SDKs exist for Python, Java, TypeScript, and more."
         },
         {
-          "id": "mcp-components-02",
-          "content": "MCP client: the part inside the AI that talks to any server using the standard."
+          "id": "building-mcp-servers-02",
+          "content": "A server simply implements a few RPC methods: list resources, read files, call tools, etc."
         },
         {
-          "id": "mcp-components-03",
-          "content": "Tools are functions the server registers. The AI can call them like built-in skills."
+          "id": "building-mcp-servers-03",
+          "content": "You can wrap existing APIs, databases, or local folders and turn them into secure MCP endpoints."
         },
         {
-          "id": "mcp-components-04",
-          "content": "Context sources let the AI read specific files, database rows, or search results on demand."
+          "id": "building-mcp-servers-04",
+          "content": "Reference implementations from Anthropic make it easy to start with Google Drive, Notion, GitHub, or Slack."
         },
         {
-          "id": "mcp-components-05",
-          "content": "Prompt templates live on the server so the AI always gets consistent instructions."
+          "id": "building-mcp-servers-05",
+          "content": "Servers can be local (on your laptop) or remote (cloud-hosted) and still work the same way."
         },
         {
-          "id": "mcp-components-06",
-          "content": "Permissions are declared up front. The AI knows exactly what it can and cannot touch."
+          "id": "building-mcp-servers-06",
+          "content": "Authentication uses standard OAuth or API keys. The AI never sees your raw credentials."
         },
         {
-          "id": "mcp-components-07",
-          "content": "Discovery happens automatically. The AI asks the server what’s available."
+          "id": "building-mcp-servers-07",
+          "content": "Rate limiting, logging, and audit trails are built into every server for enterprise safety."
         },
         {
-          "id": "mcp-components-08",
-          "content": "Sessions keep everything stateful across back-and-forth tool calls."
+          "id": "building-mcp-servers-08",
+          "content": "You can expose entire workflows as reusable prompts that the AI can trigger with one call."
         },
         {
-          "id": "mcp-components-09",
-          "content": "Reference implementations from Anthropic make spinning up a server stupidly easy."
+          "id": "building-mcp-servers-09",
+          "content": "Once published, your server works instantly with every MCP-compatible AI app on the market."
         },
         {
-          "id": "mcp-components-10",
-          "content": "The whole stack stays lightweight so you’re not dragging in a heavyweight framework."
+          "id": "building-mcp-servers-10",
+          "content": "Building servers is the fastest way to give AI superpowers tailored exactly to your data and processes."
         }
       ]
     },
     {
-      "id": "real-world-mcp",
-      "title": "MCP in Action",
-      "summary": "Where it’s already powering real AI agents.",
+      "id": "using-mcp-with-ai",
+      "title": "Using MCP with AI Models",
+      "summary": "How agents actually call tools and get context.",
       "order": 5,
       "cards": [
         {
-          "id": "real-world-mcp-01",
-          "content": "A developer asks Claude to fix a bug. MCP server hands over the exact repo files and runs the fix locally."
+          "id": "using-mcp-with-ai-01",
+          "content": "When an AI needs information, it sends an MCP request to the connected server instead of guessing."
         },
         {
-          "id": "real-world-mcp-02",
-          "content": "An AI agent books your next flight by talking to your calendar and airline APIs through one MCP server."
+          "id": "using-mcp-with-ai-02",
+          "content": "The model decides which tool or resource to use based on the server’s declared capabilities."
         },
         {
-          "id": "real-world-mcp-03",
-          "content": "Sales teams let AI pull live CRM data, draft emails, and log everything without copy-paste hell."
+          "id": "using-mcp-with-ai-03",
+          "content": "Responses come back as structured data that the model can reason over in the same conversation."
         },
         {
-          "id": "real-world-mcp-04",
-          "content": "Data analysts query fresh warehouse numbers in natural language while the MCP server keeps everything secure."
+          "id": "using-mcp-with-ai-04",
+          "content": "Chain-of-thought works naturally: the AI can call multiple tools in sequence to complete complex tasks."
         },
         {
-          "id": "real-world-mcp-05",
-          "content": "Code editors use MCP to let AI edit your actual project files with full context and undo safety."
+          "id": "using-mcp-with-ai-05",
+          "content": "Human approval flows are automatic. The server can pause and show a confirmation dialog."
         },
         {
-          "id": "real-world-mcp-06",
-          "content": "Support bots create Jira tickets, update customer records, and confirm with you before sending."
+          "id": "using-mcp-with-ai-06",
+          "content": "Context windows stay manageable because only the needed data is pulled in on demand."
         },
         {
-          "id": "real-world-mcp-07",
-          "content": "Personal AI assistants manage your email, schedule meetings, and attach the right docs on the fly."
+          "id": "using-mcp-with-ai-07",
+          "content": "Popular clients (Claude Desktop, Cursor, VS Code Copilot) already surface MCP servers in their UI."
         },
         {
-          "id": "real-world-mcp-08",
-          "content": "Enterprise teams connect the same MCP server to Claude, GPT, or any future model without extra work."
+          "id": "using-mcp-with-ai-08",
+          "content": "No prompt engineering tricks required. The model just asks the server and gets clean, verified answers."
         },
         {
-          "id": "real-world-mcp-09",
-          "content": "Local MCP servers on your laptop give AI safe access to private notes without sending data to the cloud."
+          "id": "using-mcp-with-ai-09",
+          "content": "You can switch AI models or hosts without rewriting any connectors. The protocol stays the same."
         },
         {
-          "id": "real-world-mcp-10",
-          "content": "The pattern is clear: MCP turns “it can explain” into “it can execute.”"
+          "id": "using-mcp-with-ai-10",
+          "content": "The result is AI that feels truly connected to your world instead of living in its own bubble."
         }
       ]
     },
     {
-      "id": "using-mcp-well",
-      "title": "Using MCP Well",
-      "summary": "How to turn the protocol into real leverage.",
+      "id": "limits-future-mcp",
+      "title": "Limits, Security, and the Road Ahead",
+      "summary": "Where the cracks show and what comes next.",
       "order": 6,
       "cards": [
         {
-          "id": "using-mcp-well-01",
-          "content": "Start small. Expose one tool or folder first so you can test safely."
+          "id": "limits-future-mcp-01",
+          "content": "MCP inherits the security model of whatever servers you connect. A badly written server can expose data."
         },
         {
-          "id": "using-mcp-well-02",
-          "content": "Always declare tight permissions. The AI should only touch what it needs."
+          "id": "limits-future-mcp-02",
+          "content": "Not every AI host supports MCP yet, though adoption is growing extremely fast."
         },
         {
-          "id": "using-mcp-well-03",
-          "content": "Add human approval steps for any action that costs money or changes data."
+          "id": "limits-future-mcp-03",
+          "content": "Latency can add up when the AI makes many sequential tool calls across slow networks."
         },
         {
-          "id": "using-mcp-well-04",
-          "content": "Keep your MCP server lightweight and versioned so updates don’t break existing AI clients."
+          "id": "limits-future-mcp-04",
+          "content": "Servers still need maintenance. Updates to underlying APIs can break even standardized connectors."
         },
         {
-          "id": "using-mcp-well-05",
-          "content": "Use clear tool names and descriptions. The AI picks better when it understands intent."
+          "id": "limits-future-mcp-05",
+          "content": "Overly permissive servers risk giving AI too much power. Always follow least-privilege rules."
         },
         {
-          "id": "using-mcp-well-06",
-          "content": "Combine MCP with your favorite AI model and watch it go from thinker to doer in seconds."
+          "id": "limits-future-mcp-06",
+          "content": "Privacy-conscious users can run everything locally with self-hosted MCP servers."
         },
         {
-          "id": "using-mcp-well-07",
-          "content": "Monitor logs. You’ll spot exactly which tools the AI uses most and refine them fast."
+          "id": "limits-future-mcp-07",
+          "content": "The ecosystem is young. Best practices for discovery, versioning, and error handling are still evolving."
         },
         {
-          "id": "using-mcp-well-08",
-          "content": "Share your MCP server internally. One server can power every team’s AI workflows."
+          "id": "limits-future-mcp-08",
+          "content": "Future versions will add richer streaming, multi-agent coordination, and built-in memory layers."
         },
         {
-          "id": "using-mcp-well-09",
-          "content": "Iterate on the AI’s prompts inside the server so responses stay on-brand and accurate."
+          "id": "limits-future-mcp-09",
+          "content": "MCP is becoming the foundation for the next wave of truly agentic AI that can act across all your tools."
         },
         {
-          "id": "using-mcp-well-10",
-          "content": "The real win isn’t replacing people. It’s giving every AI the context and tools to multiply what you can do."
+          "id": "limits-future-mcp-10",
+          "content": "The smartest way to use MCP is this: treat it as leverage that keeps humans in control while giving AI the context it needs to shine."
         }
       ]
     }

@@ -86,37 +86,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/generate-content", async (req: Request, res: Response) => {
-    try {
-      const { topic, count = 10, generateOptions = true } = req.body;
-
-      if (!topic || typeof topic !== "string") {
-        return res
-          .status(400)
-          .json({ error: "Topic is required and must be a string" });
-      }
-
-      const result = await generateLearningSnippets(
-        topic,
-        Number.isFinite(count) ? Number(count) : 10,
-        Boolean(generateOptions),
-      );
-      const snippets = normalizeSnippets(topic, result.snippets);
-
-      return res.json({
-        success: true,
-        snippets,
-        options: result.options ?? [],
-      });
-    } catch (error) {
-      console.error("Generation error:", error);
-      return res.status(500).json({
-        success: false,
-        error: "Failed to generate content. Please try again.",
-      });
-    }
-  });
-
   app.get("/api/health", (_req: Request, res: Response) => {
     res.json({ status: "healthy", timestamp: new Date().toISOString() });
   });

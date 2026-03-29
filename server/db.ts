@@ -65,6 +65,22 @@ export const initializeDB = async () => {
           created_at text NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
       `);
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS user_sessions (
+          sid varchar PRIMARY KEY,
+          session text NOT NULL,
+          expires_at timestamptz NOT NULL,
+          updated_at timestamptz NOT NULL DEFAULT NOW()
+        )
+      `);
+      await pool.query(`
+        CREATE INDEX IF NOT EXISTS user_sessions_expires_at_idx
+        ON user_sessions (expires_at)
+      `);
+      await pool.query(`
+        DELETE FROM user_sessions
+        WHERE expires_at <= NOW()
+      `);
       // Migrations disabled temporarily
       // await migrate(db, { migrationsFolder: './drizzle' });
       // console.log('✅ Database migrations applied');
@@ -133,5 +149,6 @@ export const getDB = () => {
   }
   return db;
 };
+export const getPool = () => pool;
 // Export for use in routes
 export { db };

@@ -4,9 +4,6 @@
  */
 
 import * as dotenv from "dotenv";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import {
   buildTopicCacheKey,
   readTopicCache,
@@ -23,15 +20,6 @@ const snippetCache = new Map<
 >();
 const inFlightGenerations = new Map<string, Promise<LearningSnippetResult>>();
 
-// Get __dirname equivalent in ES modules
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-// Ensure logs directory exists
-const logsDir = path.join(__dirname, "../../logs");
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
-}
-
 export interface TopicOption {
   title: string;
   description: string;
@@ -46,15 +34,6 @@ const DEFAULT_OPENROUTER_MODEL = "google/gemini-2.5-flash-lite";
 
 function getOpenRouterModel(): string {
   return process.env.OPENROUTER_MODEL?.trim() || DEFAULT_OPENROUTER_MODEL;
-}
-
-function appendLogLine(filename: string, payload: unknown) {
-  const filePath = path.join(logsDir, filename);
-  void fs.promises.appendFile(filePath, JSON.stringify(payload) + "\n").catch(
-    (error) => {
-      console.error("Failed to write log file:", error);
-    },
-  );
 }
 
 /**
@@ -118,19 +97,14 @@ function logRequest(
   status: string,
   durationMs?: number,
 ) {
-  const timestamp = new Date().toISOString();
-  const logEntry = {
-    timestamp,
+  console.info("[openrouter]", {
+    timestamp: new Date().toISOString(),
     topic,
     count,
     generateOptions,
     status,
     durationMs: durationMs ? `${durationMs}ms` : "N/A",
-    userId: "anonymous", // In future, add actual user ID when auth is implemented
-  };
-
-  const logFile = `requests-${new Date().toISOString().split("T")[0]}.log`;
-  appendLogLine(logFile, logEntry);
+  });
 }
 
 /**
@@ -266,26 +240,18 @@ RESPONSE FORMAT: STRICT JSON ONLY
     const requestEnd = Date.now();
     const totalDuration = requestEnd - requestStart;
 
-    // Debug logging - write full response to debug log
-    const debugLog = {
-      timestamp: new Date().toISOString(),
-      topic,
-      fullResponse: result,
-      responseStructure: {
-        hasChoices: !!result?.choices,
-        choicesLength: result?.choices?.length,
-        hasFirstChoice: !!result?.choices?.[0],
-        hasMessage: !!result?.choices?.[0]?.message,
-        hasContent: !!result?.choices?.[0]?.message?.content,
-      },
+    const responseStructure = {
+      hasChoices: !!result?.choices,
+      choicesLength: result?.choices?.length,
+      hasFirstChoice: !!result?.choices?.[0],
+      hasMessage: !!result?.choices?.[0]?.message,
+      hasContent: !!result?.choices?.[0]?.message?.content,
     };
-    const debugLogFile = `debug-${new Date().toISOString().split("T")[0]}.log`;
-    appendLogLine(debugLogFile, debugLog);
 
     // Check if response has the expected structure
     if (!result?.choices?.[0]?.message?.content) {
       console.error("Invalid response format from OpenRouter");
-      console.error("Response structure:", debugLog.responseStructure);
+      console.error("Response structure:", responseStructure);
 
       // Try to extract content from alternative response formats
       let fallbackContent = null;
@@ -376,16 +342,6 @@ RESPONSE FORMAT: STRICT JSON ONLY
 
     try {
       const content = result.choices[0].message.content;
-
-      // Debug logging - write raw response to debug log
-      const debugLog = {
-        timestamp: new Date().toISOString(),
-        topic,
-        rawResponse: content,
-        responseLength: content.length,
-      };
-      const debugLogFile = `debug-${new Date().toISOString().split("T")[0]}.log`;
-      appendLogLine(debugLogFile, debugLog);
 
       const sanitizedJson = sanitizeAndValidateJson(content);
       if (!sanitizedJson) {
@@ -679,30 +635,4 @@ function getFallbackContent(
     snippets: fallbackSnippets.slice(0, count),
     options: generateOptions ? options : undefined,
   };
-}
-
-/**
- * Generate fallback options when API fails
- */
-function getFallbackOptions(
-  topic: string,
-): TopicOption[] {
-  return [
-    {
-      title: `Introduction to ${topic}`,
-      description: `Learn the basics of ${topic}`,
-    },
-    {
-      title: `Advanced ${topic}`,
-      description: `Explore advanced concepts in ${topic}`,
-    },
-    {
-      title: `Applications of ${topic}`,
-      description: `Discover practical applications of ${topic}`,
-    },
-    {
-      title: `${topic} Research`,
-      description: `Explore current research in ${topic}`,
-    },
-  ];
 }

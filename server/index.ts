@@ -8,13 +8,14 @@ import helmet from "helmet";
 import cors from "cors";
 import session from "express-session";
 import MemoryStoreFactory from "memorystore";
-import { initializeDB } from "./db";
+import { getPool, initializeDB } from "./db";
 import chatRoutes from "./routes/chatsRuntime";
 import topicRoutes from "./routes/topicRoutesRuntime";
 import authRoutes from "./routes/authRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import courseRoutes from "./routes/courseRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
+import { PostgresSessionStore } from "./sessionStore";
 
 function isSecureCookieEnabled() {
   const override = process.env.SESSION_COOKIE_SECURE;
@@ -92,24 +93,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(
-  session({
-    name: "focusfeed.sid",
-    secret: process.env.SESSION_SECRET || "focusfeed-dev-secret",
-    resave: false,
-    saveUninitialized: false,
-    proxy: process.env.NODE_ENV === "production",
-    cookie: {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: isSecureCookieEnabled(),
-      maxAge: 1000 * 60 * 60 * 24 * 30,
-    },
-    store: new MemoryStore({
-      checkPeriod: 1000 * 60 * 60 * 24,
-    }),
-  }),
-);
-app.use(
   (req: Request, res: Response, next: NextFunction) => {
     const start = Date.now();
     const requestPath = req.path;
@@ -128,6 +111,31 @@ app.use(
 );
 (async () => {
   await initializeDB();
+  const pool = getPool();
+  const sessionStore =
+    process.env.NODE_ENV === "production" && pool
+      ? new PostgresSessionStore(pool)
+      : new MemoryStore({
+          checkPeriod: 1000 * 60 * 60 * 24,
+        });
+
+  app.use(
+    session({
+      name: "focusfeed.sid",
+      secret: process.env.SESSION_SECRET || "focusfeed-dev-secret",
+      resave: false,
+      saveUninitialized: false,
+      proxy: process.env.NODE_ENV === "production",
+      cookie: {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: isSecureCookieEnabled(),
+        maxAge: 1000 * 60 * 60 * 24 * 30,
+      },
+      store: sessionStore,
+    }),
+  );
+
   const server = await registerRoutes(app);
   app.use(authRoutes);
   app.use(adminRoutes);

@@ -1,6 +1,7 @@
 import express from "express";
 import { sql } from "drizzle-orm";
 import { db as initializedDb } from "../db";
+import { requireAuth } from "../authz";
 
 const router = express.Router();
 
@@ -25,7 +26,10 @@ function getRouteDb() {
 
 router.post("/api/topic-interactions", async (req, res) => {
   try {
-    const { userId, interactions } = req.body;
+    const user = await requireAuth(req, res);
+    if (!user) return;
+
+    const { interactions } = req.body;
     const db = getRouteDb();
 
     if (!db) {
@@ -35,7 +39,7 @@ router.post("/api/topic-interactions", async (req, res) => {
       });
     }
 
-    if (!userId || !interactions || !Array.isArray(interactions)) {
+    if (!interactions || !Array.isArray(interactions)) {
       return res.status(400).json({
         success: false,
         error: "Invalid request format",
@@ -52,7 +56,7 @@ router.post("/api/topic-interactions", async (req, res) => {
           INSERT INTO user_topic_interactions
             (user_id, topic, interaction_count, is_liked, last_interaction)
           VALUES
-            (${userId}, ${interaction.topic}, ${interaction.count || 1}, ${interaction.isLiked || false}, NOW())
+            (${user.id}, ${interaction.topic}, ${interaction.count || 1}, ${interaction.isLiked || false}, NOW())
           ON CONFLICT (user_id, topic)
           DO UPDATE SET
             interaction_count = EXCLUDED.interaction_count,
@@ -83,15 +87,10 @@ router.post("/api/topic-interactions", async (req, res) => {
 
 router.get("/api/popular-topics", async (req, res) => {
   try {
-    const { userId } = req.query;
-    const db = getRouteDb();
+    const user = await requireAuth(req, res);
+    if (!user) return;
 
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        error: "userId is required",
-      });
-    }
+    const db = getRouteDb();
 
     if (!db) {
       return res.json({
@@ -103,7 +102,7 @@ router.get("/api/popular-topics", async (req, res) => {
     const result = await db.execute(sql`
       SELECT topic, interaction_count, is_liked, last_interaction
       FROM user_topic_interactions
-      WHERE user_id = ${String(userId)}
+      WHERE user_id = ${user.id}
       ORDER BY
         is_liked DESC,
         interaction_count DESC,

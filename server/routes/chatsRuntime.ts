@@ -4,17 +4,7 @@ import { eq, desc } from "drizzle-orm";
 import { chats, chatCards } from "../../shared/schema";
 import { db as initializedDb } from "../db";
 import { generateLearningSnippets } from "../openai";
-
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: string;
-        username: string;
-      };
-    }
-  }
-}
+import { requireAuth } from "../authz";
 
 const router = express.Router();
 
@@ -34,12 +24,8 @@ function getRouteDb() {
 
 router.get("/api/chats", async (req, res) => {
   try {
-    if (!req.user?.id) {
-      return res.status(401).json({
-        success: false,
-        error: "Unauthorized - Please authenticate",
-      });
-    }
+    const user = await requireAuth(req, res);
+    if (!user) return;
 
     const db = getRouteDb();
     if (!db) {
@@ -53,7 +39,7 @@ router.get("/api/chats", async (req, res) => {
     const userChats = await db
       .select()
       .from(chats)
-      .where(eq(chats.userId, req.user.id))
+      .where(eq(chats.userId, user.id))
       .orderBy(desc(chats.createdAt));
 
     return res.json({
@@ -71,12 +57,8 @@ router.get("/api/chats", async (req, res) => {
 
 router.post("/api/chats", async (req, res) => {
   try {
-    if (!req.user?.id) {
-      return res.status(401).json({
-        success: false,
-        error: "Unauthorized - Please authenticate",
-      });
-    }
+    const user = await requireAuth(req, res);
+    if (!user) return;
 
     const { topic } = createChatSchema.parse(req.body);
     const db = getRouteDb();
@@ -86,7 +68,7 @@ router.post("/api/chats", async (req, res) => {
         success: true,
         chat: {
           id: `dev-${Math.random().toString(36).slice(2, 11)}`,
-          userId: req.user.id,
+          userId: user.id,
           topic: topic.trim(),
           createdAt: new Date().toISOString(),
         },
@@ -97,7 +79,7 @@ router.post("/api/chats", async (req, res) => {
     const newChat = await db
       .insert(chats)
       .values({
-        userId: req.user.id,
+        userId: user.id,
         topic: topic.trim(),
       })
       .returning();
@@ -131,12 +113,22 @@ router.post("/api/generate-content", async (req, res) => {
     const db = getRouteDb();
 
     if (chatId && db) {
+      const user = await requireAuth(req, res);
+      if (!user) return;
+
       const chat = await db.select().from(chats).where(eq(chats.id, chatId)).limit(1);
 
       if (!chat.length) {
         return res.status(404).json({
           success: false,
           error: "Chat not found",
+        });
+      }
+
+      if (chat[0].userId !== user.id) {
+        return res.status(403).json({
+          success: false,
+          error: "You do not have access to this chat",
         });
       }
 
