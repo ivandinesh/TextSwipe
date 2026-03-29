@@ -7,10 +7,10 @@ import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { AuthDialog } from "./AuthDialog";
+import { CoursesTeaser } from "./CoursesTeaser";
 import { LoadingScreen } from "./LoadingScreen";
 import { SwipeContainer } from "./SwipeContainer";
 import { TopicInput } from "./TopicInput";
-import { CoursesTeaser } from "@/pages/Courses";
 
 interface DemoContent {
   [key: string]: string[];
