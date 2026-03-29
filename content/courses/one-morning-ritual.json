@@ -1,0 +1,307 @@
+{
+  "id": "one-morning-ritual",
+  "slug": "one-morning-ritual",
+  "title": "The One Morning Ritual High Performers Actually Keep",
+  "tagline": "One habit. Massive edge.",
+  "description": "A 60-card guided run through the single morning system that elite performers protect like their most valuable asset.",
+  "cover": {
+    "eyebrow": "Course",
+    "accent": "electric",
+    "art": "dawn-grid"
+  },
+  "metadata": {
+    "estimatedMinutes": 47,
+    "level": "Beginner",
+    "category": "Productivity"
+  },
+  "modules": [
+    {
+      "id": "morning-chaos-edge",
+      "title": "Morning Chaos vs Edge",
+      "summary": "Why most mornings sabotage your day.",
+      "order": 1,
+      "cards": [
+        {
+          "id": "morning-chaos-edge-01",
+          "content": "High performers don’t wake up and wing it. They guard one non-negotiable ritual that sets the tone before the world pulls them in."
+        },
+        {
+          "id": "morning-chaos-edge-02",
+          "content": "Scrolling first thing floods your brain with other people’s priorities and kills your own focus window."
+        },
+        {
+          "id": "morning-chaos-edge-03",
+          "content": "Most routines collapse because they try to do everything instead of protecting one thing that actually compounds."
+        },
+        {
+          "id": "morning-chaos-edge-04",
+          "content": "The edge isn’t more hours. It’s the first thirty minutes where you control the inputs and own the output."
+        },
+        {
+          "id": "morning-chaos-edge-05",
+          "content": "Performers who keep this ritual report sharper decisions, steadier energy, and fewer reactive days."
+        },
+        {
+          "id": "morning-chaos-edge-06",
+          "content": "The ritual feels small but it quietly rewires your entire day before breakfast."
+        },
+        {
+          "id": "morning-chaos-edge-07",
+          "content": "You don’t need discipline for ten different habits. You only need it for one that matters."
+        },
+        {
+          "id": "morning-chaos-edge-08",
+          "content": "This course strips away the fluff and gives you the exact ritual that sticks because it’s simple and powerful."
+        },
+        {
+          "id": "morning-chaos-edge-09",
+          "content": "Start here and you’ll stop starting days in debt to your phone or yesterday’s stress."
+        },
+        {
+          "id": "morning-chaos-edge-10",
+          "content": "The difference between average and elite isn’t talent. It’s who owns their first thirty minutes."
+        }
+      ]
+    },
+    {
+      "id": "ritual-science",
+      "title": "Ritual Science",
+      "summary": "Why one habit compounds faster than ten.",
+      "order": 2,
+      "cards": [
+        {
+          "id": "ritual-science-01",
+          "content": "Your brain is most plastic in the first hour after waking. One ritual uses that window before willpower fades."
+        },
+        {
+          "id": "ritual-science-02",
+          "content": "Cortisol peaks naturally in the morning. Channel it into intention instead of letting it spike with chaos."
+        },
+        {
+          "id": "ritual-science-03",
+          "content": "Dopamine from completing a small ritual creates momentum that carries through meetings and deadlines."
+        },
+        {
+          "id": "ritual-science-04",
+          "content": "Consistency beats intensity. A short daily ritual builds stronger neural pathways than occasional long ones."
+        },
+        {
+          "id": "ritual-science-05",
+          "content": "High performers protect this because it creates a personal operating system for the rest of the day."
+        },
+        {
+          "id": "ritual-science-06",
+          "content": "The ritual hijacks your circadian rhythm to deliver steady focus instead of afternoon crashes."
+        },
+        {
+          "id": "ritual-science-07",
+          "content": "Science shows that people who anchor their mornings make better decisions all day long."
+        },
+        {
+          "id": "ritual-science-08",
+          "content": "It’s not about waking at 5 a.m. It’s about what you do in the first thirty minutes that actually matters."
+        },
+        {
+          "id": "ritual-science-09",
+          "content": "One ritual compounds like interest. Miss it once and you feel it. Miss it for a week and the edge is gone."
+        },
+        {
+          "id": "ritual-science-10",
+          "content": "This is the science-backed reason one simple habit separates the consistent from the chaotic."
+        }
+      ]
+    },
+    {
+      "id": "the-anchor-ritual",
+      "title": "The Anchor Ritual",
+      "summary": "The exact 20-minute system they keep.",
+      "order": 3,
+      "cards": [
+        {
+          "id": "the-anchor-ritual-01",
+          "content": "The ritual is dead simple: hydrate, move, reflect, intend. Twenty minutes total, no apps required."
+        },
+        {
+          "id": "the-anchor-ritual-02",
+          "content": "Hydrate first with 500ml of water to fire up metabolism and clear overnight brain fog."
+        },
+        {
+          "id": "the-anchor-ritual-03",
+          "content": "Move next with light bodyweight flow to wake muscles and signal your body it’s go time."
+        },
+        {
+          "id": "the-anchor-ritual-04",
+          "content": "Reflect with three quick gratitudes to shift your nervous system from stress to calm confidence."
+        },
+        {
+          "id": "the-anchor-ritual-05",
+          "content": "Intend last by naming your one focus for the day so every decision aligns with it."
+        },
+        {
+          "id": "the-anchor-ritual-06",
+          "content": "No journaling marathons. No perfect poses. Just four steps that fit any schedule."
+        },
+        {
+          "id": "the-anchor-ritual-07",
+          "content": "High performers keep it because it’s repeatable on travel days, bad sleep nights, or crazy mornings."
+        },
+        {
+          "id": "the-anchor-ritual-08",
+          "content": "The order matters. Each step builds on the last so the whole ritual feels effortless."
+        },
+        {
+          "id": "the-anchor-ritual-09",
+          "content": "This is the one they actually protect because it delivers results without demanding perfection."
+        },
+        {
+          "id": "the-anchor-ritual-10",
+          "content": "Once you run it for a week, your brain starts craving the ritual instead of fighting it."
+        }
+      ]
+    },
+    {
+      "id": "common-pitfalls",
+      "title": "Common Pitfalls",
+      "summary": "What kills most rituals and how to dodge it.",
+      "order": 4,
+      "cards": [
+        {
+          "id": "common-pitfalls-01",
+          "content": "Trying to add six new habits at once guarantees you quit by day four."
+        },
+        {
+          "id": "common-pitfalls-02",
+          "content": "Waiting for motivation instead of building the ritual as a non-negotiable appointment."
+        },
+        {
+          "id": "common-pitfalls-03",
+          "content": "Doing it after checking your phone lets the world set your agenda before you set yours."
+        },
+        {
+          "id": "common-pitfalls-04",
+          "content": "Making it too long or complicated so it feels like another chore instead of an edge."
+        },
+        {
+          "id": "common-pitfalls-05",
+          "content": "Skipping on weekends or travel and breaking the streak that actually builds the habit."
+        },
+        {
+          "id": "common-pitfalls-06",
+          "content": "Focusing on the perfect execution instead of just showing up and doing the four steps."
+        },
+        {
+          "id": "common-pitfalls-07",
+          "content": "Telling everyone about it before you’ve done it for thirty days and inviting pressure."
+        },
+        {
+          "id": "common-pitfalls-08",
+          "content": "Tying it to a specific wake-up time instead of tying it to the first thirty minutes after waking."
+        },
+        {
+          "id": "common-pitfalls-09",
+          "content": "These traps look innocent but quietly kill the consistency high performers rely on."
+        },
+        {
+          "id": "common-pitfalls-10",
+          "content": "Dodge them and your ritual becomes automatic instead of another failed experiment."
+        }
+      ]
+    },
+    {
+      "id": "making-it-stick",
+      "title": "Making It Stick",
+      "summary": "Turn one ritual into a lifelong edge.",
+      "order": 5,
+      "cards": [
+        {
+          "id": "making-it-stick-01",
+          "content": "Stack it right after waking so it becomes the first domino of your day."
+        },
+        {
+          "id": "making-it-stick-02",
+          "content": "Prepare everything the night before so there’s zero friction when you open your eyes."
+        },
+        {
+          "id": "making-it-stick-03",
+          "content": "Track it with a simple checkmark, not an app, to keep the focus on the doing."
+        },
+        {
+          "id": "making-it-stick-04",
+          "content": "Link it to something you already love like your first coffee or favorite playlist."
+        },
+        {
+          "id": "making-it-stick-05",
+          "content": "Start stupidly small on hard days so the habit never breaks even when life gets messy."
+        },
+        {
+          "id": "making-it-stick-06",
+          "content": "Review your daily intention every evening so tomorrow’s ritual feels connected."
+        },
+        {
+          "id": "making-it-stick-07",
+          "content": "Protect the slot like a meeting with your future self because it is."
+        },
+        {
+          "id": "making-it-stick-08",
+          "content": "After thirty days the ritual runs on autopilot and you stop thinking about it."
+        },
+        {
+          "id": "making-it-stick-09",
+          "content": "High performers keep it because the payoff is so obvious they refuse to miss it."
+        },
+        {
+          "id": "making-it-stick-10",
+          "content": "This is how one ritual becomes the foundation everything else is built on."
+        }
+      ]
+    },
+    {
+      "id": "daily-protocol",
+      "title": "Your Daily Protocol",
+      "summary": "Exact steps to start tomorrow morning.",
+      "order": 6,
+      "cards": [
+        {
+          "id": "daily-protocol-01",
+          "content": "Tonight: put 500ml of water by your bed and set your alarm for the same time every day."
+        },
+        {
+          "id": "daily-protocol-02",
+          "content": "Wake up, drink the water before you touch your phone or say a word."
+        },
+        {
+          "id": "daily-protocol-03",
+          "content": "Do five minutes of simple movement: push-ups, squats, or a quick stretch flow."
+        },
+        {
+          "id": "daily-protocol-04",
+          "content": "Sit or stand and name three specific things you’re grateful for right now."
+        },
+        {
+          "id": "daily-protocol-05",
+          "content": "Write or speak your single most important focus for today in one clear sentence."
+        },
+        {
+          "id": "daily-protocol-06",
+          "content": "Done in under twenty minutes. No perfection required, just show up."
+        },
+        {
+          "id": "daily-protocol-07",
+          "content": "Repeat tomorrow and every day after. The edge grows quietly but relentlessly."
+        },
+        {
+          "id": "daily-protocol-08",
+          "content": "After seven days you’ll feel the difference in energy, clarity, and decision speed."
+        },
+        {
+          "id": "daily-protocol-09",
+          "content": "This is the one ritual high performers actually keep because it’s stupidly simple and stupidly effective."
+        },
+        {
+          "id": "daily-protocol-10",
+          "content": "Start tomorrow and watch how one small morning habit quietly builds the life you want."
+        }
+      ]
+    }
+  ]
+}

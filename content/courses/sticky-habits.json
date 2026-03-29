@@ -1,0 +1,307 @@
+{
+  "id": "sticky-habits",
+  "slug": "sticky-habits",
+  "title": "Sticky Habits",
+  "tagline": "Systems that work when motivation disappears.",
+  "description": "A 60-card playbook for building habits that actually last.",
+  "cover": {
+    "eyebrow": "Course",
+    "accent": "sage",
+    "art": "chain-link"
+  },
+  "metadata": {
+    "estimatedMinutes": 48,
+    "level": "Beginner",
+    "category": "Productivity"
+  },
+  "modules": [
+    {
+      "id": "motivation-myth",
+      "title": "The Motivation Myth",
+      "summary": "Why feelings are a terrible foundation.",
+      "order": 1,
+      "cards": [
+        {
+          "id": "motivation-myth-01",
+          "content": "Motivation is a feeling that rises and falls with your mood, energy, and circumstances. It was never meant to be your daily engine."
+        },
+        {
+          "id": "motivation-myth-02",
+          "content": "Relying on motivation is like steering your life by the wind instead of the rudder. You end up wherever the breeze takes you."
+        },
+        {
+          "id": "motivation-myth-03",
+          "content": "The days you need habits most are usually the days motivation ghosts you. That's exactly when systems matter."
+        },
+        {
+          "id": "motivation-myth-04",
+          "content": "Successful people don't feel more motivated than you. They just built habits that don't need constant emotional fuel."
+        },
+        {
+          "id": "motivation-myth-05",
+          "content": "Habits run on autopilot. Motivation requires conscious effort every single time. One scales. The other burns out."
+        },
+        {
+          "id": "motivation-myth-06",
+          "content": "Think of motivation as the spark that starts the fire. Habits are the wood that keeps it burning long after the match is gone."
+        },
+        {
+          "id": "motivation-myth-07",
+          "content": "The biggest lie in self-improvement is that you need to feel ready before you begin. Action creates the feeling, not the other way around."
+        },
+        {
+          "id": "motivation-myth-08",
+          "content": "When motivation fades, identity takes over. The question shifts from 'Do I feel like it?' to 'Who am I becoming?'"
+        },
+        {
+          "id": "motivation-myth-09",
+          "content": "Discipline isn't about forcing yourself harder. It's about designing a life where the right actions become the default path."
+        },
+        {
+          "id": "motivation-myth-10",
+          "content": "Drop the motivation chase. Build small systems instead. They carry you through the flat, boring, and tough days."
+        }
+      ]
+    },
+    {
+      "id": "habit-loop",
+      "title": "The Habit Loop",
+      "summary": "The simple mechanics behind automatic behavior.",
+      "order": 2,
+      "cards": [
+        {
+          "id": "habit-loop-01",
+          "content": "Every habit follows the same loop: cue, craving, response, reward. Master these four parts and you control the behavior."
+        },
+        {
+          "id": "habit-loop-02",
+          "content": "The cue is the trigger that tells your brain it's time to act. It can be a time, place, emotion, or previous action."
+        },
+        {
+          "id": "habit-loop-03",
+          "content": "Craving is the motivational force. It's the desire for the reward that powers the habit."
+        },
+        {
+          "id": "habit-loop-04",
+          "content": "The response is the actual habit you perform. It can be a thought or an action depending on how complex it is."
+        },
+        {
+          "id": "habit-loop-05",
+          "content": "The reward satisfies the craving and teaches your brain that this loop is worth remembering for next time."
+        },
+        {
+          "id": "habit-loop-06",
+          "content": "To build a new habit, make the cue obvious, the craving attractive, the response easy, and the reward satisfying."
+        },
+        {
+          "id": "habit-loop-07",
+          "content": "To break a bad habit, do the opposite: hide the cue, make it unattractive, difficult, and unsatisfying."
+        },
+        {
+          "id": "habit-loop-08",
+          "content": "Your current habits were built by this loop running on repeat, often without you noticing."
+        },
+        {
+          "id": "habit-loop-09",
+          "content": "Once a habit becomes automatic, the cue and reward become linked directly in your brain."
+        },
+        {
+          "id": "habit-loop-10",
+          "content": "Understanding the loop gives you the operating manual for your own behavior."
+        }
+      ]
+    },
+    {
+      "id": "start-tiny",
+      "title": "Start Tiny",
+      "summary": "How ridiculous-small actions create momentum.",
+      "order": 3,
+      "cards": [
+        {
+          "id": "start-tiny-01",
+          "content": "The secret to building habits that stick is to start so small that you can't say no. Scale beats intensity."
+        },
+        {
+          "id": "start-tiny-02",
+          "content": "Two push-ups a day beats fifty push-ups once a month. Consistency compounds faster than perfection."
+        },
+        {
+          "id": "start-tiny-03",
+          "content": "Tiny habits lower the activation energy so dramatically that your brain stops negotiating with you."
+        },
+        {
+          "id": "start-tiny-04",
+          "content": "Flossing one tooth, drinking one glass of water, or writing one sentence builds the identity of someone who follows through."
+        },
+        {
+          "id": "start-tiny-05",
+          "content": "Once the tiny version is automatic, you naturally expand it without forcing motivation."
+        },
+        {
+          "id": "start-tiny-06",
+          "content": "Small starts protect you from the all-or-nothing trap that kills most habit attempts."
+        },
+        {
+          "id": "start-tiny-07",
+          "content": "Your brain loves quick wins. Tiny habits give it dopamine hits that reinforce the behavior early."
+        },
+        {
+          "id": "start-tiny-08",
+          "content": "Scale up only after the habit has survived at least two weeks of daily tiny reps."
+        },
+        {
+          "id": "start-tiny-09",
+          "content": "The gold is not in doing more on good days. It's in never missing on the days you don't feel like it."
+        },
+        {
+          "id": "start-tiny-10",
+          "content": "Start stupid small. The compound effect will shock you months later."
+        }
+      ]
+    },
+    {
+      "id": "stack-and-design",
+      "title": "Stack and Design",
+      "summary": "Habit stacking and environment hacks that make it effortless.",
+      "order": 4,
+      "cards": [
+        {
+          "id": "stack-and-design-01",
+          "content": "Habit stacking attaches a new behavior to an existing habit using the formula: After I [current habit], I will [new habit]."
+        },
+        {
+          "id": "stack-and-design-02",
+          "content": "Your environment is the invisible hand shaping your habits. Design it so good choices are obvious and easy."
+        },
+        {
+          "id": "stack-and-design-03",
+          "content": "Want to read more? Put the book on your pillow instead of hiding it in a drawer."
+        },
+        {
+          "id": "stack-and-design-04",
+          "content": "Reduce friction for good habits. Increase friction for bad ones. This beats willpower every time."
+        },
+        {
+          "id": "stack-and-design-05",
+          "content": "Prime your environment for success the night before. Set out workout clothes, prep healthy snacks, or block distracting apps."
+        },
+        {
+          "id": "stack-and-design-06",
+          "content": "Context is the cue. Change your surroundings and you change the habits that show up automatically."
+        },
+        {
+          "id": "stack-and-design-07",
+          "content": "Make good habits attractive by pairing them with something you already enjoy, like listening to a podcast only while walking."
+        },
+        {
+          "id": "stack-and-design-08",
+          "content": "One small change in your space can trigger a cascade of better behaviors without extra effort."
+        },
+        {
+          "id": "stack-and-design-09",
+          "content": "The people around you are part of your environment. Surround yourself with those who embody the habits you want."
+        },
+        {
+          "id": "stack-and-design-10",
+          "content": "Design your defaults so that the path of least resistance leads straight to your goals."
+        }
+      ]
+    },
+    {
+      "id": "when-it-gets-hard",
+      "title": "When It Gets Hard",
+      "summary": "Handling resistance, plateaus, and ghosted motivation.",
+      "order": 5,
+      "cards": [
+        {
+          "id": "when-it-gets-hard-01",
+          "content": "The first weeks feel fresh. Then boredom and resistance show up. This is where most habits die."
+        },
+        {
+          "id": "when-it-gets-hard-02",
+          "content": "Never miss twice. One missed day is a mistake. Two in a row starts a new pattern."
+        },
+        {
+          "id": "when-it-gets-hard-03",
+          "content": "When motivation is gone, fall back on your minimum viable habit. Do the tiny version no matter what."
+        },
+        {
+          "id": "when-it-gets-hard-04",
+          "content": "Plateaus happen when the novelty wears off. That's your signal to add a new layer or tweak the stack."
+        },
+        {
+          "id": "when-it-gets-hard-05",
+          "content": "Track your streak but focus on identity. Ask: What would the person I want to become do today?"
+        },
+        {
+          "id": "when-it-gets-hard-06",
+          "content": "Use the two-day rule for flexibility. You can miss one day, but never two consecutive days."
+        },
+        {
+          "id": "when-it-gets-hard-07",
+          "content": "Resistance is information. It often points to where your habit needs better design, not more willpower."
+        },
+        {
+          "id": "when-it-gets-hard-08",
+          "content": "On bad days, show up anyway. Even a 10% effort keeps the chain alive and your identity intact."
+        },
+        {
+          "id": "when-it-gets-hard-09",
+          "content": "Recommit to your why, but anchor it in identity rather than fleeting outcomes."
+        },
+        {
+          "id": "when-it-gets-hard-10",
+          "content": "The difference between people who succeed and those who don't is what they do on the days they don't feel like it."
+        }
+      ]
+    },
+    {
+      "id": "make-it-last",
+      "title": "Make It Last",
+      "summary": "Systems for identity, tracking, and long-term consistency.",
+      "order": 6,
+      "cards": [
+        {
+          "id": "make-it-last-01",
+          "content": "Habits stick best when they become part of who you are. Shift from 'I want to run' to 'I am a runner.'"
+        },
+        {
+          "id": "make-it-last-02",
+          "content": "Track your habits simply. A calendar chain or simple yes/no log creates powerful visual proof of progress."
+        },
+        {
+          "id": "make-it-last-03",
+          "content": "Celebrate small wins immediately. A quick internal 'nice' or fist pump reinforces the loop."
+        },
+        {
+          "id": "make-it-last-04",
+          "content": "Review your habits monthly. Drop what no longer serves you and double down on what does."
+        },
+        {
+          "id": "make-it-last-05",
+          "content": "Build recovery systems. Know exactly how you'll restart after travel, illness, or life chaos."
+        },
+        {
+          "id": "make-it-last-06",
+          "content": "Identity change is the strongest force. Every action is a vote for the person you want to become."
+        },
+        {
+          "id": "make-it-last-07",
+          "content": "Habits compound. The daily 1% improvements feel invisible until suddenly they're not."
+        },
+        {
+          "id": "make-it-last-08",
+          "content": "Share your habits with others or join a group. Social accountability turns individual effort into community norm."
+        },
+        {
+          "id": "make-it-last-09",
+          "content": "Make it satisfying long-term by focusing on the process and the person you're becoming, not just distant results."
+        },
+        {
+          "id": "make-it-last-10",
+          "content": "The ultimate habit is becoming someone who doesn't quit on themselves. Systems make that identity real."
+        }
+      ]
+    }
+  ]
+}

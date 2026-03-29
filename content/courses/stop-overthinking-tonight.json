@@ -1,0 +1,307 @@
+{
+  "id": "stop-overthinking-tonight",
+  "slug": "stop-overthinking-tonight",
+  "title": "Stop Overthinking Tonight and Sleep Like a Pro",
+  "tagline": "Quiet the mental noise. Fall asleep fast.",
+  "description": "A 60-card guided run through the quick switches and habits that kill overthinking and unlock deep, pro-level sleep starting tonight.",
+  "cover": {
+    "eyebrow": "Course",
+    "accent": "sage",
+    "art": "sleep-grid"
+  },
+  "metadata": {
+    "estimatedMinutes": 46,
+    "level": "Beginner",
+    "category": "Wellness"
+  },
+  "modules": [
+    {
+      "id": "overthinking-steals-sleep",
+      "title": "Why Overthinking Steals Your Sleep",
+      "summary": "The sneaky reasons your mind won't shut off.",
+      "order": 1,
+      "cards": [
+        {
+          "id": "overthinking-steals-sleep-01",
+          "content": "Overthinking at bedtime is your brain treating the quiet as prime time to replay every awkward conversation and unfinished task."
+        },
+        {
+          "id": "overthinking-steals-sleep-02",
+          "content": "The moment lights go out, your mind shifts from doer mode to problem-solver mode with no off switch."
+        },
+        {
+          "id": "overthinking-steals-sleep-03",
+          "content": "This isn't a personal flaw. It's a survival response that spikes stress hormones right when you need calm."
+        },
+        {
+          "id": "overthinking-steals-sleep-04",
+          "content": "Most people lie awake for hours because they fight the thoughts instead of redirecting them."
+        },
+        {
+          "id": "overthinking-steals-sleep-05",
+          "content": "High achievers overthink the most because their brains are wired for constant analysis and planning."
+        },
+        {
+          "id": "overthinking-steals-sleep-06",
+          "content": "The longer you stay stuck in the loop, the harder it gets to break free and actually rest."
+        },
+        {
+          "id": "overthinking-steals-sleep-07",
+          "content": "Sleep isn't lost by accident. It's lost to unchecked mental chatter that builds all day."
+        },
+        {
+          "id": "overthinking-steals-sleep-08",
+          "content": "Recognizing the pattern is the first move that lets you stop feeding it tonight."
+        },
+        {
+          "id": "overthinking-steals-sleep-09",
+          "content": "This course turns that awareness into instant off-switches you can use in bed."
+        },
+        {
+          "id": "overthinking-steals-sleep-10",
+          "content": "Tonight you stop being a victim of your thoughts and start sleeping like someone who knows the hacks."
+        }
+      ]
+    },
+    {
+      "id": "sleep-science-basics",
+      "title": "Sleep Science Basics",
+      "summary": "What actually happens when your mind races.",
+      "order": 2,
+      "cards": [
+        {
+          "id": "sleep-science-basics-01",
+          "content": "Racing thoughts keep your sympathetic nervous system on high alert and block the parasympathetic rest mode."
+        },
+        {
+          "id": "sleep-science-basics-02",
+          "content": "Melatonin production drops when cortisol stays elevated from overthinking."
+        },
+        {
+          "id": "sleep-science-basics-03",
+          "content": "Your brain's default mode network activates at night and drags you into endless what-if scenarios."
+        },
+        {
+          "id": "sleep-science-basics-04",
+          "content": "Deep sleep stages get shortened when thoughts keep firing, leaving you groggy even after hours in bed."
+        },
+        {
+          "id": "sleep-science-basics-05",
+          "content": "The amygdala treats every loose end as a threat, so your body stays ready to run instead of rest."
+        },
+        {
+          "id": "sleep-science-basics-06",
+          "content": "Simple breathing tricks can shift brain waves from alert beta to calm alpha in minutes."
+        },
+        {
+          "id": "sleep-science-basics-07",
+          "content": "Neuroplasticity means you can rewire the bedtime spin into a calm routine with repetition."
+        },
+        {
+          "id": "sleep-science-basics-08",
+          "content": "Temperature, light, and sound cues tell your brain it's safe to power down."
+        },
+        {
+          "id": "sleep-science-basics-09",
+          "content": "Understanding these mechanisms removes the mystery and gives you control tonight."
+        },
+        {
+          "id": "sleep-science-basics-10",
+          "content": "Sleep becomes reliable once you know exactly which levers to pull."
+        }
+      ]
+    },
+    {
+      "id": "instant-mind-quieters",
+      "title": "Instant Mind Quieters",
+      "summary": "Techniques that work in under two minutes.",
+      "order": 3,
+      "cards": [
+        {
+          "id": "instant-mind-quieters-01",
+          "content": "The brain dump trick: write every swirling thought on paper then literally close the notebook."
+        },
+        {
+          "id": "instant-mind-quieters-02",
+          "content": "Box breathing: four seconds in, four hold, four out, four hold. It forces your nervous system offline."
+        },
+        {
+          "id": "instant-mind-quieters-03",
+          "content": "Name the thought and file it: “Planning thought. Deal tomorrow.” Then let it go."
+        },
+        {
+          "id": "instant-mind-quieters-04",
+          "content": "Visualize a slow-moving train carrying each thought away until your mind goes blank."
+        },
+        {
+          "id": "instant-mind-quieters-05",
+          "content": "Count backwards from 300 by threes. The boring math crowds out every worry."
+        },
+        {
+          "id": "instant-mind-quieters-06",
+          "content": "Repeat “I release this” out loud or silently until the loop loses steam."
+        },
+        {
+          "id": "instant-mind-quieters-07",
+          "content": "Focus only on the feeling of your feet against the sheets to anchor you in the present."
+        },
+        {
+          "id": "instant-mind-quieters-08",
+          "content": "Play a mental game of listing every color you see in your room with eyes closed."
+        },
+        {
+          "id": "instant-mind-quieters-09",
+          "content": "These tricks work because they give your brain a new, low-stakes task."
+        },
+        {
+          "id": "instant-mind-quieters-10",
+          "content": "Pick one and use it the second your head hits the pillow tonight."
+        }
+      ]
+    },
+    {
+      "id": "body-first-calm",
+      "title": "Body-First Calm",
+      "summary": "Physical moves that quiet the mind.",
+      "order": 4,
+      "cards": [
+        {
+          "id": "body-first-calm-01",
+          "content": "Progressive muscle tension and release from toes to scalp melts the physical tension that fuels racing thoughts."
+        },
+        {
+          "id": "body-first-calm-02",
+          "content": "Legs-up-the-wall pose for five minutes drains stress and signals your body it’s safe to rest."
+        },
+        {
+          "id": "body-first-calm-03",
+          "content": "A hot shower ninety minutes before bed drops your core temperature and triggers sleep mode."
+        },
+        {
+          "id": "body-first-calm-04",
+          "content": "Cool the room to 65 degrees. Your body needs the drop to produce melatonin."
+        },
+        {
+          "id": "body-first-calm-05",
+          "content": "Gentle neck rolls and shoulder shrugs release the tightness that keeps your brain on high alert."
+        },
+        {
+          "id": "body-first-calm-06",
+          "content": "A small magnesium snack or tea calms overactive nerves without any grogginess."
+        },
+        {
+          "id": "body-first-calm-07",
+          "content": "White noise or rain sounds cover sudden jolts that restart the thought spiral."
+        },
+        {
+          "id": "body-first-calm-08",
+          "content": "No screens after sunset. The light keeps your brain in daytime mode."
+        },
+        {
+          "id": "body-first-calm-09",
+          "content": "Your body leads and your mind follows. Calm the body first and the thoughts fade."
+        },
+        {
+          "id": "body-first-calm-10",
+          "content": "These moves take zero willpower and deliver pro-level calm in minutes."
+        }
+      ]
+    },
+    {
+      "id": "evening-routine-reset",
+      "title": "Evening Routine Reset",
+      "summary": "Habits that set up effortless sleep.",
+      "order": 5,
+      "cards": [
+        {
+          "id": "evening-routine-reset-01",
+          "content": "Cut caffeine after 2 p.m. so it doesn’t sneak into your nervous system at bedtime."
+        },
+        {
+          "id": "evening-routine-reset-02",
+          "content": "Swap evening scrolls for a dull paperback that has zero plot to chase."
+        },
+        {
+          "id": "evening-routine-reset-03",
+          "content": "Set a strict lights-out time and treat it like a non-negotiable appointment."
+        },
+        {
+          "id": "evening-routine-reset-04",
+          "content": "Journal three wins from the day instead of three worries to shift your mindset."
+        },
+        {
+          "id": "evening-routine-reset-05",
+          "content": "Keep your bed for sleep only so your brain links the space with rest, not thinking."
+        },
+        {
+          "id": "evening-routine-reset-06",
+          "content": "If thoughts hit after lights out, get up for ten minutes of boring activity then try again."
+        },
+        {
+          "id": "evening-routine-reset-07",
+          "content": "Consistent wake time every morning locks your circadian rhythm no matter how late you fell asleep."
+        },
+        {
+          "id": "evening-routine-reset-08",
+          "content": "Alcohol might knock you out but it destroys deep sleep and guarantees 3 a.m. overthinking."
+        },
+        {
+          "id": "evening-routine-reset-09",
+          "content": "Small daily resets compound into nights where sleep just happens."
+        },
+        {
+          "id": "evening-routine-reset-10",
+          "content": "Build the routine once and stop negotiating with your brain every night."
+        }
+      ]
+    },
+    {
+      "id": "tonights-10-minute-plan",
+      "title": "Tonight’s 10-Minute Plan",
+      "summary": "Exact steps to sleep like a pro right now.",
+      "order": 6,
+      "cards": [
+        {
+          "id": "tonights-10-minute-plan-01",
+          "content": "Minute 1-2: Phone in another room on Do Not Disturb."
+        },
+        {
+          "id": "tonights-10-minute-plan-02",
+          "content": "Minute 3: Quick brain dump on paper then close it."
+        },
+        {
+          "id": "tonights-10-minute-plan-03",
+          "content": "Minute 4-5: Run through progressive muscle relaxation from toes up."
+        },
+        {
+          "id": "tonights-10-minute-plan-04",
+          "content": "Minute 6: Do four rounds of box breathing while lying down."
+        },
+        {
+          "id": "tonights-10-minute-plan-05",
+          "content": "Minute 7: Label any new thought and let it float away."
+        },
+        {
+          "id": "tonights-10-minute-plan-06",
+          "content": "Minute 8: Visualize a slow-moving blank screen until your mind blanks."
+        },
+        {
+          "id": "tonights-10-minute-plan-07",
+          "content": "Minute 9: Focus only on the cool feeling of the pillow under your head."
+        },
+        {
+          "id": "tonights-10-minute-plan-08",
+          "content": "Minute 10: Stay in bed and trust the process even if sleep feels slow."
+        },
+        {
+          "id": "tonights-10-minute-plan-09",
+          "content": "Wake at the same time tomorrow and repeat the plan."
+        },
+        {
+          "id": "tonights-10-minute-plan-10",
+          "content": "You now have the exact 10-minute system that turns overthinking nights into pro sleep nights."
+        }
+      ]
+    }
+  ]
+}
