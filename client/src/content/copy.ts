@@ -267,7 +267,7 @@ export const appCopy: AppCopy = {
   card: {
     topicEyebrow: "Now spinning",
     loadingBadge: "Loading",
-    styleHint: "Swipe up for the vibe",
+    styleHint: "Open theme controls",
     styleHintDesktop: "Theme the vibe",
     previousHint: "Swipe right for the last one",
     nextHint: "Swipe left for the next hit",
@@ -277,7 +277,7 @@ export const appCopy: AppCopy = {
     cardLabel: (index, total) => `Hit ${index} of ${total}`,
     controlsTitle: "Pick your vibe",
     controlsDescription: "Tweak the look without breaking the run.",
-    controlsCloseHint: "Tap anywhere to close",
+    controlsCloseHint: "Tap outside to close",
     controls: {
       backdropTitle: "Backdrop",
       typeTitle: "Type mood",

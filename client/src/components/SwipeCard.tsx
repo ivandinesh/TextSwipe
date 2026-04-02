@@ -8,6 +8,7 @@ interface SwipeCardProps {
   index: number;
   total?: number;
   isActive: boolean;
+  isMobile?: boolean;
   className?: string;
   textColor?: string;
   mutedTextColor?: string;
@@ -24,6 +25,7 @@ export function SwipeCard({
   index,
   total = index + 1,
   isActive,
+  isMobile = false,
   className,
   textColor,
   mutedTextColor,
@@ -40,6 +42,7 @@ export function SwipeCard({
     <div
       className={cn(
         "relative h-full w-full px-4 pb-4 pt-3 transition-all duration-300 md:h-full md:px-8 md:pb-8 md:pt-5",
+        isMobile && "px-3 pb-3 pt-2",
         isActive ? "opacity-100" : "opacity-0",
         className,
       )}
@@ -57,6 +60,7 @@ export function SwipeCard({
           <div
             className={cn(
               "relative flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border px-5 py-5 backdrop-blur-2xl transition-all duration-300 md:px-12 md:py-10 lg:px-14 lg:py-12",
+              isMobile && "rounded-[1.9rem] px-4 py-4",
               isActive && "scale-[1.005]",
             )}
             style={panelStyle}
@@ -76,19 +80,40 @@ export function SwipeCard({
               }
             }}
           >
-            <div className="flex min-h-0 flex-1 items-center justify-center overflow-visible pt-[4.5rem] pb-[4.5rem] md:items-start md:justify-start md:pt-[7rem] md:pb-24 lg:pt-[8rem] lg:pb-28">
+            <div
+              className={cn(
+                "flex min-h-0 flex-1 items-center justify-center overflow-visible pt-[4.5rem] pb-[4.5rem] md:items-start md:justify-start md:pt-[7rem] md:pb-24 lg:pt-[8rem] lg:pb-28",
+                isMobile && "pt-[2.7rem] pb-[3.8rem]",
+              )}
+            >
               <div className="flex w-full flex-1 items-center justify-center md:min-h-0 md:items-start">
                 <p
                   className={cn(
                     "mx-auto overflow-visible text-center font-medium tracking-[-0.02em]",
-                    sizeTier === "short" &&
+                    !isMobile &&
+                      sizeTier === "short" &&
                       "max-w-[15ch] text-[clamp(1.85rem,6.6vw,2.45rem)] leading-[1.32] md:max-w-[15ch] md:text-[clamp(2rem,2.7vw,3.15rem)] md:leading-[1.22] lg:max-w-[14ch] lg:text-[clamp(2.15rem,2.45vw,3.3rem)] lg:leading-[1.2]",
-                    sizeTier === "medium" &&
+                    !isMobile &&
+                      sizeTier === "medium" &&
                       "max-w-[17ch] text-[clamp(1.72rem,5.9vw,2.24rem)] leading-[1.38] md:max-w-[17ch] md:text-[clamp(1.82rem,2.35vw,2.7rem)] md:leading-[1.28] lg:max-w-[16ch] lg:text-[clamp(1.95rem,2.1vw,2.85rem)] lg:leading-[1.26]",
-                    sizeTier === "long" &&
+                    !isMobile &&
+                      sizeTier === "long" &&
                       "max-w-[19ch] text-[clamp(1.52rem,5vw,1.96rem)] leading-[1.44] md:max-w-[19ch] md:text-[clamp(1.62rem,1.95vw,2.2rem)] md:leading-[1.34] lg:max-w-[18ch] lg:text-[clamp(1.72rem,1.8vw,2.35rem)] lg:leading-[1.32]",
-                    sizeTier === "xlong" &&
+                    !isMobile &&
+                      sizeTier === "xlong" &&
                       "max-w-[21ch] text-[clamp(1.36rem,4.2vw,1.76rem)] leading-[1.5] md:max-w-[21ch] md:text-[clamp(1.42rem,1.7vw,1.9rem)] md:leading-[1.4] lg:max-w-[20ch] lg:text-[clamp(1.5rem,1.55vw,2rem)] lg:leading-[1.38]",
+                    isMobile &&
+                      sizeTier === "short" &&
+                      "max-w-[13.5ch] text-[clamp(1.62rem,7vw,2.15rem)] leading-[1.24]",
+                    isMobile &&
+                      sizeTier === "medium" &&
+                      "max-w-[15.5ch] text-[clamp(1.48rem,6vw,1.95rem)] leading-[1.3]",
+                    isMobile &&
+                      sizeTier === "long" &&
+                      "max-w-[17.5ch] text-[clamp(1.3rem,5vw,1.72rem)] leading-[1.38]",
+                    isMobile &&
+                      sizeTier === "xlong" &&
+                      "max-w-[19ch] text-[clamp(1.16rem,4.35vw,1.5rem)] leading-[1.44]",
                     fontClass || "",
                   )}
                   style={
@@ -106,7 +131,12 @@ export function SwipeCard({
               </div>
             </div>
 
-            <div className="absolute bottom-5 right-5 md:bottom-6 md:right-6">
+            <div
+              className={cn(
+                "absolute bottom-5 right-5 md:bottom-6 md:right-6",
+                isMobile && "bottom-4 right-4",
+              )}
+            >
               <button
                 type="button"
                 onClick={(event) => {
@@ -115,6 +145,7 @@ export function SwipeCard({
                 }}
                 className={cn(
                   "flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-md transition-all duration-200",
+                  isMobile && "h-12 w-12 shadow-[0_14px_28px_rgba(11,15,34,0.18)]",
                   isLiked
                     ? "border-primary/50 bg-primary/20 text-primary shadow-[0_0_24px_rgba(58,227,255,0.2)]"
                     : "border-white/10 bg-black/30 text-white/75 hover:bg-white/10",
@@ -129,6 +160,7 @@ export function SwipeCard({
             <div
               className={cn(
                 "pointer-events-none absolute inset-x-4 bottom-20 flex items-center justify-between gap-2 transition-all duration-300 md:inset-x-10 md:bottom-24 md:gap-3",
+                isMobile && "bottom-[4.6rem] inset-x-3",
                 showSwipeHint ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
               )}
             >
@@ -141,9 +173,9 @@ export function SwipeCard({
             </div>
 
             {index === 0 && (
-              <div className="mt-5 flex items-center justify-center md:mt-6">
+              <div className={cn("mt-5 flex items-center justify-center md:mt-6", isMobile && "mt-3")}>
                 <div
-                  className="max-w-xl text-center text-sm leading-6"
+                  className={cn("max-w-xl text-center text-sm leading-6", isMobile && "text-xs leading-5")}
                   style={{ color: mutedTextColor || textColor }}
                 >
                   {appCopy.card.helper}

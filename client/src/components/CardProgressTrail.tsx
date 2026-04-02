@@ -15,6 +15,7 @@ interface CardProgressTrailProps {
   total: number;
   activeTheme: ThemeSurface;
   activeTextTone: TextToneColors;
+  variant?: "steps" | "compact-bar";
   className?: string;
 }
 
@@ -23,8 +24,52 @@ export function CardProgressTrail({
   total,
   activeTheme,
   activeTextTone,
+  variant = "steps",
   className,
 }: CardProgressTrailProps) {
+  const progress = total > 0 ? ((currentIndex + 1) / total) * 100 : 0;
+
+  if (variant === "compact-bar") {
+    return (
+      <div
+        className={cn("pointer-events-none flex w-full items-center gap-3", className)}
+        aria-hidden="true"
+      >
+        <span
+          className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.24em]"
+          style={{ color: activeTextTone.muted }}
+        >
+          {String(currentIndex + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}
+        </span>
+        <div
+          className="relative h-2 flex-1 overflow-hidden rounded-full"
+          style={{
+            background: `linear-gradient(90deg, ${activeTheme.tile}, rgba(255,255,255,0.08))`,
+            boxShadow: `inset 0 0 0 1px ${activeTheme.overlay}`,
+          }}
+        >
+          <span
+            className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-300 ease-out"
+            style={{
+              width: `${progress}%`,
+              background:
+                "linear-gradient(90deg, rgba(58,227,255,0.9), rgba(117,160,255,0.88), rgba(211,172,255,0.8))",
+              boxShadow: "0 0 22px rgba(58,227,255,0.38)",
+            }}
+          />
+          <span
+            className="absolute inset-y-[1px] left-0 rounded-full opacity-60"
+            style={{
+              width: `${progress}%`,
+              background:
+                "linear-gradient(90deg, rgba(255,255,255,0.45), rgba(255,255,255,0))",
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(

@@ -4,7 +4,9 @@ import {
   ChevronLeft,
   ChevronRight,
   GraduationCap,
+  House,
   LayoutDashboard,
+  Menu,
   Paintbrush,
   Palette,
   Shield,
@@ -14,6 +16,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { appCopy } from "@/content/copy";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import type { AuthUser } from "@/hooks/use-auth";
 import { AuthDialog } from "./AuthDialog";
@@ -237,6 +240,7 @@ const TEXT_TONE_CHOICES: TextToneChoice[] = [
 ];
 const swipeThreshold = 42;
 const axisLockThreshold = 12;
+const MOBILE_HEADER_HEIGHT = 120;
 
 function isInteractiveTarget(target: EventTarget | null) {
   return (
@@ -275,6 +279,7 @@ export function SwipeContainer({
   onLogout,
   className,
 }: SwipeContainerProps) {
+  const isMobile = useIsMobile();
   const [isLoading, setIsLoading] = useState(false);
   const [allSnippets, setAllSnippets] = useState<string[]>(snippets);
   const [themeName, setThemeName] = useState<ThemeName>("midnight");
@@ -322,6 +327,8 @@ export function SwipeContainer({
     [allSnippets, topic],
   );
   const currentCard = cards[currentIndex];
+  const shouldLockMobileViewport = isMobile && !showOptions;
+  const mobileStageHeight = `calc(100dvh - ${MOBILE_HEADER_HEIGHT}px)`;
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("focusfeed-theme") as ThemeName | null;
@@ -600,15 +607,19 @@ export function SwipeContainer({
         return;
       }
 
-      pointer.axis = Math.abs(deltaX) >= Math.abs(deltaY) ? "x" : "y";
+      if (isMobile) {
+        pointer.axis = "x";
+      } else {
+        pointer.axis = Math.abs(deltaX) >= Math.abs(deltaY) ? "x" : "y";
+      }
     }
 
     if (pointer.axis === "x") {
       setDragOffset({ x: deltaX, y: 0 });
-    } else {
+    } else if (!isMobile) {
       setDragOffset({ x: 0, y: deltaY });
     }
-  }, []);
+  }, [isMobile]);
 
   const handlePointerUp = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     const pointer = pointerTrackerRef.current;
@@ -631,7 +642,7 @@ export function SwipeContainer({
           previousCard();
         }
       }
-    } else if (pointer.axis === "y") {
+    } else if (pointer.axis === "y" && !isMobile) {
       if (Math.abs(deltaY) > 34 || Math.abs(velocityY) > 0.4) {
         if (deltaY < 0) {
           setControlsOpen(true);
@@ -642,7 +653,164 @@ export function SwipeContainer({
     }
 
     resetGesture();
-  }, [controlsOpen, nextCard, previousCard, resetGesture]);
+  }, [controlsOpen, isMobile, nextCard, previousCard, resetGesture]);
+
+  const renderThemePanel = () => (
+    <div
+      ref={themePanelRef}
+      className={cn(
+        "pointer-events-auto w-full border shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl",
+        isMobile ? "rounded-[1.7rem] px-3 py-3" : "rounded-[2rem] px-4 py-4 md:px-5",
+      )}
+      style={{
+        background: `linear-gradient(180deg, ${activeTheme.shell}, rgba(10,12,24,0.48))`,
+        borderColor: activeTheme.overlay,
+      }}
+      data-theme-panel="true"
+      role="dialog"
+      aria-modal="false"
+      aria-label={appCopy.card.controlsTitle}
+      tabIndex={-1}
+    >
+      <div className={cn("flex items-start justify-between gap-4", isMobile ? "mb-3" : "mb-4")}>
+        <div>
+          <p
+            className={cn("font-display font-semibold", isMobile ? "text-xs" : "text-sm")}
+            style={{ color: activeTextTone.text }}
+          >
+            {appCopy.card.controlsTitle}
+          </p>
+          <p
+            className={cn("mt-1", isMobile ? "text-[11px] leading-4" : "text-xs")}
+            style={{ color: activeTextTone.muted }}
+          >
+            {appCopy.card.controlsDescription}
+          </p>
+        </div>
+        <div
+          className={cn(
+            "rounded-full border uppercase tracking-[0.24em]",
+            isMobile ? "px-2.5 py-1 text-[9px]" : "px-3 py-1 text-[10px]",
+          )}
+          style={{
+            color: activeTextTone.muted,
+            borderColor: activeTheme.overlay,
+            background: activeTheme.tile,
+          }}
+        >
+          {appCopy.card.controlsCloseHint}
+        </div>
+      </div>
+
+      <div className={cn("grid", isMobile ? "gap-2.5" : "gap-3")}>
+        <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] px-3 py-3">
+          <div className="mb-2 flex items-center gap-2">
+            <Palette className="h-4 w-4 text-primary" />
+            <p className="text-sm font-medium" style={{ color: activeTextTone.text }}>
+              {appCopy.card.controls.backdropTitle}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {THEME_CHOICES.map((choice) => (
+              <button
+                key={choice.id}
+                type="button"
+                onClick={() => selectTheme(choice.id)}
+                className={cn(
+                  "flex items-center gap-2 rounded-full border text-xs transition-transform hover:-translate-y-0.5",
+                  isMobile ? "px-2 py-1.5" : "px-2.5 py-2",
+                  themeName === choice.id && "ring-2 ring-primary/40",
+                )}
+                style={{
+                  color: activeTextTone.text,
+                  borderColor:
+                    themeName === choice.id ? "rgba(58,227,255,0.44)" : activeTheme.overlay,
+                  background:
+                    themeName === choice.id ? "rgba(255,255,255,0.12)" : activeTheme.tile,
+                }}
+              >
+                <span
+                  className="h-5 w-5 rounded-full border border-white/20"
+                  style={{ background: choice.swatch }}
+                  aria-hidden="true"
+                />
+                {appCopy.card.controls.themes[choice.id]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] px-3 py-3">
+          <div className="mb-2 flex items-center gap-2">
+            <Type className="h-4 w-4 text-primary" />
+            <p className="text-sm font-medium" style={{ color: activeTextTone.text }}>
+              {appCopy.card.controls.typeTitle}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {FONT_CHOICES.map((choice) => {
+              const Icon = choice.icon;
+              return (
+                <button
+                  key={choice.id}
+                  type="button"
+                  onClick={() => selectFont(choice.id)}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-full border transition-transform hover:-translate-y-0.5",
+                    isMobile ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm",
+                    FONT_CLASSES[choice.id],
+                    fontName === choice.id && "ring-2 ring-primary/40",
+                  )}
+                  style={{
+                    color: activeTextTone.text,
+                    borderColor:
+                      fontName === choice.id ? "rgba(58,227,255,0.44)" : activeTheme.overlay,
+                    background:
+                      fontName === choice.id ? "rgba(255,255,255,0.12)" : activeTheme.tile,
+                  }}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {appCopy.card.controls.fonts[choice.id]}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] px-3 py-3">
+          <div className="mb-2 flex items-center gap-2">
+            <Paintbrush className="h-4 w-4 text-primary" />
+            <p className="text-sm font-medium" style={{ color: activeTextTone.text }}>
+              {appCopy.card.controls.contrastTitle}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {TEXT_TONE_CHOICES.map((choice) => (
+              <button
+                key={choice.id}
+                type="button"
+                onClick={() => selectTextTone(choice.id)}
+                className={cn(
+                  "rounded-full border transition-transform hover:-translate-y-0.5",
+                  isMobile ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm",
+                  textToneName === choice.id && "ring-2 ring-primary/40",
+                )}
+                style={{
+                  color: activeTheme.textTones[choice.id].text,
+                  borderColor:
+                    textToneName === choice.id ? "rgba(58,227,255,0.44)" : activeTheme.overlay,
+                  background:
+                    textToneName === choice.id ? "rgba(255,255,255,0.12)" : activeTheme.tile,
+                }}
+              >
+                {appCopy.card.controls.textTones[choice.id]}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   if (!allSnippets.length) {
     return (
@@ -661,7 +829,11 @@ export function SwipeContainer({
         fontClass,
         className,
       )}
-      style={{ transition: "background-color 0.3s ease, color 0.3s ease" }}
+      style={{
+        transition: "background-color 0.3s ease, color 0.3s ease",
+        touchAction: shouldLockMobileViewport ? "none" : "auto",
+        overscrollBehaviorY: shouldLockMobileViewport ? "contain" : "auto",
+      }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -671,291 +843,206 @@ export function SwipeContainer({
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {liveMessage}
       </div>
-      <div
-        className={cn(
-          "pointer-events-none absolute inset-x-0 top-0 z-10 px-4 pt-4 transition-all duration-300 md:px-6",
-          showOptions || controlsOpen ? "translate-y-0 opacity-100" : "translate-y-0 opacity-100",
-        )}
-      >
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 px-4 pt-4 transition-all duration-300 md:px-6">
         <div
-          className="glass-panel pointer-events-auto rounded-[1.6rem] px-4 py-3 md:px-5"
+          className={cn(
+            "glass-panel pointer-events-auto rounded-[1.6rem]",
+            isMobile ? "px-3.5 py-3" : "px-4 py-3 md:px-5",
+          )}
           style={{
             background: `linear-gradient(180deg, ${activeTheme.shell}, rgba(10,12,24,0.64))`,
             borderColor: activeTheme.overlay,
           }}
         >
-          <div className="flex items-start gap-3 md:items-center">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onBack}
-              data-chrome-control="true"
-              className="h-11 w-11 shrink-0 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
-              data-testid="button-back"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
+          {isMobile ? (
+            <div className="space-y-3">
+              <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setControlsOpen((open) => !open)}
+                  data-chrome-control="true"
+                  className="h-11 w-11 rounded-full border border-white/10 bg-white/[0.05] text-foreground hover:bg-white/10"
+                  aria-label={appCopy.card.styleHint}
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
 
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="font-display text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/80">
-                  {appCopy.card.topicEyebrow}
-                </span>
-                {isLoading && (
-                  <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-1 text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
-                    {appCopy.card.loadingBadge}
-                  </span>
-                )}
+                <div className="min-w-0 text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="truncate font-display text-[10px] font-semibold uppercase tracking-[0.24em] text-primary/80">
+                      {appCopy.card.topicEyebrow}
+                    </span>
+                    {isLoading && (
+                      <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+                        {appCopy.card.loadingBadge}
+                      </span>
+                    )}
+                  </div>
+                  <h1
+                    className="mt-1 truncate text-center text-xl font-semibold"
+                    style={{ color: activeTextTone.text }}
+                    data-testid="text-topic-title"
+                  >
+                    {topic}
+                  </h1>
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onBack}
+                  data-chrome-control="true"
+                  className="h-11 w-11 rounded-full border border-white/10 bg-white/[0.05] text-foreground hover:bg-white/10"
+                  aria-label="Go home"
+                >
+                  <House className="h-5 w-5" />
+                </Button>
               </div>
-              <h1
-                className="mt-1 truncate text-left text-lg font-semibold md:text-2xl"
-                style={{ color: activeTextTone.text }}
-                data-testid="text-topic-title"
-              >
-                {topic}
-              </h1>
-            </div>
 
-            <div className="hidden items-center gap-2 sm:flex">
-              {user ? (
-                <>
-                  {user.isAdmin && (
+              <div
+                className="rounded-[1rem] border border-white/10 bg-white/[0.04] px-3 py-2"
+                style={{ borderColor: activeTheme.overlay }}
+              >
+                <CardProgressTrail
+                  currentIndex={currentIndex}
+                  total={allSnippets.length}
+                  activeTheme={{
+                    overlay: activeTheme.overlay,
+                    tile: activeTheme.tile,
+                  }}
+                  activeTextTone={activeTextTone}
+                  variant="compact-bar"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-start gap-3 md:items-center">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onBack}
+                data-chrome-control="true"
+                className="h-11 w-11 shrink-0 rounded-full border border-white/10 bg-white/[0.04] text-foreground hover:bg-white/10"
+                data-testid="button-back"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-display text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/80">
+                    {appCopy.card.topicEyebrow}
+                  </span>
+                  {isLoading && (
+                    <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-1 text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+                      {appCopy.card.loadingBadge}
+                    </span>
+                  )}
+                </div>
+                <h1
+                  className="mt-1 truncate text-left text-lg font-semibold md:text-2xl"
+                  style={{ color: activeTextTone.text }}
+                  data-testid="text-topic-title"
+                >
+                  {topic}
+                </h1>
+              </div>
+
+              <div className="hidden items-center gap-2 sm:flex">
+                {user ? (
+                  <>
+                    {user.isAdmin && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onOpenAdmin}
+                        className="h-10 rounded-full border-white/10 bg-white/[0.04] px-3 text-foreground"
+                        data-chrome-control="true"
+                      >
+                        <Shield className="h-4 w-4" />
+                        <span className="hidden lg:inline">{appCopy.home.adminButton}</span>
+                      </Button>
+                    )}
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={onOpenAdmin}
+                      onClick={onOpenCourses}
                       className="h-10 rounded-full border-white/10 bg-white/[0.04] px-3 text-foreground"
                       data-chrome-control="true"
                     >
-                      <Shield className="h-4 w-4" />
-                      <span className="hidden lg:inline">{appCopy.home.adminButton}</span>
+                      <GraduationCap className="h-4 w-4" />
+                      <span className="hidden lg:inline">{appCopy.home.coursesButton}</span>
                     </Button>
-                  )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={onOpenCourses}
-                    className="h-10 rounded-full border-white/10 bg-white/[0.04] px-3 text-foreground"
-                    data-chrome-control="true"
-                  >
-                    <GraduationCap className="h-4 w-4" />
-                    <span className="hidden lg:inline">{appCopy.home.coursesButton}</span>
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={onOpenDashboard}
-                    className="h-10 rounded-full border-white/10 bg-white/[0.04] px-3 text-foreground"
-                    data-chrome-control="true"
-                  >
-                    <LayoutDashboard className="h-4 w-4" />
-                    <span className="hidden lg:inline">{appCopy.home.dashboardButton}</span>
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={async () => {
-                      await onLogout?.();
-                    }}
-                    className="h-10 rounded-full border-white/10 bg-white/[0.04] px-3 text-foreground"
-                    data-chrome-control="true"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span className="hidden lg:inline">{appCopy.home.signOutButton}</span>
-                  </Button>
-                </>
-              ) : (
-                <AuthDialog triggerLabel={appCopy.auth.tabs.login} />
-              )}
-              <button
-                type="button"
-                onClick={() => setControlsOpen((open) => !open)}
-                className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] uppercase tracking-[0.24em] text-muted-foreground transition hover:bg-white/[0.08]"
-                data-chrome-control="true"
-              >
-                {appCopy.card.styleHintDesktop}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {controlsOpen && !showOptions && (
-          <motion.div
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-4 pb-5 md:px-8 md:pb-8"
-            initial={{ opacity: 0, y: 26 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 18 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-          >
-            <div className="mx-auto flex max-w-3xl justify-center">
-              <div
-                ref={themePanelRef}
-                className="pointer-events-auto w-full rounded-[2rem] border px-4 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl md:px-5"
-                style={{
-                  background: `linear-gradient(180deg, ${activeTheme.shell}, rgba(10,12,24,0.48))`,
-                  borderColor: activeTheme.overlay,
-                }}
-                data-theme-panel="true"
-                role="dialog"
-                aria-modal="false"
-                aria-label={appCopy.card.controlsTitle}
-                tabIndex={-1}
-              >
-                <div className="mb-4 flex items-start justify-between gap-4">
-                  <div>
-                    <p
-                      className="font-display text-sm font-semibold"
-                      style={{ color: activeTextTone.text }}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={onOpenDashboard}
+                      className="h-10 rounded-full border-white/10 bg-white/[0.04] px-3 text-foreground"
+                      data-chrome-control="true"
                     >
-                      {appCopy.card.controlsTitle}
-                    </p>
-                    <p
-                      className="mt-1 text-xs"
-                      style={{ color: activeTextTone.muted }}
+                      <LayoutDashboard className="h-4 w-4" />
+                      <span className="hidden lg:inline">{appCopy.home.dashboardButton}</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={async () => {
+                        await onLogout?.();
+                      }}
+                      className="h-10 rounded-full border-white/10 bg-white/[0.04] px-3 text-foreground"
+                      data-chrome-control="true"
                     >
-                      {appCopy.card.controlsDescription}
-                    </p>
-                  </div>
-                  <div
-                    className="rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.24em]"
-                    style={{
-                      color: activeTextTone.muted,
-                      borderColor: activeTheme.overlay,
-                      background: activeTheme.tile,
-                    }}
-                  >
-                    {appCopy.card.controlsCloseHint}
-                  </div>
-                </div>
-
-                <div className="grid gap-3">
-                  <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] px-3 py-3">
-                    <div className="mb-2 flex items-center gap-2">
-                      <Palette className="h-4 w-4 text-primary" />
-                      <p className="text-sm font-medium" style={{ color: activeTextTone.text }}>
-                        {appCopy.card.controls.backdropTitle}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {THEME_CHOICES.map((choice) => (
-                        <button
-                          key={choice.id}
-                          type="button"
-                          onClick={() => selectTheme(choice.id)}
-                          className={cn(
-                            "flex items-center gap-2 rounded-full border px-2.5 py-2 text-xs transition-transform hover:-translate-y-0.5",
-                            themeName === choice.id && "ring-2 ring-primary/40",
-                          )}
-                          style={{
-                            color: activeTextTone.text,
-                            borderColor:
-                              themeName === choice.id
-                                ? "rgba(58,227,255,0.44)"
-                                : activeTheme.overlay,
-                            background:
-                              themeName === choice.id ? "rgba(255,255,255,0.12)" : activeTheme.tile,
-                          }}
-                        >
-                          <span
-                            className="h-5 w-5 rounded-full border border-white/20"
-                            style={{ background: choice.swatch }}
-                            aria-hidden="true"
-                          />
-                          {appCopy.card.controls.themes[choice.id]}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] px-3 py-3">
-                    <div className="mb-2 flex items-center gap-2">
-                      <Type className="h-4 w-4 text-primary" />
-                      <p className="text-sm font-medium" style={{ color: activeTextTone.text }}>
-                        {appCopy.card.controls.typeTitle}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {FONT_CHOICES.map((choice) => {
-                        const Icon = choice.icon;
-                        return (
-                          <button
-                            key={choice.id}
-                            type="button"
-                            onClick={() => selectFont(choice.id)}
-                            className={cn(
-                              "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm transition-transform hover:-translate-y-0.5",
-                              FONT_CLASSES[choice.id],
-                              fontName === choice.id && "ring-2 ring-primary/40",
-                            )}
-                            style={{
-                              color: activeTextTone.text,
-                              borderColor:
-                                fontName === choice.id
-                                  ? "rgba(58,227,255,0.44)"
-                                  : activeTheme.overlay,
-                              background:
-                                fontName === choice.id ? "rgba(255,255,255,0.12)" : activeTheme.tile,
-                            }}
-                          >
-                            <Icon className="h-3.5 w-3.5" />
-                            {appCopy.card.controls.fonts[choice.id]}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] px-3 py-3">
-                    <div className="mb-2 flex items-center gap-2">
-                      <Paintbrush className="h-4 w-4 text-primary" />
-                      <p className="text-sm font-medium" style={{ color: activeTextTone.text }}>
-                        {appCopy.card.controls.contrastTitle}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {TEXT_TONE_CHOICES.map((choice) => (
-                        <button
-                          key={choice.id}
-                          type="button"
-                          onClick={() => selectTextTone(choice.id)}
-                          className={cn(
-                            "rounded-full border px-3 py-2 text-sm transition-transform hover:-translate-y-0.5",
-                            textToneName === choice.id && "ring-2 ring-primary/40",
-                          )}
-                          style={{
-                            color: activeTheme.textTones[choice.id].text,
-                            borderColor:
-                              textToneName === choice.id
-                                ? "rgba(58,227,255,0.44)"
-                                : activeTheme.overlay,
-                            background:
-                              textToneName === choice.id
-                                ? "rgba(255,255,255,0.12)"
-                                : activeTheme.tile,
-                          }}
-                        >
-                          {appCopy.card.controls.textTones[choice.id]}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                      <LogOut className="h-4 w-4" />
+                      <span className="hidden lg:inline">{appCopy.home.signOutButton}</span>
+                    </Button>
+                  </>
+                ) : (
+                  <AuthDialog triggerLabel={appCopy.auth.tabs.login} />
+                )}
+                <button
+                  type="button"
+                  onClick={() => setControlsOpen((open) => !open)}
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] uppercase tracking-[0.24em] text-muted-foreground transition hover:bg-white/[0.08]"
+                  data-chrome-control="true"
+                >
+                  {appCopy.card.styleHintDesktop}
+                </button>
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </div>
+        <AnimatePresence>
+          {controlsOpen && !showOptions && (
+            <motion.div
+              className={cn(
+                "pointer-events-none absolute inset-x-0 z-20",
+                isMobile ? "top-full mt-2" : "bottom-0 px-4 pb-5 md:px-8 md:pb-8",
+              )}
+              initial={{ opacity: 0, y: isMobile ? -14 : 26 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: isMobile ? -10 : 18 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <div className={cn("mx-auto flex justify-center", isMobile ? "" : "max-w-3xl")}>
+                {renderThemePanel()}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <div
         className={cn(
           "relative transition-all duration-300",
-          "pt-36 sm:pt-40 lg:pt-48 xl:pt-52",
+          isMobile ? "pt-[8.25rem]" : "pt-36 sm:pt-40 lg:pt-48 xl:pt-52",
           showOptions
             ? "min-h-full"
-            : "h-[calc(100dvh-1rem)] sm:h-[calc(100dvh-1.5rem)] lg:h-[calc(100dvh-2.5rem)]",
+            : isMobile
+              ? ""
+              : "h-[calc(100dvh-1rem)] sm:h-[calc(100dvh-1.5rem)] lg:h-[calc(100dvh-2.5rem)]",
         )}
+        style={!showOptions && isMobile ? { height: mobileStageHeight } : undefined}
       >
         {showOptions ? (
           <OptionsCard
@@ -995,42 +1082,57 @@ export function SwipeContainer({
               className="pointer-events-none absolute inset-x-6 inset-y-6 z-0 rounded-[2.4rem] opacity-80 blur-3xl md:inset-x-16 md:inset-y-10"
               style={{ background: activeTheme.backlight }}
             />
-            <div className="pointer-events-none absolute inset-x-0 top-2 z-10 flex justify-center px-6 md:top-4">
-              <div
-                className="rounded-full border px-3 py-2 backdrop-blur-md"
-                style={{
-                  borderColor: activeTheme.overlay,
-                  background: activeTheme.tile,
-                }}
-              >
-                <CardProgressTrail
-                  currentIndex={currentIndex}
-                  total={allSnippets.length}
-                  activeTheme={{
-                    overlay: activeTheme.overlay,
-                    tile: activeTheme.tile,
+            {!isMobile && (
+              <div className="pointer-events-none absolute inset-x-0 top-2 z-10 flex justify-center px-6 md:top-4">
+                <div
+                  className="rounded-full border px-3 py-2 backdrop-blur-md"
+                  style={{
+                    borderColor: activeTheme.overlay,
+                    background: activeTheme.tile,
                   }}
-                  activeTextTone={activeTextTone}
-                />
+                >
+                  <CardProgressTrail
+                    currentIndex={currentIndex}
+                    total={allSnippets.length}
+                    activeTheme={{
+                      overlay: activeTheme.overlay,
+                      tile: activeTheme.tile,
+                    }}
+                    activeTextTone={activeTextTone}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="pointer-events-none absolute inset-x-4 top-14 z-[1] h-20 md:inset-x-8 md:top-16 md:h-24 lg:top-20 lg:h-28" />
+            )}
             <div
-              className="pointer-events-none absolute inset-x-4 inset-y-3 z-[1] rounded-[2.1rem] border opacity-40 md:inset-x-8 md:inset-y-5"
+              className={cn(
+                "pointer-events-none absolute z-[1]",
+                isMobile
+                  ? "inset-x-3 top-3 h-10"
+                  : "inset-x-4 top-14 h-20 md:inset-x-8 md:top-16 md:h-24 lg:top-20 lg:h-28",
+              )}
+            />
+            <div
+              className={cn(
+                "pointer-events-none absolute z-[1] rounded-[2.1rem] border opacity-40",
+                isMobile ? "inset-x-3 inset-y-2" : "inset-x-4 inset-y-3 md:inset-x-8 md:inset-y-5",
+              )}
               style={{
                 background: activeTheme.panel,
                 borderColor: activeTheme.panelBorder,
                 boxShadow: `0 30px 90px rgba(0,0,0,0.45), ${activeTheme.panelGlow}`,
-                transform: "translate3d(0, 12px, 0) scale(0.975)",
+                transform: isMobile ? "translate3d(0, 8px, 0) scale(0.982)" : "translate3d(0, 12px, 0) scale(0.975)",
                 filter: "brightness(0.82) saturate(0.88)",
               }}
             />
             <div
-              className="pointer-events-none absolute inset-x-4 inset-y-3 z-[1] rounded-[2.1rem] border opacity-24 md:inset-x-8 md:inset-y-5"
+              className={cn(
+                "pointer-events-none absolute z-[1] rounded-[2.1rem] border opacity-24",
+                isMobile ? "inset-x-3 inset-y-2" : "inset-x-4 inset-y-3 md:inset-x-8 md:inset-y-5",
+              )}
               style={{
                 background: activeTheme.panel,
                 borderColor: activeTheme.panelBorder,
-                transform: "translate3d(0, 22px, 0) scale(0.95)",
+                transform: isMobile ? "translate3d(0, 15px, 0) scale(0.965)" : "translate3d(0, 22px, 0) scale(0.95)",
                 filter: "brightness(0.72) saturate(0.82)",
               }}
             />
@@ -1074,7 +1176,7 @@ export function SwipeContainer({
                   isDragging
                     ? {
                         x: dragOffset.x,
-                        y: dragOffset.y * 0.35,
+                        y: isMobile ? 0 : dragOffset.y * 0.35,
                         rotateZ: dragOffset.x * 0.02,
                         scale: 1.01,
                         transition: { type: "spring", stiffness: 320, damping: 28, mass: 0.8 },
@@ -1090,6 +1192,7 @@ export function SwipeContainer({
                   index={currentCard?.position ?? currentIndex}
                   total={cards.length}
                   isActive
+                  isMobile={isMobile}
                   textColor={activeTextTone.text}
                   mutedTextColor={activeTextTone.muted}
                   fontClass={fontClass}
@@ -1112,12 +1215,20 @@ export function SwipeContainer({
                 />
               </motion.div>
             </AnimatePresence>
-            <div className="pointer-events-none absolute inset-x-4 bottom-5 z-[3] flex justify-between md:inset-x-8 md:bottom-8">
+            <div
+              className={cn(
+                "pointer-events-none absolute z-[3] flex justify-between",
+                isMobile ? "inset-x-3 bottom-3" : "inset-x-4 bottom-5 md:inset-x-8 md:bottom-8",
+              )}
+            >
               <button
                 type="button"
                 onClick={previousCard}
                 disabled={currentIndex <= 0}
-                className="pointer-events-auto inline-flex h-11 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-4 text-sm text-white/80 backdrop-blur-md transition hover:bg-white/10 disabled:opacity-40"
+                className={cn(
+                  "pointer-events-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/25 text-white/80 backdrop-blur-md transition hover:bg-white/10 disabled:opacity-40",
+                  isMobile ? "h-10 px-3 text-xs" : "h-11 px-4 text-sm",
+                )}
                 data-chrome-control="true"
                 aria-label="Go to previous card"
               >
@@ -1127,7 +1238,10 @@ export function SwipeContainer({
               <button
                 type="button"
                 onClick={nextCard}
-                className="pointer-events-auto inline-flex h-11 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-4 text-sm text-white/80 backdrop-blur-md transition hover:bg-white/10"
+                className={cn(
+                  "pointer-events-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/25 text-white/80 backdrop-blur-md transition hover:bg-white/10",
+                  isMobile ? "h-10 px-3 text-xs" : "h-11 px-4 text-sm",
+                )}
                 data-chrome-control="true"
                 aria-label={currentIndex >= cards.length - 1 ? "Open next options" : "Go to next card"}
               >
