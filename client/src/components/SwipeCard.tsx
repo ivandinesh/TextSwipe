@@ -42,17 +42,18 @@ export function SwipeCard({
     <div
       className={cn(
         "relative h-full w-full px-4 pb-4 pt-3 transition-all duration-300 md:h-full md:px-8 md:pb-8 md:pt-5",
-        isMobile && "px-2 pb-2 pt-1",
+        isMobile && "px-0 pb-0 pt-0",
         isActive ? "opacity-100" : "opacity-0",
         className,
       )}
       data-testid={`card-learn-${index}`}
     >
-      <div className="mx-auto flex h-full w-full max-w-[min(92vw,64rem)] flex-col xl:max-w-[58rem]">
+      <div className={cn("mx-auto flex h-full w-full max-w-[min(92vw,64rem)] flex-col xl:max-w-[58rem]", isMobile && "max-w-full")}>
         <div className="relative h-full flex-1">
           <div
             className={cn(
               "pointer-events-none absolute inset-x-[8%] top-[14%] h-[58%] rounded-full blur-3xl transition-all duration-300 md:inset-x-[16%]",
+              isMobile && "inset-x-[14%] top-[10%] h-[48%] blur-[44px]",
               isActive ? "opacity-100 scale-100" : "opacity-70 scale-95",
             )}
             style={backlightStyle}
@@ -60,7 +61,7 @@ export function SwipeCard({
           <div
             className={cn(
               "relative flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border px-5 py-5 backdrop-blur-2xl transition-all duration-300 md:px-12 md:py-10 lg:px-14 lg:py-12",
-              isMobile && "rounded-[1.85rem] px-4 py-3",
+              isMobile && "rounded-[1.9rem] px-4 py-2.5 backdrop-blur-[18px]",
               isActive && "scale-[1.005]",
             )}
             style={panelStyle}
@@ -84,10 +85,10 @@ export function SwipeCard({
               className={cn(
                 "flex min-h-0 flex-1 items-center justify-center overflow-visible pt-[4.5rem] pb-[4.5rem] md:items-start md:justify-start md:pt-[7rem] md:pb-24 lg:pt-[8rem] lg:pb-28",
                 !isMobile && "md:pt-[5.6rem] md:pb-20 lg:pt-[6.25rem] lg:pb-24",
-                isMobile && "pt-[1.9rem] pb-[2.9rem]",
+                isMobile && "items-center justify-center pt-[0.65rem] pb-[1.35rem]",
               )}
             >
-              <div className="flex w-full flex-1 items-center justify-center md:min-h-0 md:items-start">
+              <div className={cn("flex w-full flex-1 items-center justify-center md:min-h-0 md:items-start", isMobile && "min-h-0 items-center")}>
                 <p
                   className={cn(
                     "mx-auto overflow-visible text-center font-medium tracking-[-0.02em]",
@@ -135,7 +136,7 @@ export function SwipeCard({
             <div
               className={cn(
                 "absolute bottom-5 right-5 md:bottom-6 md:right-6",
-                isMobile && "bottom-4 right-4",
+                isMobile && "bottom-3.5 right-3.5",
               )}
             >
               <button
@@ -146,7 +147,7 @@ export function SwipeCard({
                 }}
                 className={cn(
                   "flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-md transition-all duration-200",
-                  isMobile && "h-12 w-12 shadow-[0_14px_28px_rgba(11,15,34,0.18)]",
+                  isMobile && "h-11 w-11 border-white/8 bg-black/18 shadow-[0_12px_24px_rgba(11,15,34,0.12)]",
                   isLiked
                     ? "border-primary/50 bg-primary/20 text-primary shadow-[0_0_24px_rgba(58,227,255,0.2)]"
                     : "border-white/10 bg-black/30 text-white/75 hover:bg-white/10",
@@ -161,7 +162,7 @@ export function SwipeCard({
             <div
               className={cn(
                 "pointer-events-none absolute inset-x-4 bottom-20 flex items-center justify-between gap-2 transition-all duration-300 md:inset-x-10 md:bottom-24 md:gap-3",
-                isMobile && "bottom-[4rem] inset-x-3",
+                isMobile && "bottom-[3.4rem] inset-x-3",
                 showSwipeHint ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
               )}
             >
@@ -174,7 +175,7 @@ export function SwipeCard({
             </div>
 
             {index === 0 && (
-              <div className={cn("mt-5 flex items-center justify-center md:mt-6", isMobile && "mt-3")}>
+              <div className={cn("mt-5 flex items-center justify-center md:mt-6", isMobile && "mt-2")}>
                 <div
                   className={cn("max-w-xl text-center text-sm leading-6", isMobile && "text-xs leading-5")}
                   style={{ color: mutedTextColor || textColor }}
