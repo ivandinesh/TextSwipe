@@ -1014,6 +1014,7 @@ export function SwipeContainer({
                 />
               </div>
             </div>
+            <div className="pointer-events-none absolute inset-x-4 top-14 z-[1] h-20 md:inset-x-8 md:top-16 md:h-24 lg:top-20 lg:h-28" />
             <div
               className="pointer-events-none absolute inset-x-4 inset-y-3 z-[1] rounded-[2.1rem] border opacity-40 md:inset-x-8 md:inset-y-5"
               style={{

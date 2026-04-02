@@ -76,19 +76,19 @@ export function SwipeCard({
               }
             }}
           >
-            <div className="flex min-h-0 flex-1 items-center justify-center overflow-visible py-3 md:py-6 lg:py-8">
-              <div className="w-full">
+            <div className="flex min-h-0 flex-1 items-center justify-center overflow-visible pt-[4.5rem] pb-[4.5rem] md:items-start md:justify-start md:pt-[7rem] md:pb-24 lg:pt-[8rem] lg:pb-28">
+              <div className="flex w-full flex-1 items-center justify-center md:min-h-0 md:items-start">
                 <p
                   className={cn(
                     "mx-auto overflow-visible text-center font-medium tracking-[-0.02em]",
                     sizeTier === "short" &&
-                      "max-w-[15ch] text-[clamp(1.85rem,6.6vw,2.45rem)] leading-[1.32] md:max-w-[16ch] md:text-[clamp(2.3rem,3.2vw,3.65rem)] md:leading-[1.18] lg:max-w-[15ch] lg:text-[clamp(2.45rem,2.95vw,3.75rem)]",
+                      "max-w-[15ch] text-[clamp(1.85rem,6.6vw,2.45rem)] leading-[1.32] md:max-w-[15ch] md:text-[clamp(2rem,2.7vw,3.15rem)] md:leading-[1.22] lg:max-w-[14ch] lg:text-[clamp(2.15rem,2.45vw,3.3rem)] lg:leading-[1.2]",
                     sizeTier === "medium" &&
-                      "max-w-[17ch] text-[clamp(1.72rem,5.9vw,2.24rem)] leading-[1.38] md:max-w-[18ch] md:text-[clamp(2rem,2.8vw,3rem)] md:leading-[1.22] lg:max-w-[17ch] lg:text-[clamp(2.1rem,2.55vw,3.1rem)]",
+                      "max-w-[17ch] text-[clamp(1.72rem,5.9vw,2.24rem)] leading-[1.38] md:max-w-[17ch] md:text-[clamp(1.82rem,2.35vw,2.7rem)] md:leading-[1.28] lg:max-w-[16ch] lg:text-[clamp(1.95rem,2.1vw,2.85rem)] lg:leading-[1.26]",
                     sizeTier === "long" &&
-                      "max-w-[19ch] text-[clamp(1.52rem,5vw,1.96rem)] leading-[1.44] md:max-w-[20ch] md:text-[clamp(1.75rem,2.35vw,2.5rem)] md:leading-[1.28] lg:max-w-[19ch] lg:text-[clamp(1.85rem,2.15vw,2.65rem)]",
+                      "max-w-[19ch] text-[clamp(1.52rem,5vw,1.96rem)] leading-[1.44] md:max-w-[19ch] md:text-[clamp(1.62rem,1.95vw,2.2rem)] md:leading-[1.34] lg:max-w-[18ch] lg:text-[clamp(1.72rem,1.8vw,2.35rem)] lg:leading-[1.32]",
                     sizeTier === "xlong" &&
-                      "max-w-[21ch] text-[clamp(1.36rem,4.2vw,1.76rem)] leading-[1.5] md:max-w-[22ch] md:text-[clamp(1.52rem,2vw,2.15rem)] md:leading-[1.34] lg:max-w-[21ch] lg:text-[clamp(1.62rem,1.85vw,2.25rem)]",
+                      "max-w-[21ch] text-[clamp(1.36rem,4.2vw,1.76rem)] leading-[1.5] md:max-w-[21ch] md:text-[clamp(1.42rem,1.7vw,1.9rem)] md:leading-[1.4] lg:max-w-[20ch] lg:text-[clamp(1.5rem,1.55vw,2rem)] lg:leading-[1.38]",
                     fontClass || "",
                   )}
                   style={
