@@ -1124,7 +1124,7 @@ export function SwipeContainer({
         ) : (
           isMobile ? (
             <div
-              className="relative flex-1 min-h-0 px-2"
+              className="relative h-full min-h-0 px-2"
               style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
             >
               <div
