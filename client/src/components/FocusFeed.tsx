@@ -70,6 +70,7 @@ export function FocusFeed() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const sessionStartRef = useRef<string | null>(null);
   const highestCardSeenRef = useRef(0);
+  const defaultTitle = "FocusFeed | Swipe to Learn";
 
   const updateLearningUrl = (topic: string, index: number) => {
     window.history.pushState(
@@ -174,6 +175,16 @@ export function FocusFeed() {
       updateLearningUrl(topic, 0);
     }
   };
+
+  useEffect(() => {
+    const normalizedTopic = currentTopic.trim();
+    if ((currentView === "loading" || currentView === "learning") && normalizedTopic) {
+      document.title = `${normalizedTopic} | FocusFeed`;
+      return;
+    }
+
+    document.title = defaultTitle;
+  }, [currentTopic, currentView]);
 
   useEffect(() => {
     const { view, topic, index } = getUrlState();
