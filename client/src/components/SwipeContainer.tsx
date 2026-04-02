@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import type { AuthUser } from "@/hooks/use-auth";
 import { AuthDialog } from "./AuthDialog";
 import { CardProgressTrail } from "./CardProgressTrail";
+import { LoadingScreen } from "./LoadingScreen";
 import { OptionsCard } from "./OptionsCard";
 import { SwipeCard } from "./SwipeCard";
 
@@ -240,7 +241,7 @@ const TEXT_TONE_CHOICES: TextToneChoice[] = [
 ];
 const swipeThreshold = 42;
 const axisLockThreshold = 12;
-const MOBILE_HEADER_HEIGHT = 120;
+const MOBILE_HEADER_HEIGHT = 108;
 
 function isInteractiveTarget(target: EventTarget | null) {
   return (
@@ -292,6 +293,7 @@ export function SwipeContainer({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [liveMessage, setLiveMessage] = useState("");
+  const [processingMessage, setProcessingMessage] = useState<string | null>(null);
   const themePanelRef = useRef<HTMLDivElement | null>(null);
   const pointerTrackerRef = useRef<{
     pointerId: number | null;
@@ -358,6 +360,7 @@ export function SwipeContainer({
     setSwipeDirection(1);
     setDragOffset({ x: 0, y: 0 });
     setIsDragging(false);
+    setProcessingMessage(null);
   }, [snippets, topic]);
 
   useEffect(() => {
@@ -388,6 +391,13 @@ export function SwipeContainer({
       }
 
       setIsLoading(true);
+      if (subtopic) {
+        setProcessingMessage(`Lining up a fresh run on ${subtopic}...`);
+      } else if (findNewTopics) {
+        setProcessingMessage(`Looking for fresh angles on ${topic}...`);
+      } else {
+        setProcessingMessage(appCopy.loading.customMessage(topic));
+      }
       try {
         const requestTopic = subtopic
           ? `Focus on ${subtopic} aspect of ${topic}`
@@ -436,6 +446,7 @@ export function SwipeContainer({
         setControlsOpen(false);
       } finally {
         setIsLoading(false);
+        setProcessingMessage(null);
       }
     },
     [isLoading, onIndexChange, onOptionsChange, topic],
@@ -820,6 +831,10 @@ export function SwipeContainer({
     );
   }
 
+  if (processingMessage) {
+    return <LoadingScreen message={processingMessage} className={cn(activeTheme.surface, fontClass)} />;
+  }
+
   return (
     <div
       className={cn(
@@ -1035,7 +1050,7 @@ export function SwipeContainer({
       <div
         className={cn(
           "relative transition-all duration-300",
-          isMobile ? "pt-[8.25rem]" : "pt-36 sm:pt-40 lg:pt-48 xl:pt-52",
+          isMobile ? "pt-[7.4rem]" : "pt-36 sm:pt-40 lg:pt-48 xl:pt-52",
           showOptions
             ? "min-h-full"
             : isMobile
@@ -1107,14 +1122,14 @@ export function SwipeContainer({
               className={cn(
                 "pointer-events-none absolute z-[1]",
                 isMobile
-                  ? "inset-x-3 top-3 h-10"
+                  ? "inset-x-2 top-2 h-6"
                   : "inset-x-4 top-14 h-20 md:inset-x-8 md:top-16 md:h-24 lg:top-20 lg:h-28",
               )}
             />
             <div
               className={cn(
                 "pointer-events-none absolute z-[1] rounded-[2.1rem] border opacity-40",
-                isMobile ? "inset-x-3 inset-y-2" : "inset-x-4 inset-y-3 md:inset-x-8 md:inset-y-5",
+                isMobile ? "inset-x-2 inset-y-1" : "inset-x-4 inset-y-3 md:inset-x-8 md:inset-y-5",
               )}
               style={{
                 background: activeTheme.panel,
@@ -1127,7 +1142,7 @@ export function SwipeContainer({
             <div
               className={cn(
                 "pointer-events-none absolute z-[1] rounded-[2.1rem] border opacity-24",
-                isMobile ? "inset-x-3 inset-y-2" : "inset-x-4 inset-y-3 md:inset-x-8 md:inset-y-5",
+                isMobile ? "inset-x-2 inset-y-1" : "inset-x-4 inset-y-3 md:inset-x-8 md:inset-y-5",
               )}
               style={{
                 background: activeTheme.panel,
@@ -1215,40 +1230,31 @@ export function SwipeContainer({
                 />
               </motion.div>
             </AnimatePresence>
-            <div
-              className={cn(
-                "pointer-events-none absolute z-[3] flex justify-between",
-                isMobile ? "inset-x-3 bottom-3" : "inset-x-4 bottom-5 md:inset-x-8 md:bottom-8",
-              )}
-            >
-              <button
-                type="button"
-                onClick={previousCard}
-                disabled={currentIndex <= 0}
-                className={cn(
-                  "pointer-events-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/25 text-white/80 backdrop-blur-md transition hover:bg-white/10 disabled:opacity-40",
-                  isMobile ? "h-10 px-3 text-xs" : "h-11 px-4 text-sm",
-                )}
-                data-chrome-control="true"
-                aria-label="Go to previous card"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={nextCard}
-                className={cn(
-                  "pointer-events-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/25 text-white/80 backdrop-blur-md transition hover:bg-white/10",
-                  isMobile ? "h-10 px-3 text-xs" : "h-11 px-4 text-sm",
-                )}
-                data-chrome-control="true"
-                aria-label={currentIndex >= cards.length - 1 ? "Open next options" : "Go to next card"}
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
+            {!isMobile && (
+              <div className="pointer-events-none absolute inset-x-4 bottom-5 z-[3] flex justify-between md:inset-x-8 md:bottom-8">
+                <button
+                  type="button"
+                  onClick={previousCard}
+                  disabled={currentIndex <= 0}
+                  className="pointer-events-auto inline-flex h-11 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-4 text-sm text-white/80 backdrop-blur-md transition hover:bg-white/10 disabled:opacity-40"
+                  data-chrome-control="true"
+                  aria-label="Go to previous card"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={nextCard}
+                  className="pointer-events-auto inline-flex h-11 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-4 text-sm text-white/80 backdrop-blur-md transition hover:bg-white/10"
+                  data-chrome-control="true"
+                  aria-label={currentIndex >= cards.length - 1 ? "Open next options" : "Go to next card"}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

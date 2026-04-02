@@ -42,7 +42,7 @@ export function SwipeCard({
     <div
       className={cn(
         "relative h-full w-full px-4 pb-4 pt-3 transition-all duration-300 md:h-full md:px-8 md:pb-8 md:pt-5",
-        isMobile && "px-3 pb-3 pt-2",
+        isMobile && "px-2 pb-2 pt-1",
         isActive ? "opacity-100" : "opacity-0",
         className,
       )}
@@ -60,7 +60,7 @@ export function SwipeCard({
           <div
             className={cn(
               "relative flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border px-5 py-5 backdrop-blur-2xl transition-all duration-300 md:px-12 md:py-10 lg:px-14 lg:py-12",
-              isMobile && "rounded-[1.9rem] px-4 py-4",
+              isMobile && "rounded-[1.85rem] px-4 py-3",
               isActive && "scale-[1.005]",
             )}
             style={panelStyle}
@@ -83,7 +83,7 @@ export function SwipeCard({
             <div
               className={cn(
                 "flex min-h-0 flex-1 items-center justify-center overflow-visible pt-[4.5rem] pb-[4.5rem] md:items-start md:justify-start md:pt-[7rem] md:pb-24 lg:pt-[8rem] lg:pb-28",
-                isMobile && "pt-[2.7rem] pb-[3.8rem]",
+                isMobile && "pt-[1.9rem] pb-[2.9rem]",
               )}
             >
               <div className="flex w-full flex-1 items-center justify-center md:min-h-0 md:items-start">
@@ -160,7 +160,7 @@ export function SwipeCard({
             <div
               className={cn(
                 "pointer-events-none absolute inset-x-4 bottom-20 flex items-center justify-between gap-2 transition-all duration-300 md:inset-x-10 md:bottom-24 md:gap-3",
-                isMobile && "bottom-[4.6rem] inset-x-3",
+                isMobile && "bottom-[4rem] inset-x-3",
                 showSwipeHint ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
               )}
             >
