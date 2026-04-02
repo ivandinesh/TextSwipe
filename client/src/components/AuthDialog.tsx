@@ -8,12 +8,17 @@ import { useAuth } from "@/hooks/use-auth";
 
 interface AuthDialogProps {
   triggerLabel?: string;
+  defaultTab?: "login" | "register";
 }
 
-export function AuthDialog({ triggerLabel = appCopy.auth.trigger }: AuthDialogProps) {
+export function AuthDialog({
+  triggerLabel = appCopy.auth.trigger,
+  defaultTab = "login",
+}: AuthDialogProps) {
   const { forgotPassword, login, register } = useAuth();
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"tabs" | "forgot">("tabs");
+  const [activeTab, setActiveTab] = useState<"login" | "register">(defaultTab);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
@@ -67,11 +72,18 @@ export function AuthDialog({ triggerLabel = appCopy.auth.trigger }: AuthDialogPr
         setOpen(nextOpen);
         if (!nextOpen) {
           setMode("tabs");
+          setActiveTab(defaultTab);
           setForgotSuccess("");
         }
       }}
     >
-      <DialogTrigger asChild>
+      <DialogTrigger
+        asChild
+        onClick={() => {
+          setMode("tabs");
+          setActiveTab(defaultTab);
+        }}
+      >
         <Button variant="outline" className="rounded-full border-white/10 bg-white/[0.04] text-foreground">
           {triggerLabel}
         </Button>
@@ -115,7 +127,7 @@ export function AuthDialog({ triggerLabel = appCopy.auth.trigger }: AuthDialogPr
             </Button>
           </form>
         ) : (
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")} className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-white/[0.04]">
               <TabsTrigger value="login">{appCopy.auth.tabs.login}</TabsTrigger>
               <TabsTrigger value="register">{appCopy.auth.tabs.register}</TabsTrigger>

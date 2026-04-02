@@ -951,10 +951,10 @@ export function SwipeContainer({
       <div
         className={cn(
           "relative transition-all duration-300",
-          "pt-36 sm:pt-40",
+          "pt-36 sm:pt-40 lg:pt-48 xl:pt-52",
           showOptions
             ? "min-h-full"
-            : "h-[calc(100dvh-1rem)] sm:h-[calc(100dvh-1.5rem)]",
+            : "h-[calc(100dvh-1rem)] sm:h-[calc(100dvh-1.5rem)] lg:h-[calc(100dvh-2.5rem)]",
         )}
       >
         {showOptions ? (
@@ -995,7 +995,7 @@ export function SwipeContainer({
               className="pointer-events-none absolute inset-x-6 inset-y-6 z-0 rounded-[2.4rem] opacity-80 blur-3xl md:inset-x-16 md:inset-y-10"
               style={{ background: activeTheme.backlight }}
             />
-            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center px-6">
+            <div className="pointer-events-none absolute inset-x-0 top-2 z-10 flex justify-center px-6 md:top-4">
               <div
                 className="rounded-full border px-3 py-2 backdrop-blur-md"
                 style={{

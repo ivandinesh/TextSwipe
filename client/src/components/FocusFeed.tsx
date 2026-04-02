@@ -401,7 +401,10 @@ export function FocusFeed() {
                     Drop into structured 60-card courses that feel like a premium scroll lane, then keep your place every time you come back.
                   </p>
                   <div className="mt-5">
-                    <AuthDialog triggerLabel={appCopy.home.coursesTeaserCta} />
+                    <AuthDialog
+                      triggerLabel={appCopy.home.coursesTeaserCta}
+                      defaultTab="register"
+                    />
                   </div>
                 </div>
               </section>

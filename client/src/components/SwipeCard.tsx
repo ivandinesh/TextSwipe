@@ -45,7 +45,7 @@ export function SwipeCard({
       )}
       data-testid={`card-learn-${index}`}
     >
-      <div className="mx-auto flex h-full w-full max-w-[min(92vw,72rem)] flex-col">
+      <div className="mx-auto flex h-full w-full max-w-[min(92vw,64rem)] flex-col xl:max-w-[58rem]">
         <div className="relative h-full flex-1">
           <div
             className={cn(
@@ -56,7 +56,7 @@ export function SwipeCard({
           />
           <div
             className={cn(
-              "relative flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border px-5 py-5 backdrop-blur-2xl transition-all duration-300 md:px-12 md:py-8",
+              "relative flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border px-5 py-5 backdrop-blur-2xl transition-all duration-300 md:px-12 md:py-10 lg:px-14 lg:py-12",
               isActive && "scale-[1.005]",
             )}
             style={panelStyle}
@@ -76,19 +76,19 @@ export function SwipeCard({
               }
             }}
           >
-            <div className="flex min-h-0 flex-1 items-center justify-center overflow-visible py-2 md:py-3">
+            <div className="flex min-h-0 flex-1 items-center justify-center overflow-visible py-3 md:py-6 lg:py-8">
               <div className="w-full">
                 <p
                   className={cn(
                     "mx-auto overflow-visible text-center font-medium tracking-[-0.02em]",
                     sizeTier === "short" &&
-                      "max-w-[15ch] text-[clamp(1.85rem,6.6vw,2.45rem)] leading-[1.32] md:max-w-[18ch] md:text-[clamp(2.8rem,4vw,4.4rem)] md:leading-[1.24]",
+                      "max-w-[15ch] text-[clamp(1.85rem,6.6vw,2.45rem)] leading-[1.32] md:max-w-[16ch] md:text-[clamp(2.3rem,3.2vw,3.65rem)] md:leading-[1.18] lg:max-w-[15ch] lg:text-[clamp(2.45rem,2.95vw,3.75rem)]",
                     sizeTier === "medium" &&
-                      "max-w-[17ch] text-[clamp(1.72rem,5.9vw,2.24rem)] leading-[1.38] md:max-w-[19ch] md:text-[clamp(2.45rem,3.6vw,3.7rem)] md:leading-[1.28]",
+                      "max-w-[17ch] text-[clamp(1.72rem,5.9vw,2.24rem)] leading-[1.38] md:max-w-[18ch] md:text-[clamp(2rem,2.8vw,3rem)] md:leading-[1.22] lg:max-w-[17ch] lg:text-[clamp(2.1rem,2.55vw,3.1rem)]",
                     sizeTier === "long" &&
-                      "max-w-[19ch] text-[clamp(1.52rem,5vw,1.96rem)] leading-[1.44] md:max-w-[21ch] md:text-[clamp(2.05rem,3vw,3.05rem)] md:leading-[1.34]",
+                      "max-w-[19ch] text-[clamp(1.52rem,5vw,1.96rem)] leading-[1.44] md:max-w-[20ch] md:text-[clamp(1.75rem,2.35vw,2.5rem)] md:leading-[1.28] lg:max-w-[19ch] lg:text-[clamp(1.85rem,2.15vw,2.65rem)]",
                     sizeTier === "xlong" &&
-                      "max-w-[21ch] text-[clamp(1.36rem,4.2vw,1.76rem)] leading-[1.5] md:max-w-[23ch] md:text-[clamp(1.78rem,2.55vw,2.6rem)] md:leading-[1.4]",
+                      "max-w-[21ch] text-[clamp(1.36rem,4.2vw,1.76rem)] leading-[1.5] md:max-w-[22ch] md:text-[clamp(1.52rem,2vw,2.15rem)] md:leading-[1.34] lg:max-w-[21ch] lg:text-[clamp(1.62rem,1.85vw,2.25rem)]",
                     fontClass || "",
                   )}
                   style={
