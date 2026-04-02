@@ -83,6 +83,7 @@ export function SwipeCard({
             <div
               className={cn(
                 "flex min-h-0 flex-1 items-center justify-center overflow-visible pt-[4.5rem] pb-[4.5rem] md:items-start md:justify-start md:pt-[7rem] md:pb-24 lg:pt-[8rem] lg:pb-28",
+                !isMobile && "md:pt-[5.6rem] md:pb-20 lg:pt-[6.25rem] lg:pb-24",
                 isMobile && "pt-[1.9rem] pb-[2.9rem]",
               )}
             >

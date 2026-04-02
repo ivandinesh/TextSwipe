@@ -666,12 +666,14 @@ export function SwipeContainer({
     resetGesture();
   }, [controlsOpen, isMobile, nextCard, previousCard, resetGesture]);
 
-  const renderThemePanel = () => (
+  const renderThemePanel = (mode: "mobile-drawer" | "desktop-rail" = "mobile-drawer") => (
     <div
       ref={themePanelRef}
       className={cn(
         "pointer-events-auto w-full border shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl",
-        isMobile ? "rounded-[1.7rem] px-3 py-3" : "rounded-[2rem] px-4 py-4 md:px-5",
+        mode === "mobile-drawer"
+          ? "rounded-[1.7rem] px-3 py-3"
+          : "rounded-[2rem] px-4 py-4",
       )}
       style={{
         background: `linear-gradient(180deg, ${activeTheme.shell}, rgba(10,12,24,0.48))`,
@@ -683,37 +685,47 @@ export function SwipeContainer({
       aria-label={appCopy.card.controlsTitle}
       tabIndex={-1}
     >
-      <div className={cn("flex items-start justify-between gap-4", isMobile ? "mb-3" : "mb-4")}>
+      <div className={cn("flex items-start justify-between gap-4", mode === "mobile-drawer" ? "mb-3" : "mb-4")}>
         <div>
           <p
-            className={cn("font-display font-semibold", isMobile ? "text-xs" : "text-sm")}
+            className={cn("font-display font-semibold", mode === "mobile-drawer" ? "text-xs" : "text-sm")}
             style={{ color: activeTextTone.text }}
           >
             {appCopy.card.controlsTitle}
           </p>
           <p
-            className={cn("mt-1", isMobile ? "text-[11px] leading-4" : "text-xs")}
+            className={cn("mt-1", mode === "mobile-drawer" ? "text-[11px] leading-4" : "text-xs leading-5")}
             style={{ color: activeTextTone.muted }}
           >
             {appCopy.card.controlsDescription}
           </p>
         </div>
-        <div
-          className={cn(
-            "rounded-full border uppercase tracking-[0.24em]",
-            isMobile ? "px-2.5 py-1 text-[9px]" : "px-3 py-1 text-[10px]",
-          )}
-          style={{
-            color: activeTextTone.muted,
-            borderColor: activeTheme.overlay,
-            background: activeTheme.tile,
-          }}
-        >
-          {appCopy.card.controlsCloseHint}
-        </div>
+        {mode === "mobile-drawer" ? (
+          <div
+            className="rounded-full border px-2.5 py-1 text-[9px] uppercase tracking-[0.24em]"
+            style={{
+              color: activeTextTone.muted,
+              borderColor: activeTheme.overlay,
+              background: activeTheme.tile,
+            }}
+          >
+            {appCopy.card.controlsCloseHint}
+          </div>
+        ) : (
+          <div
+            className="rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.24em]"
+            style={{
+              color: activeTextTone.muted,
+              borderColor: activeTheme.overlay,
+              background: activeTheme.tile,
+            }}
+          >
+            Live
+          </div>
+        )}
       </div>
 
-      <div className={cn("grid", isMobile ? "gap-2.5" : "gap-3")}>
+      <div className={cn("grid", mode === "mobile-drawer" ? "gap-2.5" : "gap-3")}>
         <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] px-3 py-3">
           <div className="mb-2 flex items-center gap-2">
             <Palette className="h-4 w-4 text-primary" />
@@ -721,7 +733,7 @@ export function SwipeContainer({
               {appCopy.card.controls.backdropTitle}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className={cn("flex flex-wrap gap-2", mode === "desktop-rail" && "gap-1.5")}>
             {THEME_CHOICES.map((choice) => (
               <button
                 key={choice.id}
@@ -729,7 +741,7 @@ export function SwipeContainer({
                 onClick={() => selectTheme(choice.id)}
                 className={cn(
                   "flex items-center gap-2 rounded-full border text-xs transition-transform hover:-translate-y-0.5",
-                  isMobile ? "px-2 py-1.5" : "px-2.5 py-2",
+                  mode === "mobile-drawer" ? "px-2 py-1.5" : "px-2.5 py-2",
                   themeName === choice.id && "ring-2 ring-primary/40",
                 )}
                 style={{
@@ -758,7 +770,7 @@ export function SwipeContainer({
               {appCopy.card.controls.typeTitle}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className={cn("flex flex-wrap gap-2", mode === "desktop-rail" && "gap-1.5")}>
             {FONT_CHOICES.map((choice) => {
               const Icon = choice.icon;
               return (
@@ -768,7 +780,7 @@ export function SwipeContainer({
                   onClick={() => selectFont(choice.id)}
                   className={cn(
                     "inline-flex items-center gap-2 rounded-full border transition-transform hover:-translate-y-0.5",
-                    isMobile ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm",
+                    mode === "mobile-drawer" ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm",
                     FONT_CLASSES[choice.id],
                     fontName === choice.id && "ring-2 ring-primary/40",
                   )}
@@ -795,7 +807,7 @@ export function SwipeContainer({
               {appCopy.card.controls.contrastTitle}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className={cn("flex flex-wrap gap-2", mode === "desktop-rail" && "gap-1.5")}>
             {TEXT_TONE_CHOICES.map((choice) => (
               <button
                 key={choice.id}
@@ -803,7 +815,7 @@ export function SwipeContainer({
                 onClick={() => selectTextTone(choice.id)}
                 className={cn(
                   "rounded-full border transition-transform hover:-translate-y-0.5",
-                  isMobile ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm",
+                  mode === "mobile-drawer" ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm",
                   textToneName === choice.id && "ring-2 ring-primary/40",
                 )}
                 style={{
@@ -1015,14 +1027,6 @@ export function SwipeContainer({
                 ) : (
                   <AuthDialog triggerLabel={appCopy.auth.tabs.login} />
                 )}
-                <button
-                  type="button"
-                  onClick={() => setControlsOpen((open) => !open)}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] uppercase tracking-[0.24em] text-muted-foreground transition hover:bg-white/[0.08]"
-                  data-chrome-control="true"
-                >
-                  {appCopy.card.styleHintDesktop}
-                </button>
               </div>
             </div>
           )}
@@ -1040,7 +1044,7 @@ export function SwipeContainer({
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
               <div className={cn("mx-auto flex justify-center", isMobile ? "" : "max-w-3xl")}>
-                {renderThemePanel()}
+                {renderThemePanel("mobile-drawer")}
               </div>
             </motion.div>
           )}
@@ -1050,12 +1054,12 @@ export function SwipeContainer({
       <div
         className={cn(
           "relative transition-all duration-300",
-          isMobile ? "pt-[7.4rem]" : "pt-36 sm:pt-40 lg:pt-48 xl:pt-52",
+          isMobile ? "pt-[7.4rem]" : "pt-24 lg:pt-28",
           showOptions
             ? "min-h-full"
             : isMobile
               ? ""
-              : "h-[calc(100dvh-1rem)] sm:h-[calc(100dvh-1.5rem)] lg:h-[calc(100dvh-2.5rem)]",
+              : "h-[calc(100dvh-1.25rem)] lg:h-[calc(100dvh-1.5rem)]",
         )}
         style={!showOptions && isMobile ? { height: mobileStageHeight } : undefined}
       >
@@ -1085,177 +1089,307 @@ export function SwipeContainer({
             }}
           />
         ) : (
-          <div className="relative h-full">
-            <div
-              className="pointer-events-none absolute inset-0 z-0 opacity-100 transition-opacity duration-300"
-              style={{
-                background:
-                  `radial-gradient(circle at center, rgba(8,12,24,0) 0%, ${activeTheme.shell.replace("0.84", "0.18").replace("0.86", "0.18")} 38%, rgba(4,6,18,0.58) 100%)`,
-              }}
-            />
-            <div
-              className="pointer-events-none absolute inset-x-6 inset-y-6 z-0 rounded-[2.4rem] opacity-80 blur-3xl md:inset-x-16 md:inset-y-10"
-              style={{ background: activeTheme.backlight }}
-            />
-            {!isMobile && (
-              <div className="pointer-events-none absolute inset-x-0 top-2 z-10 flex justify-center px-6 md:top-4">
-                <div
-                  className="rounded-full border px-3 py-2 backdrop-blur-md"
-                  style={{
-                    borderColor: activeTheme.overlay,
-                    background: activeTheme.tile,
+          isMobile ? (
+            <div className="relative h-full">
+              <div
+                className="pointer-events-none absolute inset-0 z-0 opacity-100 transition-opacity duration-300"
+                style={{
+                  background:
+                    `radial-gradient(circle at center, rgba(8,12,24,0) 0%, ${activeTheme.shell.replace("0.84", "0.18").replace("0.86", "0.18")} 38%, rgba(4,6,18,0.58) 100%)`,
+                }}
+              />
+              <div
+                className="pointer-events-none absolute inset-x-6 inset-y-6 z-0 rounded-[2.4rem] opacity-80 blur-3xl md:inset-x-16 md:inset-y-10"
+                style={{ background: activeTheme.backlight }}
+              />
+              <div
+                className="pointer-events-none absolute inset-x-2 top-2 z-[1] h-6"
+              />
+              <div
+                className="pointer-events-none absolute inset-x-2 inset-y-1 z-[1] rounded-[2.1rem] border opacity-40"
+                style={{
+                  background: activeTheme.panel,
+                  borderColor: activeTheme.panelBorder,
+                  boxShadow: `0 30px 90px rgba(0,0,0,0.45), ${activeTheme.panelGlow}`,
+                  transform: "translate3d(0, 8px, 0) scale(0.982)",
+                  filter: "brightness(0.82) saturate(0.88)",
+                }}
+              />
+              <div
+                className="pointer-events-none absolute inset-x-2 inset-y-1 z-[1] rounded-[2.1rem] border opacity-24"
+                style={{
+                  background: activeTheme.panel,
+                  borderColor: activeTheme.panelBorder,
+                  transform: "translate3d(0, 15px, 0) scale(0.965)",
+                  filter: "brightness(0.72) saturate(0.82)",
+                }}
+              />
+              <AnimatePresence initial={false} custom={swipeDirection} mode="popLayout">
+                <motion.div
+                  key={currentCard?.id ?? `${topic}-${currentIndex}-card`}
+                  custom={swipeDirection}
+                  variants={{
+                    enter: (direction: 1 | -1) => ({
+                      x: direction > 0 ? 88 : -88,
+                      opacity: 0,
+                      scale: 0.97,
+                      rotateZ: direction > 0 ? 1.5 : -1.5,
+                    }),
+                    center: {
+                      x: 0,
+                      opacity: 1,
+                      scale: 1,
+                      rotateZ: 0,
+                      transition: {
+                        x: { type: "spring", stiffness: 260, damping: 28, mass: 0.95 },
+                        scale: { type: "spring", stiffness: 240, damping: 26, mass: 0.92 },
+                        rotateZ: { type: "spring", stiffness: 260, damping: 30 },
+                        opacity: { duration: 0.18 },
+                      },
+                    },
+                    exit: (direction: 1 | -1) => ({
+                      x: direction > 0 ? -132 : 132,
+                      opacity: 0,
+                      scale: 0.985,
+                      rotateZ: direction > 0 ? -1.8 : 1.8,
+                      transition: {
+                        x: { type: "spring", stiffness: 260, damping: 30, mass: 0.95 },
+                        opacity: { duration: 0.16 },
+                        scale: { duration: 0.2 },
+                      },
+                    }),
                   }}
+                  initial="enter"
+                  animate={
+                    isDragging
+                      ? {
+                          x: dragOffset.x,
+                          y: 0,
+                          rotateZ: dragOffset.x * 0.02,
+                          scale: 1.01,
+                          transition: { type: "spring", stiffness: 320, damping: 28, mass: 0.8 },
+                        }
+                      : "center"
+                  }
+                  exit="exit"
+                  className="absolute inset-0 z-[2]"
                 >
-                  <CardProgressTrail
-                    currentIndex={currentIndex}
-                    total={allSnippets.length}
-                    activeTheme={{
-                      overlay: activeTheme.overlay,
-                      tile: activeTheme.tile,
+                  <SwipeCard
+                    key={currentCard?.id ?? `${topic}-${currentIndex}`}
+                    content={currentCard?.content ?? allSnippets[currentIndex]}
+                    index={currentCard?.position ?? currentIndex}
+                    total={cards.length}
+                    isActive
+                    isMobile
+                    textColor={activeTextTone.text}
+                    mutedTextColor={activeTextTone.muted}
+                    fontClass={fontClass}
+                    showSwipeHint={showSwipeHint && currentIndex === 0}
+                    isLiked={Boolean(
+                      allSnippets[currentIndex] &&
+                        _likedSnippets.includes(allSnippets[currentIndex]),
+                    )}
+                    onLike={toggleLikeCurrent}
+                    panelStyle={{
+                      background: activeTheme.panel,
+                      borderColor: "rgba(255,255,255,0.18)",
+                      boxShadow: `0 36px 120px rgba(0,0,0,0.52), ${activeTheme.panelGlow}`,
                     }}
-                    activeTextTone={activeTextTone}
+                    backlightStyle={{
+                      background: activeTheme.backlight,
+                      opacity: 1,
+                    }}
+                    className="absolute inset-0"
                   />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="mx-auto grid h-full max-w-[min(96vw,110rem)] grid-cols-[minmax(0,1fr)_17.5rem] gap-5 px-5 pb-5 lg:grid-cols-[minmax(0,1fr)_18.75rem] lg:gap-6 lg:px-8 lg:pb-6">
+              <div className="relative min-h-0">
+                <div className="relative h-full pt-12 lg:pt-14">
+                  <div
+                    className="pointer-events-none absolute inset-0 z-0 opacity-100 transition-opacity duration-300"
+                    style={{
+                      background:
+                        `radial-gradient(circle at center, rgba(8,12,24,0) 0%, ${activeTheme.shell.replace("0.84", "0.18").replace("0.86", "0.18")} 38%, rgba(4,6,18,0.58) 100%)`,
+                    }}
+                  />
+                  <div
+                    className="pointer-events-none absolute inset-x-10 inset-y-5 z-0 rounded-[2.4rem] opacity-80 blur-3xl lg:inset-x-16 lg:inset-y-8"
+                    style={{ background: activeTheme.backlight }}
+                  />
+                  <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex justify-center px-8 lg:px-12">
+                    <div
+                      className="rounded-[1.4rem] border px-4 py-2.5 backdrop-blur-xl"
+                      style={{
+                        borderColor: activeTheme.panelBorder,
+                        background: `linear-gradient(180deg, ${activeTheme.tile}, rgba(255,255,255,0.03))`,
+                        boxShadow: "0 18px 48px rgba(0,0,0,0.2)",
+                      }}
+                    >
+                      <CardProgressTrail
+                        currentIndex={currentIndex}
+                        total={allSnippets.length}
+                        activeTheme={{
+                          overlay: activeTheme.overlay,
+                          tile: activeTheme.tile,
+                        }}
+                        activeTextTone={activeTextTone}
+                      />
+                    </div>
+                  </div>
+                  <div className="pointer-events-none absolute inset-x-6 top-8 z-[1] h-6 lg:inset-x-10 lg:top-9" />
+                  <div
+                    className="pointer-events-none absolute inset-x-4 inset-y-4 z-[1] rounded-[2.1rem] border opacity-40 lg:inset-x-8 lg:inset-y-5"
+                    style={{
+                      background: activeTheme.panel,
+                      borderColor: activeTheme.panelBorder,
+                      boxShadow: `0 30px 90px rgba(0,0,0,0.45), ${activeTheme.panelGlow}`,
+                      transform: "translate3d(0, 8px, 0) scale(0.982)",
+                      filter: "brightness(0.82) saturate(0.88)",
+                    }}
+                  />
+                  <div
+                    className="pointer-events-none absolute inset-x-4 inset-y-4 z-[1] rounded-[2.1rem] border opacity-24 lg:inset-x-8 lg:inset-y-5"
+                    style={{
+                      background: activeTheme.panel,
+                      borderColor: activeTheme.panelBorder,
+                      transform: "translate3d(0, 16px, 0) scale(0.964)",
+                      filter: "brightness(0.72) saturate(0.82)",
+                    }}
+                  />
+                  <AnimatePresence initial={false} custom={swipeDirection} mode="popLayout">
+                    <motion.div
+                      key={currentCard?.id ?? `${topic}-${currentIndex}-card`}
+                      custom={swipeDirection}
+                      variants={{
+                        enter: (direction: 1 | -1) => ({
+                          x: direction > 0 ? 88 : -88,
+                          opacity: 0,
+                          scale: 0.97,
+                          rotateZ: direction > 0 ? 1.5 : -1.5,
+                        }),
+                        center: {
+                          x: 0,
+                          opacity: 1,
+                          scale: 1,
+                          rotateZ: 0,
+                          transition: {
+                            x: { type: "spring", stiffness: 260, damping: 28, mass: 0.95 },
+                            scale: { type: "spring", stiffness: 240, damping: 26, mass: 0.92 },
+                            rotateZ: { type: "spring", stiffness: 260, damping: 30 },
+                            opacity: { duration: 0.18 },
+                          },
+                        },
+                        exit: (direction: 1 | -1) => ({
+                          x: direction > 0 ? -132 : 132,
+                          opacity: 0,
+                          scale: 0.985,
+                          rotateZ: direction > 0 ? -1.8 : 1.8,
+                          transition: {
+                            x: { type: "spring", stiffness: 260, damping: 30, mass: 0.95 },
+                            opacity: { duration: 0.16 },
+                            scale: { duration: 0.2 },
+                          },
+                        }),
+                      }}
+                      initial="enter"
+                      animate={
+                        isDragging
+                          ? {
+                              x: dragOffset.x,
+                              y: dragOffset.y * 0.35,
+                              rotateZ: dragOffset.x * 0.02,
+                              scale: 1.01,
+                              transition: { type: "spring", stiffness: 320, damping: 28, mass: 0.8 },
+                            }
+                          : "center"
+                      }
+                      exit="exit"
+                      className="absolute inset-0 z-[2]"
+                    >
+                      <SwipeCard
+                        key={currentCard?.id ?? `${topic}-${currentIndex}`}
+                        content={currentCard?.content ?? allSnippets[currentIndex]}
+                        index={currentCard?.position ?? currentIndex}
+                        total={cards.length}
+                        isActive
+                        textColor={activeTextTone.text}
+                        mutedTextColor={activeTextTone.muted}
+                        fontClass={fontClass}
+                        showSwipeHint={showSwipeHint && currentIndex === 0}
+                        isLiked={Boolean(
+                          allSnippets[currentIndex] &&
+                            _likedSnippets.includes(allSnippets[currentIndex]),
+                        )}
+                        onLike={toggleLikeCurrent}
+                        panelStyle={{
+                          background: activeTheme.panel,
+                          borderColor: "rgba(255,255,255,0.18)",
+                          boxShadow: `0 36px 120px rgba(0,0,0,0.52), ${activeTheme.panelGlow}`,
+                        }}
+                        backlightStyle={{
+                          background: activeTheme.backlight,
+                          opacity: 1,
+                        }}
+                        className="absolute inset-0"
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+                  <div className="pointer-events-none absolute inset-x-4 bottom-5 z-[3] flex justify-between lg:inset-x-8 lg:bottom-7">
+                    <button
+                      type="button"
+                      onClick={previousCard}
+                      disabled={currentIndex <= 0}
+                      className="pointer-events-auto inline-flex h-11 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-4 text-sm text-white/80 backdrop-blur-md transition hover:bg-white/10 disabled:opacity-40"
+                      data-chrome-control="true"
+                      aria-label="Go to previous card"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Back
+                    </button>
+                    <button
+                      type="button"
+                      onClick={nextCard}
+                      className="pointer-events-auto inline-flex h-11 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-4 text-sm text-white/80 backdrop-blur-md transition hover:bg-white/10"
+                      data-chrome-control="true"
+                      aria-label={currentIndex >= cards.length - 1 ? "Open next options" : "Go to next card"}
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            )}
-            <div
-              className={cn(
-                "pointer-events-none absolute z-[1]",
-                isMobile
-                  ? "inset-x-2 top-2 h-6"
-                  : "inset-x-4 top-14 h-20 md:inset-x-8 md:top-16 md:h-24 lg:top-20 lg:h-28",
-              )}
-            />
-            <div
-              className={cn(
-                "pointer-events-none absolute z-[1] rounded-[2.1rem] border opacity-40",
-                isMobile ? "inset-x-2 inset-y-1" : "inset-x-4 inset-y-3 md:inset-x-8 md:inset-y-5",
-              )}
-              style={{
-                background: activeTheme.panel,
-                borderColor: activeTheme.panelBorder,
-                boxShadow: `0 30px 90px rgba(0,0,0,0.45), ${activeTheme.panelGlow}`,
-                transform: isMobile ? "translate3d(0, 8px, 0) scale(0.982)" : "translate3d(0, 12px, 0) scale(0.975)",
-                filter: "brightness(0.82) saturate(0.88)",
-              }}
-            />
-            <div
-              className={cn(
-                "pointer-events-none absolute z-[1] rounded-[2.1rem] border opacity-24",
-                isMobile ? "inset-x-2 inset-y-1" : "inset-x-4 inset-y-3 md:inset-x-8 md:inset-y-5",
-              )}
-              style={{
-                background: activeTheme.panel,
-                borderColor: activeTheme.panelBorder,
-                transform: isMobile ? "translate3d(0, 15px, 0) scale(0.965)" : "translate3d(0, 22px, 0) scale(0.95)",
-                filter: "brightness(0.72) saturate(0.82)",
-              }}
-            />
-            <AnimatePresence initial={false} custom={swipeDirection} mode="popLayout">
-              <motion.div
-                key={currentCard?.id ?? `${topic}-${currentIndex}-card`}
-                custom={swipeDirection}
-                variants={{
-                  enter: (direction: 1 | -1) => ({
-                    x: direction > 0 ? 88 : -88,
-                    opacity: 0,
-                    scale: 0.97,
-                    rotateZ: direction > 0 ? 1.5 : -1.5,
-                  }),
-                  center: {
-                    x: 0,
-                    opacity: 1,
-                    scale: 1,
-                    rotateZ: 0,
-                    transition: {
-                      x: { type: "spring", stiffness: 260, damping: 28, mass: 0.95 },
-                      scale: { type: "spring", stiffness: 240, damping: 26, mass: 0.92 },
-                      rotateZ: { type: "spring", stiffness: 260, damping: 30 },
-                      opacity: { duration: 0.18 },
-                    },
-                  },
-                  exit: (direction: 1 | -1) => ({
-                    x: direction > 0 ? -132 : 132,
-                    opacity: 0,
-                    scale: 0.985,
-                    rotateZ: direction > 0 ? -1.8 : 1.8,
-                    transition: {
-                      x: { type: "spring", stiffness: 260, damping: 30, mass: 0.95 },
-                      opacity: { duration: 0.16 },
-                      scale: { duration: 0.2 },
-                    },
-                  }),
-                }}
-                initial="enter"
-                animate={
-                  isDragging
-                    ? {
-                        x: dragOffset.x,
-                        y: isMobile ? 0 : dragOffset.y * 0.35,
-                        rotateZ: dragOffset.x * 0.02,
-                        scale: 1.01,
-                        transition: { type: "spring", stiffness: 320, damping: 28, mass: 0.8 },
-                      }
-                    : "center"
-                }
-                exit="exit"
-                className="absolute inset-0 z-[2]"
-              >
-                <SwipeCard
-                  key={currentCard?.id ?? `${topic}-${currentIndex}`}
-                  content={currentCard?.content ?? allSnippets[currentIndex]}
-                  index={currentCard?.position ?? currentIndex}
-                  total={cards.length}
-                  isActive
-                  isMobile={isMobile}
-                  textColor={activeTextTone.text}
-                  mutedTextColor={activeTextTone.muted}
-                  fontClass={fontClass}
-                  showSwipeHint={showSwipeHint && currentIndex === 0}
-                  isLiked={Boolean(
-                    allSnippets[currentIndex] &&
-                      _likedSnippets.includes(allSnippets[currentIndex]),
-                  )}
-                  onLike={toggleLikeCurrent}
-                  panelStyle={{
-                    background: activeTheme.panel,
-                    borderColor: "rgba(255,255,255,0.18)",
-                    boxShadow: `0 36px 120px rgba(0,0,0,0.52), ${activeTheme.panelGlow}`,
-                  }}
-                  backlightStyle={{
-                    background: activeTheme.backlight,
-                    opacity: 1,
-                  }}
-                  className="absolute inset-0"
-                />
-              </motion.div>
-            </AnimatePresence>
-            {!isMobile && (
-              <div className="pointer-events-none absolute inset-x-4 bottom-5 z-[3] flex justify-between md:inset-x-8 md:bottom-8">
-                <button
-                  type="button"
-                  onClick={previousCard}
-                  disabled={currentIndex <= 0}
-                  className="pointer-events-auto inline-flex h-11 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-4 text-sm text-white/80 backdrop-blur-md transition hover:bg-white/10 disabled:opacity-40"
-                  data-chrome-control="true"
-                  aria-label="Go to previous card"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Back
-                </button>
-                <button
-                  type="button"
-                  onClick={nextCard}
-                  className="pointer-events-auto inline-flex h-11 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-4 text-sm text-white/80 backdrop-blur-md transition hover:bg-white/10"
-                  data-chrome-control="true"
-                  aria-label={currentIndex >= cards.length - 1 ? "Open next options" : "Go to next card"}
-                >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            )}
-          </div>
+
+              <aside className="relative hidden min-h-0 md:block">
+                <div className="sticky top-0 flex h-full flex-col pt-12 lg:pt-14">
+                  <div
+                    className="mb-3 rounded-[1.35rem] border px-3.5 py-3 backdrop-blur-xl"
+                    style={{
+                      borderColor: activeTheme.panelBorder,
+                      background: `linear-gradient(180deg, rgba(255,255,255,0.06), ${activeTheme.tile})`,
+                      boxShadow: "0 18px 48px rgba(0,0,0,0.18)",
+                    }}
+                  >
+                    <p
+                      className="font-display text-[10px] font-semibold uppercase tracking-[0.3em] text-primary/80"
+                    >
+                      Style dock
+                    </p>
+                    <p
+                      className="mt-2 text-xs leading-5"
+                      style={{ color: activeTextTone.muted }}
+                    >
+                      Tune the deck without leaving the run.
+                    </p>
+                  </div>
+                  {renderThemePanel("desktop-rail")}
+                </div>
+              </aside>
+            </div>
+          )
         )}
       </div>
     </div>
