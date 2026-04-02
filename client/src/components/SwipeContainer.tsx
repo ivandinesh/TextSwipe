@@ -664,7 +664,9 @@ export function SwipeContainer({
     resetGesture();
   }, [controlsOpen, isMobile, nextCard, previousCard, resetGesture]);
 
-  const renderThemePanel = (mode: "mobile-drawer" | "desktop-rail" = "mobile-drawer") => (
+  const renderThemePanel = (
+    mode: "mobile-drawer" | "desktop-rail" | "desktop-popover" = "mobile-drawer",
+  ) => (
     <div
       ref={themePanelRef}
       className={cn(
@@ -672,6 +674,7 @@ export function SwipeContainer({
         mode === "mobile-drawer"
           ? "rounded-[1.7rem] px-3 py-3"
           : "rounded-[2rem] px-4 py-4",
+        mode === "desktop-popover" && "max-h-[min(70dvh,42rem)] max-w-[22rem] overflow-y-auto",
       )}
       style={{
         background: `linear-gradient(180deg, ${activeTheme.shell}, rgba(10,12,24,0.48))`,
@@ -848,7 +851,7 @@ export function SwipeContainer({
   return (
     <div
       className={cn(
-        "relative h-screen transition-all duration-300 ease-in-out",
+        "relative flex h-[100dvh] min-h-[100dvh] flex-col transition-all duration-300 ease-in-out",
         showOptions ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden",
         activeTheme.surface,
         fontClass,
@@ -1002,6 +1005,15 @@ export function SwipeContainer({
               </div>
 
               <div className="hidden items-center gap-2 sm:flex">
+                <button
+                  type="button"
+                  onClick={() => setControlsOpen((open) => !open)}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-foreground transition hover:bg-white/[0.08]"
+                  data-chrome-control="true"
+                  aria-label={appCopy.card.styleHintDesktop}
+                >
+                  <Menu className="h-4.5 w-4.5" />
+                </button>
                 {user ? (
                   <>
                     {user.isAdmin && (
@@ -1058,17 +1070,14 @@ export function SwipeContainer({
         <AnimatePresence>
           {!isMobile && controlsOpen && !showOptions && (
             <motion.div
-              className={cn(
-                "pointer-events-none absolute inset-x-0 z-20",
-                "bottom-0 px-4 pb-5 md:px-8 md:pb-8",
-              )}
+              className="pointer-events-none absolute inset-x-0 top-full z-20 mt-3 px-4 md:px-6"
               initial={{ opacity: 0, y: 26 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 18 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <div className="mx-auto flex max-w-3xl justify-center">
-                {renderThemePanel("mobile-drawer")}
+              <div className="mx-auto flex max-w-[min(96vw,110rem)] justify-end">
+                {renderThemePanel("desktop-popover")}
               </div>
             </motion.div>
           )}
@@ -1115,7 +1124,7 @@ export function SwipeContainer({
         ) : (
           isMobile ? (
             <div
-              className="relative h-full min-h-0 px-2"
+              className="relative flex-1 min-h-0 px-2"
               style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
             >
               <div
@@ -1218,7 +1227,7 @@ export function SwipeContainer({
               </AnimatePresence>
             </div>
           ) : (
-            <div className="mx-auto grid h-full max-w-[min(96vw,110rem)] grid-cols-[minmax(0,1fr)_17.5rem] gap-5 px-5 pb-5 lg:grid-cols-[minmax(0,1fr)_18.75rem] lg:gap-6 lg:px-8 lg:pb-6">
+            <div className="mx-auto h-full max-w-[min(96vw,90rem)] px-5 pb-5 lg:px-8 lg:pb-6">
               <div className="relative min-h-0">
                 <div className="relative h-full pt-12 lg:pt-14">
                   <div
@@ -1375,32 +1384,6 @@ export function SwipeContainer({
                   </div>
                 </div>
               </div>
-
-              <aside className="relative hidden min-h-0 md:block">
-                <div className="sticky top-0 flex h-full flex-col pt-12 lg:pt-14">
-                  <div
-                    className="mb-3 rounded-[1.35rem] border px-3.5 py-3 backdrop-blur-xl"
-                    style={{
-                      borderColor: activeTheme.panelBorder,
-                      background: `linear-gradient(180deg, rgba(255,255,255,0.06), ${activeTheme.tile})`,
-                      boxShadow: "0 18px 48px rgba(0,0,0,0.18)",
-                    }}
-                  >
-                    <p
-                      className="font-display text-[10px] font-semibold uppercase tracking-[0.3em] text-primary/80"
-                    >
-                      Style dock
-                    </p>
-                    <p
-                      className="mt-2 text-xs leading-5"
-                      style={{ color: activeTextTone.muted }}
-                    >
-                      Tune the deck without leaving the run.
-                    </p>
-                  </div>
-                  {renderThemePanel("desktop-rail")}
-                </div>
-              </aside>
             </div>
           )
         )}
