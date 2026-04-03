@@ -254,12 +254,23 @@ function shouldIgnoreKeyboardEvent(target: EventTarget | null) {
     return false;
   }
 
-  if (target.isContentEditable) {
+  if (target.isContentEditable || Boolean(target.closest("[contenteditable='true'], [contenteditable=''], [contenteditable]"))) {
     return true;
   }
 
-  const tagName = target.tagName.toLowerCase();
-  return ["input", "textarea", "select", "button"].includes(tagName);
+  return Boolean(target.closest("input, textarea, select"));
+}
+
+function shouldUseSpaceForNavigation(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) {
+    return true;
+  }
+
+  return !Boolean(
+    target.closest(
+      "button, a, summary, [role='button'], [role='link'], [data-chrome-control='true'], [data-theme-panel='true']",
+    ),
+  );
 }
 
 export function SwipeContainer({
@@ -294,6 +305,7 @@ export function SwipeContainer({
   const [liveMessage, setLiveMessage] = useState("");
   const [processingMessage, setProcessingMessage] = useState<string | null>(null);
   const themePanelRef = useRef<HTMLDivElement | null>(null);
+  const desktopControlsButtonRef = useRef<HTMLButtonElement | null>(null);
   const pointerTrackerRef = useRef<{
     pointerId: number | null;
     startX: number;
@@ -314,6 +326,7 @@ export function SwipeContainer({
     engaged: false,
   });
   const deckIdRef = useRef(0);
+  const previousControlsOpenRef = useRef(false);
 
   const activeTheme = THEMES[themeName];
   const activeTextTone = activeTheme.textTones[textToneName];
@@ -500,31 +513,39 @@ export function SwipeContainer({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (controlsOpen) {
+          e.preventDefault();
+          setControlsOpen(false);
+        } else if (showOptions) {
+          e.preventDefault();
+          setShowOptions(false);
+        } else {
+          e.preventDefault();
+          onBack();
+        }
+        return;
+      }
+
       if (shouldIgnoreKeyboardEvent(e.target)) {
         return;
       }
 
-      if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " ") {
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
         e.preventDefault();
         nextCard();
       } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
         e.preventDefault();
         previousCard();
+      } else if (e.key === " " && shouldUseSpaceForNavigation(e.target)) {
+        e.preventDefault();
+        nextCard();
       } else if (e.key.toLowerCase() === "w") {
         e.preventDefault();
         setControlsOpen(true);
-      } else if (e.key === "Escape" && controlsOpen) {
-        e.preventDefault();
-        setControlsOpen(false);
       } else if (e.key.toLowerCase() === "f") {
         e.preventDefault();
         toggleLikeCurrent();
-      } else if (e.key === "Escape") {
-        if (showOptions) {
-          setShowOptions(false);
-        } else {
-          onBack();
-        }
       }
     };
 
@@ -559,6 +580,16 @@ export function SwipeContainer({
       themePanelRef.current?.focus();
     }
   }, [controlsOpen, showOptions]);
+
+  useEffect(() => {
+    if (!isMobile && previousControlsOpenRef.current && !controlsOpen && !showOptions) {
+      window.requestAnimationFrame(() => {
+        desktopControlsButtonRef.current?.focus();
+      });
+    }
+
+    previousControlsOpenRef.current = controlsOpen;
+  }, [controlsOpen, isMobile, showOptions]);
 
   const resetGesture = useCallback(() => {
     pointerTrackerRef.current = {
@@ -1008,6 +1039,7 @@ export function SwipeContainer({
                 <button
                   type="button"
                   onClick={() => setControlsOpen((open) => !open)}
+                  ref={desktopControlsButtonRef}
                   className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-foreground transition hover:bg-white/[0.08]"
                   data-chrome-control="true"
                   aria-label={appCopy.card.styleHintDesktop}
@@ -1088,12 +1120,12 @@ export function SwipeContainer({
       <div
         className={cn(
           "relative transition-all duration-300",
-          isMobile ? "flex-1 min-h-0" : "pt-24 lg:pt-28",
+          isMobile ? "flex-1 min-h-0" : "flex-1 min-h-0 pt-24 lg:pt-28",
           showOptions
             ? "min-h-full"
             : isMobile
               ? ""
-              : "h-[calc(100dvh-1.25rem)] lg:h-[calc(100dvh-1.5rem)]",
+              : "",
         )}
       >
         {showOptions ? (
@@ -1228,8 +1260,8 @@ export function SwipeContainer({
             </div>
           ) : (
             <div className="mx-auto h-full max-w-[min(96vw,90rem)] px-5 pb-5 lg:px-8 lg:pb-6">
-              <div className="relative min-h-0">
-                <div className="relative h-full pt-12 lg:pt-14">
+              <div className="flex h-full min-h-0 flex-col">
+                <div className="relative flex h-full min-h-0 flex-1 flex-col pt-12 lg:pt-14">
                   <div
                     className="pointer-events-none absolute inset-0 z-0 opacity-100 transition-opacity duration-300"
                     style={{
@@ -1261,7 +1293,7 @@ export function SwipeContainer({
                       />
                     </div>
                   </div>
-                  <div className="pointer-events-none absolute inset-x-6 top-8 z-[1] h-6 lg:inset-x-10 lg:top-9" />
+                  <div className="pointer-events-none absolute inset-x-6 top-8 z-[1] h-4 lg:inset-x-10 lg:top-9" />
                   <div
                     className="pointer-events-none absolute inset-x-4 inset-y-4 z-[1] rounded-[2.1rem] border opacity-40 lg:inset-x-8 lg:inset-y-5"
                     style={{
@@ -1281,84 +1313,86 @@ export function SwipeContainer({
                       filter: "brightness(0.72) saturate(0.82)",
                     }}
                   />
-                  <AnimatePresence initial={false} custom={swipeDirection} mode="popLayout">
-                    <motion.div
-                      key={currentCard?.id ?? `${topic}-${currentIndex}-card`}
-                      custom={swipeDirection}
-                      variants={{
-                        enter: (direction: 1 | -1) => ({
-                          x: direction > 0 ? 88 : -88,
-                          opacity: 0,
-                          scale: 0.97,
-                          rotateZ: direction > 0 ? 1.5 : -1.5,
-                        }),
-                        center: {
-                          x: 0,
-                          opacity: 1,
-                          scale: 1,
-                          rotateZ: 0,
-                          transition: {
-                            x: { type: "spring", stiffness: 260, damping: 28, mass: 0.95 },
-                            scale: { type: "spring", stiffness: 240, damping: 26, mass: 0.92 },
-                            rotateZ: { type: "spring", stiffness: 260, damping: 30 },
-                            opacity: { duration: 0.18 },
+                  <div className="relative flex h-full min-h-0 flex-1 items-stretch pt-6 lg:pt-7">
+                    <AnimatePresence initial={false} custom={swipeDirection} mode="popLayout">
+                      <motion.div
+                        key={currentCard?.id ?? `${topic}-${currentIndex}-card`}
+                        custom={swipeDirection}
+                        variants={{
+                          enter: (direction: 1 | -1) => ({
+                            x: direction > 0 ? 88 : -88,
+                            opacity: 0,
+                            scale: 0.97,
+                            rotateZ: direction > 0 ? 1.5 : -1.5,
+                          }),
+                          center: {
+                            x: 0,
+                            opacity: 1,
+                            scale: 1,
+                            rotateZ: 0,
+                            transition: {
+                              x: { type: "spring", stiffness: 260, damping: 28, mass: 0.95 },
+                              scale: { type: "spring", stiffness: 240, damping: 26, mass: 0.92 },
+                              rotateZ: { type: "spring", stiffness: 260, damping: 30 },
+                              opacity: { duration: 0.18 },
+                            },
                           },
-                        },
-                        exit: (direction: 1 | -1) => ({
-                          x: direction > 0 ? -132 : 132,
-                          opacity: 0,
-                          scale: 0.985,
-                          rotateZ: direction > 0 ? -1.8 : 1.8,
-                          transition: {
-                            x: { type: "spring", stiffness: 260, damping: 30, mass: 0.95 },
-                            opacity: { duration: 0.16 },
-                            scale: { duration: 0.2 },
-                          },
-                        }),
-                      }}
-                      initial="enter"
-                      animate={
-                        isDragging
-                          ? {
-                              x: dragOffset.x,
-                              y: dragOffset.y * 0.35,
-                              rotateZ: dragOffset.x * 0.02,
-                              scale: 1.01,
-                              transition: { type: "spring", stiffness: 320, damping: 28, mass: 0.8 },
-                            }
-                          : "center"
-                      }
-                      exit="exit"
-                      className="absolute inset-0 z-[2]"
-                    >
-                      <SwipeCard
-                        key={currentCard?.id ?? `${topic}-${currentIndex}`}
-                        content={currentCard?.content ?? allSnippets[currentIndex]}
-                        index={currentCard?.position ?? currentIndex}
-                        total={cards.length}
-                        isActive
-                        textColor={activeTextTone.text}
-                        mutedTextColor={activeTextTone.muted}
-                        fontClass={fontClass}
-                        showSwipeHint={showSwipeHint && currentIndex === 0}
-                        isLiked={Boolean(
-                          allSnippets[currentIndex] &&
-                            _likedSnippets.includes(allSnippets[currentIndex]),
-                        )}
-                        onLike={toggleLikeCurrent}
-                        panelStyle={{
-                          background: activeTheme.panel,
-                          borderColor: "rgba(255,255,255,0.18)",
-                          boxShadow: `0 36px 120px rgba(0,0,0,0.52), ${activeTheme.panelGlow}`,
+                          exit: (direction: 1 | -1) => ({
+                            x: direction > 0 ? -132 : 132,
+                            opacity: 0,
+                            scale: 0.985,
+                            rotateZ: direction > 0 ? -1.8 : 1.8,
+                            transition: {
+                              x: { type: "spring", stiffness: 260, damping: 30, mass: 0.95 },
+                              opacity: { duration: 0.16 },
+                              scale: { duration: 0.2 },
+                            },
+                          }),
                         }}
-                        backlightStyle={{
-                          background: activeTheme.backlight,
-                          opacity: 1,
-                        }}
-                        className="absolute inset-0"
-                      />
-                    </motion.div>
-                  </AnimatePresence>
+                        initial="enter"
+                        animate={
+                          isDragging
+                            ? {
+                                x: dragOffset.x,
+                                y: dragOffset.y * 0.35,
+                                rotateZ: dragOffset.x * 0.02,
+                                scale: 1.01,
+                                transition: { type: "spring", stiffness: 320, damping: 28, mass: 0.8 },
+                              }
+                            : "center"
+                        }
+                        exit="exit"
+                        className="absolute inset-0 z-[2]"
+                      >
+                        <SwipeCard
+                          key={currentCard?.id ?? `${topic}-${currentIndex}`}
+                          content={currentCard?.content ?? allSnippets[currentIndex]}
+                          index={currentCard?.position ?? currentIndex}
+                          total={cards.length}
+                          isActive
+                          textColor={activeTextTone.text}
+                          mutedTextColor={activeTextTone.muted}
+                          fontClass={fontClass}
+                          showSwipeHint={showSwipeHint && currentIndex === 0}
+                          isLiked={Boolean(
+                            allSnippets[currentIndex] &&
+                              _likedSnippets.includes(allSnippets[currentIndex]),
+                          )}
+                          onLike={toggleLikeCurrent}
+                          panelStyle={{
+                            background: activeTheme.panel,
+                            borderColor: "rgba(255,255,255,0.18)",
+                            boxShadow: `0 36px 120px rgba(0,0,0,0.52), ${activeTheme.panelGlow}`,
+                          }}
+                          backlightStyle={{
+                            background: activeTheme.backlight,
+                            opacity: 1,
+                          }}
+                          className="absolute inset-0"
+                        />
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
                   <div className="pointer-events-none absolute inset-x-4 bottom-5 z-[3] flex justify-between lg:inset-x-8 lg:bottom-7">
                     <button
                       type="button"
