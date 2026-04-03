@@ -874,7 +874,7 @@ export function SwipeContainer({
       {isMobile && (
         <div
           className="relative z-20 shrink-0 px-4 pb-2"
-          style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
+          style={{ paddingTop: "max(2.75rem, calc(env(safe-area-inset-top) + 0.75rem))" }}
         >
           <div
             className="glass-panel pointer-events-auto rounded-[1.45rem] px-3.5 py-2.5"
