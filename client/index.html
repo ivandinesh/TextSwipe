@@ -31,9 +31,287 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Inter", system-ui, sans-serif;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background:
+          radial-gradient(circle at top, rgba(58, 227, 255, 0.16), transparent 30%),
+          radial-gradient(circle at 85% 18%, rgba(141, 92, 255, 0.18), transparent 24%),
+          linear-gradient(180deg, rgba(14, 17, 37, 0.98), rgba(7, 10, 26, 1));
+        color: #f4f7ff;
+      }
+
+      body[data-focusfeed-boot="ready"] #boot-shell {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      body[data-focusfeed-boot="ready"] #root {
+        opacity: 1;
+      }
+
+      #root {
+        opacity: 0;
+        transition: opacity 220ms ease;
+      }
+
+      #boot-shell {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        overflow: hidden;
+        transition: opacity 280ms ease, visibility 280ms ease;
+      }
+
+      #boot-shell::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 18% 16%, rgba(58, 227, 255, 0.16), transparent 24%),
+          radial-gradient(circle at 82% 22%, rgba(141, 92, 255, 0.16), transparent 20%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 38%);
+        pointer-events: none;
+      }
+
+      .boot-shell__wrap {
+        position: relative;
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .boot-shell__panel {
+        width: min(100%, 720px);
+        border-radius: 36px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background:
+          linear-gradient(180deg, rgba(24, 28, 52, 0.82), rgba(12, 16, 32, 0.72));
+        box-shadow:
+          0 34px 100px rgba(0, 0, 0, 0.38),
+          inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(26px);
+        padding: 28px;
+      }
+
+      .boot-shell__eyebrow {
+        margin: 0;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.34em;
+        text-transform: uppercase;
+        color: rgba(111, 232, 255, 0.84);
+      }
+
+      .boot-shell__title {
+        margin: 14px 0 0;
+        font-size: clamp(32px, 6vw, 60px);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+        font-weight: 700;
+      }
+
+      .boot-shell__copy {
+        margin: 18px 0 0;
+        max-width: 42rem;
+        font-size: 16px;
+        line-height: 1.7;
+        color: rgba(220, 228, 248, 0.82);
+      }
+
+      .boot-shell__row {
+        margin-top: 22px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .boot-shell__pill {
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        color: rgba(236, 241, 255, 0.88);
+        padding: 10px 14px;
+        font-size: 13px;
+      }
+
+      .boot-shell__status {
+        margin-top: 28px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 14px 16px;
+      }
+
+      .boot-shell__orb {
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #3ae3ff, #9a82ff);
+        box-shadow: 0 0 28px rgba(58, 227, 255, 0.46);
+        animation: bootPulse 1.35s ease-in-out infinite;
+        flex: none;
+      }
+
+      .boot-shell__status-copy strong {
+        display: block;
+        font-size: 14px;
+        color: #f8fbff;
+      }
+
+      .boot-shell__status-copy span {
+        display: block;
+        margin-top: 4px;
+        font-size: 13px;
+        color: rgba(208, 216, 237, 0.76);
+      }
+
+      .boot-shell__actions {
+        margin-top: 22px;
+        display: none;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .boot-shell__button {
+        appearance: none;
+        border: 0;
+        cursor: pointer;
+        border-radius: 999px;
+        padding: 12px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #05131b;
+        background: linear-gradient(135deg, #64edff, #b49bff);
+        box-shadow: 0 14px 34px rgba(90, 176, 255, 0.24);
+      }
+
+      .boot-shell__secondary {
+        background: rgba(255, 255, 255, 0.06);
+        color: #eef3ff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: none;
+      }
+
+      .boot-shell__maintenance {
+        display: none;
+      }
+
+      body[data-focusfeed-boot="maintenance"] .boot-shell__loading {
+        display: none;
+      }
+
+      body[data-focusfeed-boot="maintenance"] .boot-shell__maintenance {
+        display: block;
+      }
+
+      body[data-focusfeed-boot="maintenance"] .boot-shell__actions {
+        display: flex;
+      }
+
+      body[data-focusfeed-boot="maintenance"] .boot-shell__orb {
+        background: linear-gradient(135deg, #ffb47a, #ff7d9c);
+        box-shadow: 0 0 28px rgba(255, 142, 122, 0.4);
+        animation: none;
+      }
+
+      @keyframes bootPulse {
+        0%, 100% { transform: scale(0.88); opacity: 0.72; }
+        50% { transform: scale(1.1); opacity: 1; }
+      }
+    </style>
   </head>
-  <body>
+  <body data-focusfeed-boot="loading">
+    <div id="boot-shell" aria-live="polite">
+      <div class="boot-shell__wrap">
+        <div class="boot-shell__panel">
+          <p class="boot-shell__eyebrow">FocusFeed</p>
+          <div class="boot-shell__loading">
+            <h1 class="boot-shell__title">Stacking the next run.</h1>
+            <p class="boot-shell__copy">
+              We are warming up the feed, restoring the app shell, and lining up the next swipe.
+            </p>
+            <div class="boot-shell__row">
+              <div class="boot-shell__pill">Realtime boot check</div>
+              <div class="boot-shell__pill">UI shell recovery</div>
+              <div class="boot-shell__pill">Content lane sync</div>
+            </div>
+          </div>
+          <div class="boot-shell__maintenance">
+            <h1 class="boot-shell__title">Quick maintenance in progress.</h1>
+            <p class="boot-shell__copy">
+              FocusFeed is taking longer than expected to come online. We are recovering the app and bringing the next-gen scroll lane back up now.
+            </p>
+            <div class="boot-shell__row">
+              <div class="boot-shell__pill">Deploy still settling</div>
+              <div class="boot-shell__pill">Service cold start</div>
+              <div class="boot-shell__pill">Automatic recovery active</div>
+            </div>
+          </div>
+          <div class="boot-shell__status">
+            <div class="boot-shell__orb"></div>
+            <div class="boot-shell__status-copy">
+              <strong id="boot-shell-status-title">Booting FocusFeed</strong>
+              <span id="boot-shell-status-text">If the app does not mount shortly, we will switch to maintenance mode automatically.</span>
+            </div>
+          </div>
+          <div class="boot-shell__actions">
+            <button class="boot-shell__button" type="button" onclick="window.location.reload()">Try Again</button>
+            <button class="boot-shell__button boot-shell__secondary" type="button" onclick="window.location.href='/'">Go Home</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="root"></div>
+    <script>
+      (function () {
+        var bootState = "loading";
+        var bootTimer = null;
+        var statusTitle = document.getElementById("boot-shell-status-title");
+        var statusText = document.getElementById("boot-shell-status-text");
+
+        function setBootState(nextState) {
+          if (bootState === "ready" && nextState !== "ready") return;
+          bootState = nextState;
+          document.body.setAttribute("data-focusfeed-boot", nextState);
+
+          if (nextState === "maintenance") {
+            if (statusTitle) statusTitle.textContent = "Maintenance mode";
+            if (statusText) statusText.textContent = "The app shell did not finish loading in time. Refresh and we will try the run again.";
+          }
+
+          if (nextState === "ready") {
+            if (bootTimer) window.clearTimeout(bootTimer);
+          }
+        }
+
+        window.addEventListener("focusfeed:boot-ready", function () {
+          setBootState("ready");
+        });
+
+        window.addEventListener("focusfeed:boot-error", function () {
+          setBootState("maintenance");
+        });
+
+        bootTimer = window.setTimeout(function () {
+          setBootState("maintenance");
+        }, 9000);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
